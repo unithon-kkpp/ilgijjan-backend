@@ -1,0 +1,72 @@
+name: deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run chmod to make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set environment values
+        run: |
+          mkdir -p src/main/resources/{gcp}
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.yml
+          echo "${{ secrets.GCP_SERVICE_KEY }}" | base64 --decode > src/main/resources/gcp/service-key.json
+        shell: bash
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: clean build -x test
+
+      - name: Docker build
+        run: |
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker build -t ilgijjan_spring .
+          docker tag ilgijjan_spring ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
+
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: GITHUB_SHA
+          script: |
+            sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
+            sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} ilgijjan_spring
+            
+            sudo docker stop ilgijjan_spring || true
+            sudo docker rm ilgijjan_spring || true
+            sudo docker-compose down
+            
+            sudo docker-compose up -d --force-recreate
+            
+            CURRENT_IMAGE_ID=$(sudo docker images --format "{{.Repository}} {{.Tag}} {{.ID}}" | grep "${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }} ${GITHUB_SHA::7}" | awk '{print $3}')
+            
+            for IMAGE_ID in $(sudo docker images ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }} --format "{{.ID}}" | sort -u | grep -v "$CURRENT_IMAGE_ID"); do
+              sudo docker rmi "$IMAGE_ID" || true
+            done
+            
+            sudo docker image prune -f
