@@ -28,6 +28,11 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("mysql:mysql-connector-java:8.0.33")
+	
+	// Google Cloud 
+	implementation("org.springframework.cloud:spring-cloud-gcp-starter:1.2.5.RELEASE")
+	implementation("org.springframework.cloud:spring-cloud-gcp-storage:1.2.5.RELEASE")
 }
 
 kotlin {
