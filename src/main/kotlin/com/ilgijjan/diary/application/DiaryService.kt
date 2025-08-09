@@ -23,8 +23,8 @@ class DiaryService(
     fun createDiary(request: CreateDiaryRequest): CreateDiaryResponse {
         val text = textExtractor.extractText(request.photoUrl, request.text.orEmpty())
         val imageUrl = imageGenerator.generateImage(text, request.weather)
-        val (mp4Url, lyrics) = musicGenerator.generateMusic(text)
-        val command = CreateDiaryCommand.of(request, text, imageUrl, mp4Url, lyrics)
+        val musicResult = musicGenerator.generateMusic(text)
+        val command = CreateDiaryCommand.of(request, text, imageUrl, musicResult.audioUrl, musicResult.lyrics)
         val diary = diaryCreator.create(command)
         return CreateDiaryResponse(diary.id!!)
     }
