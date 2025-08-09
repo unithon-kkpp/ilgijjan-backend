@@ -1,1 +1,1 @@
-rootProject.name = "tada-diary"
+rootProject.name = "ilgijjan"
