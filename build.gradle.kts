@@ -35,7 +35,7 @@ dependencies {
 	implementation("org.springframework.cloud:spring-cloud-gcp-storage:1.2.5.RELEASE")
 
 	// Swagger
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0")
 }
 
 kotlin {
