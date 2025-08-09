@@ -9,7 +9,7 @@ data class ReadDiariesResponse(
     val diaryList: List<DiaryItem>
 ) {
     companion object {
-        private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        private val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
 
         fun from(diaries: List<Diary>): ReadDiariesResponse {
             val items = diaries.map { diary ->

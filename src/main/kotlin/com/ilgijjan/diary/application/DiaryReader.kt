@@ -1,6 +1,7 @@
 package com.ilgijjan.diary.application
 
-import CustomException
+import com.ilgijjan.common.exception.CustomException
+import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.diary.domain.Diary
 import com.ilgijjan.diary.infrastructure.DiaryRepository
 import org.springframework.stereotype.Component

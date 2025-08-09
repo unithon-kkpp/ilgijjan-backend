@@ -34,7 +34,7 @@ data class ReadDiaryResponse(
     val lyrics: String
 ) {
     companion object {
-        private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        private val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
 
         fun from(diary: Diary): ReadDiaryResponse {
             return ReadDiaryResponse(

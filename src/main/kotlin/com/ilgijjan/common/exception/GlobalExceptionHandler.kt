@@ -1,4 +1,5 @@
-import jakarta.servlet.http.HttpServletRequest
+package com.ilgijjan.common.exception
+
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -16,97 +17,90 @@ import org.springframework.web.servlet.resource.NoResourceFoundException
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-	private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+	private val log = LoggerFactory.getLogger(this::class.java)
 
-	// 500 : Internal Server Error
 	@ExceptionHandler(Exception::class)
-	fun handleServerException(e: Exception, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleServerException(e: Exception): ResponseEntity<ErrorResponse> {
 		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
-	// 404 : Not Found
 	@ExceptionHandler(NoResourceFoundException::class)
-	protected fun handleNoResourceFoundException(e: NoResourceFoundException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleNoResourceFoundException(e: NoResourceFoundException): ResponseEntity<ErrorResponse> {
 		log.error(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.NOT_FOUND, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.NOT_FOUND)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
-	// 405 : Method Not Allowed
 	@ExceptionHandler(HttpRequestMethodNotSupportedException::class)
-	protected fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException): ResponseEntity<ErrorResponse> {
 		log.error(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.METHOD_NOT_ALLOWED, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.METHOD_NOT_ALLOWED)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
-	// 400 : MethodArgumentNotValidException
 	@ExceptionHandler(MethodArgumentNotValidException::class)
-	fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
 		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
-	// 400 : MethodArgumentType
 	@ExceptionHandler(MethodArgumentTypeMismatchException::class)
-	fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
 		log.error(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_TYPE_VALUE, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_TYPE_VALUE)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
-	// 400 : Bad Request, ModelAttribute
 	@ExceptionHandler(BindException::class)
-	fun handleBindException(e: BindException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleBindException(e: BindException): ResponseEntity<ErrorResponse> {
 		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException::class)
-	fun handleHttpMessageNotReadableException(e: HttpMessageNotReadableException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleHttpMessageNotReadableException(e: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> {
 		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
 	@ExceptionHandler(IllegalArgumentException::class)
-	fun handleIllegalArgumentException(e: IllegalArgumentException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> {
 		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
 	@ExceptionHandler(NoHandlerFoundException::class)
-	fun handleNoHandlerFoundException(e: NoHandlerFoundException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleNoHandlerFoundException(e: NoHandlerFoundException): ResponseEntity<ErrorResponse> {
 		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.NOT_FOUND, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.NOT_FOUND)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
 	@ExceptionHandler(MissingServletRequestParameterException::class)
-	fun handleMissingServletRequestParameterException(e: MissingServletRequestParameterException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleMissingServletRequestParameterException(e: MissingServletRequestParameterException): ResponseEntity<ErrorResponse> {
 		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.MISSING_REQUEST_PARAMETER, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.MISSING_REQUEST_PARAMETER)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
-	// 유효성 검사 에러
 	@ExceptionHandler(HandlerMethodValidationException::class)
-	fun handleHandlerMethodValidationException(e: HandlerMethodValidationException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleHandlerMethodValidationException(e: HandlerMethodValidationException): ResponseEntity<ErrorResponse> {
 		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
-	// Custom Exception
 	@ExceptionHandler(CustomException::class)
-	fun handleCustomException(e: CustomException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+	fun handleCustomException(e: CustomException): ResponseEntity<ErrorResponse> {
+		println(">>> CustomException 잡힘! 메시지: ${e.errorCode.message}")
 		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(e.errorCode, request.requestURI)
-		return ResponseEntity.status(errorResponse.status.value()).body(errorResponse)
+		val errorResponse = ErrorResponse.of(e.errorCode)
+		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 }
