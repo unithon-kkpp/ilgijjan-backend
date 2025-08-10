@@ -19,7 +19,8 @@ data class ReadDiariesResponse(
                     date = diary.createdAt?.format(formatter) ?: "0000.00.00",
                     imageUrl = diary.imageUrl,
                     weather = diary.weather,
-                    introLines = diary.lyrics.take(8)
+                    mood = diary.mood,
+                    introLines = diary.lyrics.take(9)
                 )
             }
             return ReadDiariesResponse(items)
@@ -39,6 +40,9 @@ data class DiaryItem(
 
     @field:Schema(description = "날씨 정보", example = "SUNNY")
     val weather: Weather,
+
+    @field:Schema(description = "감정 정보", example = "5")
+    val mood: Int,
 
     @field:Schema(description = "가사 첫 두마디", example = "빨간 꽃 노란 꽃")
     val introLines: String
