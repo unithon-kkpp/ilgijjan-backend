@@ -13,6 +13,7 @@ interface DiaryRepository : JpaRepository<Diary, Long> {
         SELECT d FROM Diary d 
         WHERE FUNCTION('YEAR', d.createdAt) = :year 
           AND FUNCTION('MONTH', d.createdAt) = :month
+        ORDER BY d.createdAt DESC
     """)
     fun findAllByYearAndMonth(
         @Param("year") year: Int,
