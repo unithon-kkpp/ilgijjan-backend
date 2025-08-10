@@ -1,4 +1,4 @@
-package com.ilgijjan.integration.text
+package com.ilgijjan.integration.text.application
 
 interface TextRefiner {
     fun refineText(text: String): String

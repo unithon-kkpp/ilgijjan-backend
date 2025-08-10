@@ -1,5 +1,6 @@
-package com.ilgijjan.integration.text
+package com.ilgijjan.integration.text.infrastructure
 
+import com.ilgijjan.integration.text.application.TextRefiner
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component

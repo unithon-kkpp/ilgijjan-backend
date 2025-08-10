@@ -1,6 +1,6 @@
 package com.ilgijjan.domain.diary.application
 
-import com.ilgijjan.integration.ocr.OcrProcessor
+import com.ilgijjan.integration.ocr.application.OcrProcessor
 import org.springframework.stereotype.Component
 
 @Component

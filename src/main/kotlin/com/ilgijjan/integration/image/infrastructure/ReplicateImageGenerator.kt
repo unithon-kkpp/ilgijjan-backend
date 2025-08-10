@@ -1,6 +1,7 @@
-package com.ilgijjan.integration.image
+package com.ilgijjan.integration.image.infrastructure
 
 import com.ilgijjan.domain.diary.domain.Weather
+import com.ilgijjan.integration.image.application.ImageGenerator
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component

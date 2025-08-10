@@ -1,4 +1,4 @@
-package com.ilgijjan.integration.image
+package com.ilgijjan.integration.image.application
 
 import com.ilgijjan.domain.diary.domain.Weather
 

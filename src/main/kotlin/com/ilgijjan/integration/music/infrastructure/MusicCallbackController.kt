@@ -1,4 +1,4 @@
-package com.ilgijjan.integration.music
+package com.ilgijjan.integration.music.infrastructure
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty

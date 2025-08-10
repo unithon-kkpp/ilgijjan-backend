@@ -1,6 +1,8 @@
-package com.ilgijjan.integration.music
+package com.ilgijjan.integration.music.infrastructure
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.ilgijjan.integration.music.application.MusicResult
+import com.ilgijjan.integration.music.application.MusicGenerator
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders

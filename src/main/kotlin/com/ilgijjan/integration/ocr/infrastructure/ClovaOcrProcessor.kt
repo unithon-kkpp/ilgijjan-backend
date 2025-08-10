@@ -1,5 +1,6 @@
-package com.ilgijjan.integration.ocr
+package com.ilgijjan.integration.ocr.infrastructure
 
+import com.ilgijjan.integration.ocr.application.OcrProcessor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
