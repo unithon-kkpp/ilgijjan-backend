@@ -8,7 +8,6 @@ import com.ilgijjan.domain.diary.presentation.ReadDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadDiariesResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.awt.SystemColor.text
 
 @Service
 @Transactional(readOnly = true)
@@ -28,12 +27,14 @@ class DiaryService(
 //        val musicResult = musicGenerator.generateMusic(text)
 //        val command = CreateDiaryCommand.of(request, text, imageUrl, musicResult.audioUrl, musicResult.lyrics)
 
+        // Dummy
         val command = CreateDiaryCommand.of(
             request,
             request.text?: "",
-            "https://storage.googleapis.com/kkpp-bucket/06d0882a-dc40-4173-a7c8-203e19d9ed82",
+            "https://storage.googleapis.com/kkpp-bucket/46763f45-6ed8-4cfa-8d69-bdfd2950278d",
             "https://apiboxfiles.erweima.ai/ZWZjZDg4OTAtNmUwMC00ZjM4LWE5OTQtZjdlYzE3MzgwNWYy.mp3",
             "노래 가사..")
+
         val diary = diaryCreator.create(command)
         return CreateDiaryResponse(diary.id!!)
     }
@@ -43,8 +44,8 @@ class DiaryService(
         return ReadDiaryResponse.from(diary)
     }
 
-    fun findAll(): ReadDiariesResponse {
-        val diaries = diaryReader.findAll()
+    fun findAllByYearAndMonth(year: Int, month: Int): ReadDiariesResponse {
+        val diaries = diaryReader.findAllByYearAndMonth(year, month)
         return ReadDiariesResponse.from(diaries)
     }
 }

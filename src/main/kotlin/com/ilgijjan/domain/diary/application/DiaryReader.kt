@@ -15,7 +15,7 @@ class DiaryReader(
             .orElseThrow { CustomException(ErrorCode.DIARY_NOT_FOUND) }
     }
 
-    fun findAll(): List<Diary> {
-        return diaryRepository.findAll()
+    fun findAllByYearAndMonth(year: Int, month: Int): List<Diary> {
+        return diaryRepository.findAllByYearAndMonth(year, month)
     }
 }

@@ -30,8 +30,11 @@ class DiaryController(
 
     @GetMapping
     @Operation(summary = "일기 목록 조회")
-    fun findDiaries(): ResponseEntity<ReadDiariesResponse> {
-        val response = diaryService.findAll()
+    fun findDiaries(
+        @RequestParam year: Int,
+        @RequestParam month: Int
+    ): ResponseEntity<ReadDiariesResponse> {
+        val response = diaryService.findAllByYearAndMonth(year, month)
         return ResponseEntity(response, HttpStatus.OK)
     }
 }
