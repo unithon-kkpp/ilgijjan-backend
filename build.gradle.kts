@@ -37,7 +37,15 @@ dependencies {
 	// Swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0")
 
+	// Jackson
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+	// Webflux
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+	// Netty
+	implementation("io.netty:netty-resolver-dns-native-macos:4.1.123.Final:osx-aarch_64")
+
 }
 
 kotlin {
