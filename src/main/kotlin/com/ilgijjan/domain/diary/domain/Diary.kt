@@ -9,6 +9,7 @@ class Diary (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
+    @Lob
     var text: String,
 
     @Enumerated(EnumType.STRING)

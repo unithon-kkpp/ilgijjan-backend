@@ -17,5 +17,6 @@ enum class ErrorCode(
     MISSING_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, "필수 파라미터가 누락되었습니다."),
 
     // Diary
-    DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, "일기 정보를 찾을 수 없습니다.");
+    DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, "일기 정보를 찾을 수 없습니다."),
+    INVALID_INPUT_FOR_DIARY(HttpStatus.BAD_REQUEST, "photoUrl과 text 중 하나만 값이 있어야 합니다. 둘 다 값이 있거나 둘 다 비어 있으면 안 됩니다.");
 }
