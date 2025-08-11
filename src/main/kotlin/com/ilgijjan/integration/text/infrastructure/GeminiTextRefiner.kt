@@ -22,11 +22,7 @@ class GeminiTextRefiner(
         .build()
 
     override fun refineText(text: String): String {
-        val prompt = """
-        $text
-        Please refine this diary entry into concise English within 100 characters, capturing the core meaning.
-        Respond **only with the refined text**. Do NOT include any explanations, greetings, or additional comments.
-        """.trimIndent()
+        val prompt = "$text Please refine this diary entry into concise English within 80 characters, capturing the core meaning. Output only the refined text without any extra explanations."
 
         val requestBody = mapOf(
             "contents" to listOf(

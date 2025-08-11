@@ -38,11 +38,13 @@ class DiaryService(
     @Transactional
     fun createDiary(request: CreateDiaryRequest): CreateDiaryResponse {
         val text = textExtractor.extractText(request.photoUrl, request.text.orEmpty())
-
-        val musicResult = musicGenerator.generateMusic(text)
-        // 비동기 처리 필요 : 음원 생성 / 텍스트 정제 -> 이미지 생성
         val refinedText = textRefiner.refineText(text)
-        val imageUrl = imageGenerator.generateImage(refinedText, request.weather)
+
+        val musicFuture = musicGenerator.generateMusicAsync(refinedText)
+        val imageFuture = imageGenerator.generateImageAsync(refinedText, request.weather)
+
+        val musicResult = musicFuture.get()
+        val imageUrl = imageFuture.get()
 
         val command = CreateDiaryCommand.of(request, text, imageUrl, musicResult.audioUrl, musicResult.lyrics)
 

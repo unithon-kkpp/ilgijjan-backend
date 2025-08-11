@@ -45,7 +45,6 @@ dependencies {
 
 	// Netty
 	implementation("io.netty:netty-resolver-dns-native-macos:4.1.123.Final:osx-aarch_64")
-
 }
 
 kotlin {

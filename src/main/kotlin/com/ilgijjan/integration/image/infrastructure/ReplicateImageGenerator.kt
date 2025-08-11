@@ -2,23 +2,36 @@ package com.ilgijjan.integration.image.infrastructure
 
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.integration.image.application.ImageGenerator
+import com.ilgijjan.integration.music.application.MusicResult
+import com.ilgijjan.integration.text.infrastructure.GeminiTextRefiner
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import java.util.concurrent.CompletableFuture
 
 @Component
 class ReplicateImageGenerator(
     @Value("\${replicate.api.base-url}") private val baseUrl: String,
     @Value("\${replicate.api.token}") private val apiToken: String,
-    @Value("\${replicate.api.model-version}") private val modelVersion: String
+    @Value("\${replicate.api.model-version}") private val modelVersion: String,
 ) : ImageGenerator {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     private val webClient: WebClient = WebClient.builder()
         .baseUrl(baseUrl)
         .build()
-    override fun generateImage(text: String, weather: Weather): String {
+
+    @Async("asyncExecutor")
+    override fun generateImageAsync(text: String, weather: Weather): CompletableFuture<String> {
+        log.info("[generateImageAsync] 비동기 작업 시작 - 스레드: ${Thread.currentThread().name}")
+        val imageUrl = generateImage(text, weather)
+        log.info("[generateImageAsync] 비동기 작업 종료 - 스레드: ${Thread.currentThread().name}")
+        return CompletableFuture.completedFuture(imageUrl)
+    }
+
+    fun generateImage(text: String, weather: Weather): String {
         val prompt = buildPrompt(text, weather)
 
         val requestBody = mapOf(
@@ -93,11 +106,7 @@ class ReplicateImageGenerator(
     // 77자 이내로 압축 필요 (specified maximum sequence length for this model : 77)
     private fun buildPrompt(text: String, weather: Weather): String {
         val weatherStr = weather.name.lowercase()
-        return """
-             A cute and colorful children's storybook illustration based on the diary text: "$text".
-             Depict the weather as "$weatherStr" in the background and atmosphere.
-             Use a square (1:1) aspect ratio.
-        """.trimIndent()
+        return "Cute, colorful children's storybook illustration from: \"$text\". Show \"$weatherStr\" weather in background. Square (1:1) aspect ratio."
     }
 
     private fun extractImageUrl(output: Any?): String? {

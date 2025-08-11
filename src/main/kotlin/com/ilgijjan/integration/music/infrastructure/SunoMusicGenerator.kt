@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Async
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
@@ -29,22 +30,24 @@ class SunoMusicGenerator(
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
     private val taskFutures = ConcurrentHashMap<String, CompletableFuture<MusicResult>>()
 
+    @Async("asyncExecutor")
+    override fun generateMusicAsync(text: String): CompletableFuture<MusicResult> {
+        log.info("[generateMusicAsync] 비동기 작업 시작 - 스레드: ${Thread.currentThread().name}")
+        val result = generateMusic(text)
+        log.info("[generateMusicAsync] 비동기 작업 완료 - 스레드: ${Thread.currentThread().name}")
+        return CompletableFuture.completedFuture(result)
+    }
+
     // 가사 생성 요청만 하고 taskId 반환
-    override fun generateMusic(text: String): MusicResult {
+    fun generateMusic(text: String): MusicResult {
         log.info("[generateMusic] 시작 - 입력 텍스트 길이: ${text.length}")
         val bannedWords = listOf("오늘", "같이")
         var sanitizedText = text
         bannedWords.forEach { word ->
             sanitizedText = sanitizedText.replace(word, "")
         }
-        val prompt = """
-            다음 일기를 바탕으로 쉽고 기억에 남는 한국어 어린이 동요 가사를 만들어줘. 
-            단어 수는 최대 100단어로 제한해줘.
-            출력은 오직 동요 가사 텍스트만 해줘. 
-            프롬프트 문구나 ‘한국어 동요 노래 만들어줘:’ 같은 말은 절대 포함하지 말고 순수 가사 내용만 보내줘:
-            
-            $sanitizedText
-        """.trimIndent()
+        val prompt = "Based on the following diary, please write only the Korean children's song lyrics in Korean. Diary: $sanitizedText"
+            .take(200)
         val lyricsTaskId = requestLyricsGeneration(prompt)
         log.info("[generateMusic] 가사 생성 요청 완료, taskId: $lyricsTaskId")
 
@@ -99,7 +102,7 @@ class SunoMusicGenerator(
             set("Authorization", "Bearer $apiToken")
         }
         val requestBody = mapOf(
-            "prompt" to "한국어 동요 노래 만들어줘(30초 ~ 40초 이내 길이로): $lyrics",
+            "prompt" to lyrics,
             "customMode" to true,
             "style" to "Children",
             "title" to "Generated Song",
