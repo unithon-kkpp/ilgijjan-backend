@@ -21,6 +21,13 @@ class DiaryController(
         return ResponseEntity(response, HttpStatus.OK)
     }
 
+    @PostMapping
+    @Operation(summary = "일기 작성하기")
+    fun createDiary(@RequestBody @Valid request: CreateDiaryRequest): ResponseEntity<CreateDiaryResponse> {
+        val response = diaryService.createDiary(request)
+        return ResponseEntity(response, HttpStatus.OK)
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "일기 단건 조회")
     fun getDiary(@PathVariable id: Long): ResponseEntity<ReadDiaryResponse> {

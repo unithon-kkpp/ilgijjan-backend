@@ -37,7 +37,14 @@ class SunoMusicGenerator(
         bannedWords.forEach { word ->
             sanitizedText = sanitizedText.replace(word, "")
         }
-        val prompt = "Write a simple, catchy Korean children's song (동요) based on this diary: $sanitizedText"
+        val prompt = """
+            다음 일기를 바탕으로 쉽고 기억에 남는 한국어 어린이 동요 가사를 만들어줘. 
+            단어 수는 최대 100단어로 제한해줘.
+            출력은 오직 동요 가사 텍스트만 해줘. 
+            프롬프트 문구나 ‘한국어 동요 노래 만들어줘:’ 같은 말은 절대 포함하지 말고 순수 가사 내용만 보내줘:
+            
+            $sanitizedText
+        """.trimIndent()
         val lyricsTaskId = requestLyricsGeneration(prompt)
         log.info("[generateMusic] 가사 생성 요청 완료, taskId: $lyricsTaskId")
 
@@ -47,7 +54,7 @@ class SunoMusicGenerator(
 
         try {
             // 최대 60초까지 대기 (필요에 따라 조절)
-            return future.get(60, TimeUnit.SECONDS)
+            return future.get(180, TimeUnit.SECONDS)
         } catch (ex: TimeoutException) {
             taskFutures.remove(lyricsTaskId)
             throw RuntimeException("음악 생성 타임아웃")
@@ -92,7 +99,7 @@ class SunoMusicGenerator(
             set("Authorization", "Bearer $apiToken")
         }
         val requestBody = mapOf(
-            "prompt" to lyrics,
+            "prompt" to "한국어 동요 노래 만들어줘(30초 ~ 40초 이내 길이로): $lyrics",
             "customMode" to true,
             "style" to "Children",
             "title" to "Generated Song",

@@ -20,6 +20,7 @@ class Diary (
 
     var musicUrl: String,
 
+    @Lob
     var lyrics: String,
 
     var mood: Int

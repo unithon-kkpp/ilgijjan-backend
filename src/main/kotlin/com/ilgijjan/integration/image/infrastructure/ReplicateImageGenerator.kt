@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+
 @Component
 class ReplicateImageGenerator(
     @Value("\${replicate.api.base-url}") private val baseUrl: String,
@@ -93,8 +94,9 @@ class ReplicateImageGenerator(
     private fun buildPrompt(text: String, weather: Weather): String {
         val weatherStr = weather.name.lowercase()
         return """
-            A cute and colorful children's storybook illustration based on the following diary text: "$text".
-            Please depict the weather as "$weatherStr" and reflect it clearly in the background and atmosphere.
+             A cute and colorful children's storybook illustration based on the diary text: "$text".
+             Depict the weather as "$weatherStr" in the background and atmosphere.
+             Use a square (1:1) aspect ratio.
         """.trimIndent()
     }
 
