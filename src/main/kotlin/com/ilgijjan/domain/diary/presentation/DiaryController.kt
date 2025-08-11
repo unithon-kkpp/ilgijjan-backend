@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*
 class DiaryController(
     private val diaryService: DiaryService
 ) {
-    @PostMapping
-    @Operation(summary = "일기 작성하기")
-    fun createDiary(@RequestBody @Valid request: CreateDiaryRequest): ResponseEntity<CreateDiaryResponse> {
-        val response = diaryService.createDiary(request)
+    @PostMapping("/test")
+    @Operation(summary = "일기 작성하기 테스트")
+    fun createDiaryWithDummy(@RequestBody @Valid request: CreateDiaryRequest): ResponseEntity<CreateDiaryResponse> {
+        val response = diaryService.createDiaryWithDummy(request)
         return ResponseEntity(response, HttpStatus.OK)
     }
 

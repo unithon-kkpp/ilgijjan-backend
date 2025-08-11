@@ -20,13 +20,7 @@ class DiaryService(
 ) {
 
     @Transactional
-    fun createDiary(request: CreateDiaryRequest): CreateDiaryResponse {
-//        val text = textExtractor.extractText(request.photoUrl, request.text.orEmpty())
-//        // 비동기 처리 필요 : 이미지 생성 / 음원 생성
-//        val imageUrl = imageGenerator.generateImage(text, request.weather)
-//        val musicResult = musicGenerator.generateMusic(text)
-//        val command = CreateDiaryCommand.of(request, text, imageUrl, musicResult.audioUrl, musicResult.lyrics)
-
+    fun createDiaryWithDummy(request: CreateDiaryRequest): CreateDiaryResponse {
         // Dummy
         val command = CreateDiaryCommand.of(
             request,
