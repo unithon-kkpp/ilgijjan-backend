@@ -96,13 +96,15 @@ class SunoMusicGenerator(
 
     // 음악 생성 요청
     fun requestMusicGeneration(lyrics: String): String {
+        val cleanedLyrics = lyrics.replace(Regex("\\[(.*?)]\\n*"), "")
+
         val url = "$sunoBaseUrl/generate"
         val headers = HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
             set("Authorization", "Bearer $apiToken")
         }
         val requestBody = mapOf(
-            "prompt" to lyrics,
+            "prompt" to cleanedLyrics,
             "customMode" to true,
             "style" to "Children",
             "title" to "Generated Song",
