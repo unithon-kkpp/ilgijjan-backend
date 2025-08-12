@@ -11,6 +11,6 @@ class HealthCheckController {
 
     @GetMapping("/health")
     fun healthCheck(): ResponseEntity<String> {
-        return ResponseEntity.ok("Health Check")
+        return ResponseEntity.ok("Health Check!")
     }
 }
