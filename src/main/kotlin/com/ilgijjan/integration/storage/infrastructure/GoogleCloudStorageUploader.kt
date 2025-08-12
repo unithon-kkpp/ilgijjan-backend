@@ -7,6 +7,9 @@ import com.ilgijjan.integration.storage.presentation.StorageResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
+import java.net.HttpURLConnection
+import java.net.URI
+import java.net.URL
 import java.nio.channels.Channels
 import java.util.UUID
 
@@ -31,6 +34,28 @@ class GoogleCloudStorageUploader(
         }
 
         return StorageResponse(generateFileUrl(uuid))
+    }
+
+    override fun uploadFromUrl(imageUrl: String): String {
+        val uuid = UUID.randomUUID().toString()
+
+        val uri = URI.create(imageUrl)
+        val connection = uri.toURL().openConnection() as HttpURLConnection
+        connection.requestMethod = "GET"
+
+        connection.inputStream.use { inputStream ->
+            val blobInfo = BlobInfo.newBuilder(bucketName, uuid)
+                .setContentType("image/png")
+                .build()
+
+            storage.writer(blobInfo).use { writeChannel ->
+                Channels.newOutputStream(writeChannel).use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+        }
+
+        return generateFileUrl(uuid)
     }
 
     private fun generateFileUrl(fileName: String): String {

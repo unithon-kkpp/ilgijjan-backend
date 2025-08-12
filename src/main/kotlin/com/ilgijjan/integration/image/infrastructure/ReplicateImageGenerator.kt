@@ -2,8 +2,7 @@ package com.ilgijjan.integration.image.infrastructure
 
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.integration.image.application.ImageGenerator
-import com.ilgijjan.integration.music.application.MusicResult
-import com.ilgijjan.integration.text.infrastructure.GeminiTextRefiner
+import com.ilgijjan.integration.storage.application.FileUploader
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Async
@@ -16,9 +15,9 @@ class ReplicateImageGenerator(
     @Value("\${replicate.api.base-url}") private val baseUrl: String,
     @Value("\${replicate.api.token}") private val apiToken: String,
     @Value("\${replicate.api.model-version}") private val modelVersion: String,
+    private val fileUploader: FileUploader
 ) : ImageGenerator {
     private val log = LoggerFactory.getLogger(this::class.java)
-
     private val webClient: WebClient = WebClient.builder()
         .baseUrl(baseUrl)
         .build()
@@ -82,8 +81,8 @@ class ReplicateImageGenerator(
 
                     when (pollStatus) {
                         "succeeded" -> {
-                            val output = extractImageUrl(statusResponse["output"])
-                            return output ?: throw RuntimeException("응답에 이미지 URL이 없음")
+                            val output = extractImageUrl(statusResponse["output"]) ?: throw RuntimeException("응답에 이미지 URL이 없음")
+                            return fileUploader.uploadFromUrl(output)
                         }
 
                         "failed", "canceled" -> throw RuntimeException("이미지 생성 실패 또는 취소됨")
@@ -95,7 +94,8 @@ class ReplicateImageGenerator(
 
             "succeeded" -> {
                 val output = extractImageUrl(initialResponse["output"])
-                return output ?: throw RuntimeException("응답에 이미지 URL이 없음")
+                    ?: throw RuntimeException("응답에 이미지 URL이 없음")
+                return fileUploader.uploadFromUrl(output)
             }
 
             "failed", "canceled" -> throw RuntimeException("이미지 생성 실패 또는 취소됨")

@@ -6,6 +6,7 @@ import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
 import com.ilgijjan.domain.diary.presentation.CreateDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadDiariesResponse
+import com.ilgijjan.integration.storage.infrastructure.GoogleCloudStorageUploader
 import com.ilgijjan.integration.text.infrastructure.GeminiTextRefiner
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
