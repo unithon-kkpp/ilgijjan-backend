@@ -19,7 +19,7 @@ data class ReadDiaryResponse(
     val mood: Int,
 
     @field:Schema(description = "일기 내용", example = "오늘은 행복한 하루였다.")
-    val text: String,
+    val text: String?,
 
     @field:Schema(description = "일기장 사진 URL", nullable = true, example = "https://example.com/photo.jpg")
     val photoUrl: String?,
@@ -42,7 +42,7 @@ data class ReadDiaryResponse(
                 date = diary.createdAt?.format(formatter) ?: "0000.00.00",
                 weather = diary.weather,
                 mood = diary.mood,
-                text = diary.text,
+                text = if (diary.photoUrl != null) null else diary.text,
                 photoUrl = diary.photoUrl,
                 imageUrl = diary.imageUrl,
                 musicUrl = diary.musicUrl,
