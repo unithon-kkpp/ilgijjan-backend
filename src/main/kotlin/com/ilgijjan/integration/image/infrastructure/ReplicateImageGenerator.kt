@@ -3,11 +3,17 @@ package com.ilgijjan.integration.image.infrastructure
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.integration.image.application.ImageGenerator
 import com.ilgijjan.integration.storage.application.FileUploader
+import io.netty.channel.ChannelOption
+import io.netty.handler.timeout.ReadTimeoutHandler
+import io.netty.handler.timeout.WriteTimeoutHandler
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.netty.http.client.HttpClient
+import java.time.Duration
 import java.util.concurrent.CompletableFuture
 
 @Component
@@ -18,8 +24,19 @@ class ReplicateImageGenerator(
     private val fileUploader: FileUploader
 ) : ImageGenerator {
     private val log = LoggerFactory.getLogger(this::class.java)
+
     private val webClient: WebClient = WebClient.builder()
         .baseUrl(baseUrl)
+        .clientConnector(ReactorClientHttpConnector(
+            HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10_000) // 연결 타임아웃 10초
+                .responseTimeout(Duration.ofSeconds(300)) // 응답 타임아웃 60초
+                .doOnConnected { conn ->
+                    conn.addHandlerLast(ReadTimeoutHandler(300))
+                    conn.addHandlerLast(WriteTimeoutHandler(300))
+                }
+                .keepAlive(false) // 매 요청마다 새 TCP 연결
+        ))
         .build()
 
     @Async("asyncExecutor")
@@ -62,18 +79,7 @@ class ReplicateImageGenerator(
             "starting", "processing" -> {
                 log.info("작업이 아직 진행 중입니다. 폴링을 시작합니다. id={}", id)
                 while (true) {
-                    val statusResponse = try {
-                        webClient.get()
-                            .uri("/$id")
-                            .header("Authorization", "Bearer $apiToken")
-                            .retrieve()
-                            .bodyToMono(Map::class.java)
-                            .block() ?: throw RuntimeException("상태 조회 응답 없음")
-                    } catch (e: Exception) {
-                        log.error("Replicate 상태 조회 실패", e)
-                        throw e
-                    }
-
+                    val statusResponse = pollStatusWithRetry(id)
                     log.info("폴링 상태 응답 전체: {}", statusResponse)
 
                     val pollStatus = statusResponse["status"] as? String ?: "unknown"
@@ -81,12 +87,12 @@ class ReplicateImageGenerator(
 
                     when (pollStatus) {
                         "succeeded" -> {
-                            val output = extractImageUrl(statusResponse["output"]) ?: throw RuntimeException("응답에 이미지 URL이 없음")
+                            val output = extractImageUrl(statusResponse["output"])
+                                ?: throw RuntimeException("응답에 이미지 URL이 없음")
                             return fileUploader.uploadFromUrl(output)
                         }
-
                         "failed", "canceled" -> throw RuntimeException("이미지 생성 실패 또는 취소됨")
-                        "starting", "processing" -> Thread.sleep(1000)
+                        "starting", "processing" -> Thread.sleep(3000)
                         else -> throw RuntimeException("알 수 없는 상태: $pollStatus")
                     }
                 }
@@ -115,5 +121,26 @@ class ReplicateImageGenerator(
             is List<*> -> output.firstOrNull() as? String
             else -> null
         }
+    }
+
+    private fun pollStatusWithRetry(id: String, maxRetries: Int = 3): Map<*, *> {
+        var attempt = 0
+        var lastError: Exception? = null
+        while (attempt < maxRetries) {
+            try {
+                return webClient.get()
+                    .uri("/$id")
+                    .header("Authorization", "Bearer $apiToken")
+                    .retrieve()
+                    .bodyToMono(Map::class.java)
+                    .block() ?: throw RuntimeException("상태 조회 응답 없음")
+            } catch (e: Exception) {
+                log.warn("폴링 상태 조회 실패 (재시도 ${attempt + 1}/$maxRetries)", e)
+                lastError = e
+                Thread.sleep(2000)
+                attempt++
+            }
+        }
+        throw lastError ?: RuntimeException("알 수 없는 폴링 실패")
     }
 }

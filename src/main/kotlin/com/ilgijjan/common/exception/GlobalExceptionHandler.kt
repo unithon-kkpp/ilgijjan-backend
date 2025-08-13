@@ -28,12 +28,12 @@ class GlobalExceptionHandler {
 		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
-	@ExceptionHandler(NoResourceFoundException::class)
-	fun handleNoResourceFoundException(e: NoResourceFoundException): ResponseEntity<ErrorResponse> {
-		log.error(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.NOT_FOUND)
-		return ResponseEntity.status(errorResponse.status).body(errorResponse)
-	}
+//	@ExceptionHandler(NoResourceFoundException::class)
+//	fun handleNoResourceFoundException(e: NoResourceFoundException): ResponseEntity<ErrorResponse> {
+//		log.error(e.message, e)
+//		val errorResponse = ErrorResponse.of(ErrorCode.NOT_FOUND)
+//		return ResponseEntity.status(errorResponse.status).body(errorResponse)
+//	}
 
 	@ExceptionHandler(HttpRequestMethodNotSupportedException::class)
 	fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException): ResponseEntity<ErrorResponse> {
