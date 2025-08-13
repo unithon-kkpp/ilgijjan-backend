@@ -1,6 +1,8 @@
 package com.ilgijjan.integration.music.infrastructure
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.ilgijjan.common.exception.CustomException
+import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.integration.music.application.MusicResult
 import com.ilgijjan.integration.music.application.MusicGenerator
 import org.springframework.beans.factory.annotation.Value
@@ -57,10 +59,10 @@ class SunoMusicGenerator(
 
         try {
             // 최대 60초까지 대기 (필요에 따라 조절)
-            return future.get(180, TimeUnit.SECONDS)
+            return future.get(300, TimeUnit.SECONDS)
         } catch (ex: TimeoutException) {
             taskFutures.remove(lyricsTaskId)
-            throw RuntimeException("음악 생성 타임아웃")
+            throw CustomException(ErrorCode.MUSIC_GENERATE_TIMEOUT)
         } catch (ex: Exception) {
             taskFutures.remove(lyricsTaskId)
             throw ex

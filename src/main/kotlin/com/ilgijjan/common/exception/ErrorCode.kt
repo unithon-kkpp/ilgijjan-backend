@@ -18,5 +18,8 @@ enum class ErrorCode(
 
     // Diary
     DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, "일기 정보를 찾을 수 없습니다."),
-    INVALID_INPUT_FOR_DIARY(HttpStatus.BAD_REQUEST, "photoUrl과 text 중 하나만 값이 있어야 합니다. 둘 다 값이 있거나 둘 다 비어 있으면 안 됩니다.");
+    INVALID_INPUT_FOR_DIARY(HttpStatus.BAD_REQUEST, "photoUrl과 text 중 하나만 값이 있어야 합니다. 둘 다 값이 있거나 둘 다 비어 있으면 안 됩니다."),
+
+    // Music
+    MUSIC_GENERATE_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "음악 생성 타임아웃");
 }
