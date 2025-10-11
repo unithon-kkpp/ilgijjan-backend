@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import java.net.HttpURLConnection
 import java.net.URI
-import java.net.URL
 import java.nio.channels.Channels
 import java.util.UUID
 

@@ -58,7 +58,6 @@ class SunoMusicGenerator(
         taskFutures[lyricsTaskId] = future
 
         try {
-            // 최대 60초까지 대기 (필요에 따라 조절)
             return future.get(300, TimeUnit.SECONDS)
         } catch (ex: TimeoutException) {
             taskFutures.remove(lyricsTaskId)
