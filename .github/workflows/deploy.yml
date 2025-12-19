@@ -40,8 +40,8 @@ jobs:
       - name: Docker build
         run: |
           echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-          docker build -t ilgijjan_spring .
-          docker tag ilgijjan_spring ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
+          docker build -t ilgijjan-server .
+          docker tag ilgijjan-server ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
 
       - name: Deploy
@@ -55,10 +55,10 @@ jobs:
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
-            sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} ilgijjan_spring
+            sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} ilgijjan-server
             
-            sudo docker stop ilgijjan_spring || true
-            sudo docker rm ilgijjan_spring || true
+            sudo docker stop ilgijjan-server || true
+            sudo docker rm ilgijjan-server || true
             sudo docker-compose down
             
             sudo docker-compose up -d --force-recreate
