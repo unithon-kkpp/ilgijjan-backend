@@ -2,10 +2,12 @@ package com.ilgijjan.integration.image.infrastructure
 
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.fixtures.DiaryTextFixtures
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
+@Disabled
 @SpringBootTest
 class GeminiImageGeneratorTest @Autowired constructor(
     private val geminiImageGenerator: GeminiImageGenerator

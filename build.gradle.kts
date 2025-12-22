@@ -33,6 +33,7 @@ dependencies {
 	// Google Cloud 
 	implementation("org.springframework.cloud:spring-cloud-gcp-starter:1.2.5.RELEASE")
 	implementation("org.springframework.cloud:spring-cloud-gcp-storage:1.2.5.RELEASE")
+    implementation("com.google.cloud:google-cloud-vision:3.34.0")
 
 	// Swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0")
