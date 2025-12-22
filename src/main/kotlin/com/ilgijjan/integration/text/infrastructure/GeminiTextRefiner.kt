@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Component
 class GeminiTextRefiner(
-    @Value("\${gemini.api.url}")
+    @Value("\${gemini.api.text-url}")
     private val apiUrl: String,
     @Value("\${gemini.api.key}")
     private val apiKey: String
