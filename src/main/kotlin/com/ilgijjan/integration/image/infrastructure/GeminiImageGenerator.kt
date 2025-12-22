@@ -105,10 +105,18 @@ class GeminiImageGenerator(
     private fun buildPrompt(text: String, weather: Weather): String {
         val weatherStr = weather.name.lowercase()
         return """
-            Cute, colorful children's storybook illustration based on this story: "$text". 
-            Show "$weatherStr" weather in background. 
-            Square (1:1) aspect ratio.
-            Do not include text in the image.
+            Generate an image directly based on the details below.
+            
+            [Content]
+            Story: "$text"
+            Weather: "$weatherStr"
+            Style: Cute children's storybook illustration.
+            Ratio: Square (1:1)
+
+            [CRITICAL INSTRUCTION]
+            1. Output ONLY the image.
+            2. DO NOT generate any text, conversation, or introduction (e.g., "Here is the image").
+            3. JUST GENERATE THE IMAGE DATA.
         """.trimIndent()
     }
 
