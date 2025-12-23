@@ -11,19 +11,19 @@ import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.filter.GenericFilterBean
+import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
 class JwtAuthenticationFilter(
     private val jwtTokenProvider: JwtTokenProvider,
     private val objectMapper: ObjectMapper
-) : GenericFilterBean() {
+) : OncePerRequestFilter() {
 
     private val log = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
 
-    override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+    override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         try {
-            val token = jwtTokenProvider.resolveToken(request as HttpServletRequest)
+            val token = jwtTokenProvider.resolveToken(request)
 
             if (token != null) {
                 jwtTokenProvider.validateToken(token)
@@ -31,10 +31,10 @@ class JwtAuthenticationFilter(
                 SecurityContextHolder.getContext().authentication = authentication
             }
 
-            chain.doFilter(request, response)
+            filterChain.doFilter(request, response)
 
         } catch (e: CustomException) {
-            setErrorResponse(response as HttpServletResponse, e)
+            setErrorResponse(response, e)
         }
     }
 
