@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(LoginUserResolverTest.TestController::class)
-class LoginUserResolverTest @Autowired constructor(
+class LoginUserArgumentResolverTest @Autowired constructor(
     private val mockMvc: MockMvc,
     private val jwtTokenProvider: JwtTokenProvider
 ) {
