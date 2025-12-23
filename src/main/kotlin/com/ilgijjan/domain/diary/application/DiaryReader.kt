@@ -5,6 +5,7 @@ import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.domain.diary.domain.Diary
 import com.ilgijjan.domain.diary.infrastructure.DiaryRepository
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 class DiaryReader(
@@ -16,6 +17,8 @@ class DiaryReader(
     }
 
     fun findAllByUserIdAndDate(userId: Long, year: Int, month: Int): List<Diary> {
-        return diaryRepository.findAllByUserIdAndYearAndMonth(userId, year, month)
+        val startOfMonth = LocalDateTime.of(year, month, 1, 0, 0)
+        val endOfMonth = startOfMonth.plusMonths(1)
+        return diaryRepository.findAllByUserIdAndDateRange(userId, startOfMonth, endOfMonth)
     }
 }
