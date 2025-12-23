@@ -21,5 +21,10 @@ enum class ErrorCode(
     INVALID_INPUT_FOR_DIARY(HttpStatus.BAD_REQUEST, "photoUrl과 text 중 하나만 값이 있어야 합니다. 둘 다 값이 있거나 둘 다 비어 있으면 안 됩니다."),
 
     // Music
-    MUSIC_GENERATE_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "음악 생성 타임아웃");
+    MUSIC_GENERATE_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "음악 생성 타임아웃"),
+
+    // Jwt
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+    TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "요청 헤더에 토큰이 존재하지 않습니다.");
 }
