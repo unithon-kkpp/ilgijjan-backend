@@ -8,14 +8,18 @@ import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.GenericFilterBean
 import java.io.IOException
 
 class JwtAuthenticationFilter(
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val objectMapper: ObjectMapper
 ) : GenericFilterBean() {
+
+    private val log = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
         try {
@@ -35,8 +39,6 @@ class JwtAuthenticationFilter(
     }
 
     private fun setErrorResponse(response: HttpServletResponse, e: CustomException) {
-        val objectMapper = ObjectMapper()
-
         response.status = e.errorCode.status.value()
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         response.characterEncoding = "UTF-8"
@@ -46,7 +48,6 @@ class JwtAuthenticationFilter(
         try {
             response.writer.write(objectMapper.writeValueAsString(errorResponse))
         } catch (ioException: IOException) {
-            ioException.printStackTrace()
-        }
+            log.error("Filter Response Writer Error: {}", ioException.message, ioException)        }
     }
 }

@@ -1,5 +1,6 @@
 package com.ilgijjan.common.config
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.ilgijjan.common.jwt.JwtAuthenticationEntryPoint
 import com.ilgijjan.common.jwt.JwtAuthenticationFilter
 import com.ilgijjan.common.jwt.JwtTokenProvider
@@ -15,7 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 class SecurityConfig(
     private val jwtTokenProvider: JwtTokenProvider,
-    private val authenticationEntryPoint: JwtAuthenticationEntryPoint
+    private val authenticationEntryPoint: JwtAuthenticationEntryPoint,
+    private val objectMapper: ObjectMapper
 ) {
 
     @Bean
@@ -30,8 +32,7 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/api/auth/**",
-                    "/swagger-ui/**", "/v3/api-docs/**",
-                    "/h2-console/**"
+                    "/swagger-ui/**", "/v3/api-docs/**"
                 ).permitAll()
                     .anyRequest().authenticated()
             }
@@ -39,7 +40,7 @@ class SecurityConfig(
                 it.authenticationEntryPoint(authenticationEntryPoint)
             }
             .addFilterBefore(
-                JwtAuthenticationFilter(jwtTokenProvider),
+                JwtAuthenticationFilter(jwtTokenProvider, objectMapper),
                 UsernamePasswordAuthenticationFilter::class.java
             )
 
