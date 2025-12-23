@@ -25,12 +25,12 @@ class LoginUserArgumentResolver : HandlerMethodArgumentResolver {
         webRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?
     ): Any {
-        val authentication = SecurityContextHolder.getContext().authentication
+        val principal = SecurityContextHolder.getContext().authentication?.principal
 
-        if (authentication == null || authentication.principal == "anonymousUser") {
+        if (principal !is Long) {
             throw CustomException(ErrorCode.INVALID_TOKEN)
         }
 
-        return authentication.principal.toString().toLong()
+        return principal
     }
 }
