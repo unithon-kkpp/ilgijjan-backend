@@ -16,7 +16,7 @@ class LoginUserArgumentResolver : HandlerMethodArgumentResolver {
 
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.hasParameterAnnotation(LoginUser::class.java) &&
-                parameter.parameterType == Long::class.java
+                (parameter.parameterType == Long::class.javaObjectType || parameter.parameterType == Long::class.java)
     }
 
     override fun resolveArgument(
