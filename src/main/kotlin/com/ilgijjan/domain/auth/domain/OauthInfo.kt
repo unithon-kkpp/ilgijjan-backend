@@ -5,7 +5,7 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 
 @Embeddable
-class OauthInfo (
+data class OauthInfo (
     @Enumerated(EnumType.STRING)
     val provider: OauthProvider,
 
