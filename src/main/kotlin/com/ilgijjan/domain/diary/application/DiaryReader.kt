@@ -5,17 +5,20 @@ import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.domain.diary.domain.Diary
 import com.ilgijjan.domain.diary.infrastructure.DiaryRepository
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 class DiaryReader(
     private val diaryRepository: DiaryRepository
 ) {
-    fun getDiaryById(id: Long): Diary {
-        return diaryRepository.findById(id)
+    fun getDiaryById(diaryId: Long): Diary {
+        return diaryRepository.findById(diaryId)
             .orElseThrow { CustomException(ErrorCode.DIARY_NOT_FOUND) }
     }
 
-    fun findAllByYearAndMonth(year: Int, month: Int): List<Diary> {
-        return diaryRepository.findAllByYearAndMonth(year, month)
+    fun findAllByUserIdAndDate(userId: Long, year: Int, month: Int): List<Diary> {
+        val startOfMonth = LocalDateTime.of(year, month, 1, 0, 0)
+        val endOfMonth = startOfMonth.plusMonths(1)
+        return diaryRepository.findAllByUserIdAndDateRange(userId, startOfMonth, endOfMonth)
     }
 }
