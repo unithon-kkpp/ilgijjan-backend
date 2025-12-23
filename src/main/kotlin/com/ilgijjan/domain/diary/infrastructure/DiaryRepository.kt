@@ -11,11 +11,13 @@ interface DiaryRepository : JpaRepository<Diary, Long> {
 
     @Query("""
         SELECT d FROM Diary d 
-        WHERE FUNCTION('YEAR', d.createdAt) = :year 
+        WHERE d.user.id = :userId
+          AND FUNCTION('YEAR', d.createdAt) = :year 
           AND FUNCTION('MONTH', d.createdAt) = :month
         ORDER BY d.createdAt DESC
     """)
-    fun findAllByYearAndMonth(
+    fun findAllByUserIdAndYearAndMonth(
+        @Param("userId") userId: Long,
         @Param("year") year: Int,
         @Param("month") month: Int
     ): List<Diary>

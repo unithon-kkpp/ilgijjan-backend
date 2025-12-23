@@ -2,9 +2,11 @@ package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
+import com.ilgijjan.domain.user.domain.User
 
 data class CreateDiaryCommand(
     val text: String,
+    val user: User,
     val weather: Weather,
     val photoUrl: String?,
     val imageUrl: String,
@@ -15,6 +17,7 @@ data class CreateDiaryCommand(
     companion object {
         fun of(
             request: CreateDiaryRequest,
+            user: User,
             text: String,
             imageUrl: String,
             musicUrl: String,
@@ -22,6 +25,7 @@ data class CreateDiaryCommand(
         ): CreateDiaryCommand {
             return CreateDiaryCommand(
                 text = text,
+                user = user,
                 weather = request.weather,
                 photoUrl = request.photoUrl,
                 imageUrl = imageUrl,

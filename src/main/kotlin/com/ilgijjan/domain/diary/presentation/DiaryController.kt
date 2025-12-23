@@ -1,5 +1,6 @@
 package com.ilgijjan.domain.diary.presentation
 
+import com.ilgijjan.common.annotation.LoginUser
 import com.ilgijjan.domain.diary.application.DiaryService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -16,32 +17,39 @@ class DiaryController(
 ) {
     @PostMapping("/test")
     @Operation(summary = "일기 작성하기 테스트")
-    fun createDiaryWithDummy(@RequestBody @Valid request: CreateDiaryRequest): ResponseEntity<CreateDiaryResponse> {
-        val response = diaryService.createDiaryWithDummy(request)
+    fun createDiaryWithDummy(
+        @LoginUser userId: Long,
+        @RequestBody @Valid request: CreateDiaryRequest
+    ): ResponseEntity<CreateDiaryResponse> {
+        val response = diaryService.createDiaryWithDummy(userId, request)
         return ResponseEntity(response, HttpStatus.OK)
     }
 
     @PostMapping
     @Operation(summary = "일기 작성하기")
-    fun createDiary(@RequestBody @Valid request: CreateDiaryRequest): ResponseEntity<CreateDiaryResponse> {
-        val response = diaryService.createDiary(request)
+    fun createDiary(
+        @LoginUser userId: Long,
+        @RequestBody @Valid request: CreateDiaryRequest
+    ): ResponseEntity<CreateDiaryResponse> {
+        val response = diaryService.createDiary(userId, request)
         return ResponseEntity(response, HttpStatus.OK)
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{diaryId}")
     @Operation(summary = "일기 단건 조회")
-    fun getDiary(@PathVariable id: Long): ResponseEntity<ReadDiaryResponse> {
-        val response = diaryService.getDiaryById(id)
+    fun getDiary(@PathVariable diaryId: Long): ResponseEntity<ReadDiaryResponse> {
+        val response = diaryService.getDiaryById(diaryId)
         return ResponseEntity(response, HttpStatus.OK)
     }
 
     @GetMapping
-    @Operation(summary = "일기 목록 조회")
-    fun findDiaries(
+    @Operation(summary = "내 일기 목록 조회")
+    fun findMyDiaries(
+        @LoginUser userId: Long,
         @RequestParam year: Int,
         @RequestParam month: Int
     ): ResponseEntity<ReadDiariesResponse> {
-        val response = diaryService.findAllByYearAndMonth(year, month)
+        val response = diaryService.findMyDiariesByYearAndMonth(userId, year, month)
         return ResponseEntity(response, HttpStatus.OK)
     }
 }

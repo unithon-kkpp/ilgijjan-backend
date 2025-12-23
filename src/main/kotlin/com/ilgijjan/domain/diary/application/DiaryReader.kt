@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component
 class DiaryReader(
     private val diaryRepository: DiaryRepository
 ) {
-    fun getDiaryById(id: Long): Diary {
-        return diaryRepository.findById(id)
+    fun getDiaryById(diaryId: Long): Diary {
+        return diaryRepository.findById(diaryId)
             .orElseThrow { CustomException(ErrorCode.DIARY_NOT_FOUND) }
     }
 
-    fun findAllByYearAndMonth(year: Int, month: Int): List<Diary> {
-        return diaryRepository.findAllByYearAndMonth(year, month)
+    fun findAllByUserIdAndDate(userId: Long, year: Int, month: Int): List<Diary> {
+        return diaryRepository.findAllByUserIdAndYearAndMonth(userId, year, month)
     }
 }

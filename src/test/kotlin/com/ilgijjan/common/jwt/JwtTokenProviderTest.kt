@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest
 class JwtTokenProviderTest @Autowired constructor(
     private val jwtTokenProvider: JwtTokenProvider
 ) {
+    private val log = org.slf4j.LoggerFactory.getLogger(javaClass)
 
     @Test
     @Disabled("개발 시 임시 토큰이 필요할 때만 수동으로 실행")
@@ -22,12 +23,10 @@ class JwtTokenProviderTest @Autowired constructor(
         val userId = 1L
 
         // when
-        val accessToken = jwtTokenProvider.createToken(userId, TokenType.ACCESS)
-        val refreshToken = jwtTokenProvider.createToken(userId, TokenType.REFRESH)
+        val accessToken = jwtTokenProvider.createToken(userId, TokenType.TEST)
 
         // then
-        println("Access Token: $accessToken")
-        println("Refresh Token: $refreshToken")
+        log.info("Access Token: $accessToken")
     }
 
     @Test
