@@ -46,6 +46,12 @@ dependencies {
 
 	// Netty
 	implementation("io.netty:netty-resolver-dns-native-macos:4.1.123.Final:osx-aarch_64")
+
+    // Security
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 }
 
 kotlin {

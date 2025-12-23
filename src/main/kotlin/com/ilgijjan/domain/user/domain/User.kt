@@ -24,14 +24,14 @@ class User(
     val oauthInfo: OauthInfo,
 
     @Enumerated(EnumType.STRING)
-    var character : Character
+    var avatar : Avatar
 ) : BaseEntity() {
 
     fun updateName(name: String) {
         this.name = name
     }
 
-    fun updateCharacter(character: Character) {
-        this.character = character
+    fun updateAvatar(avatar: Avatar) {
+        this.avatar = avatar
     }
 }

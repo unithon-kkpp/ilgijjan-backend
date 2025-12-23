@@ -1,0 +1,48 @@
+package com.ilgijjan.common.config
+
+import com.ilgijjan.common.jwt.JwtAuthenticationEntryPoint
+import com.ilgijjan.common.jwt.JwtAuthenticationFilter
+import com.ilgijjan.common.jwt.JwtTokenProvider
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+
+@Configuration
+@EnableWebSecurity
+class SecurityConfig(
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val authenticationEntryPoint: JwtAuthenticationEntryPoint
+) {
+
+    @Bean
+    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+        http
+            .csrf { it.disable() }
+            .formLogin { it.disable() }
+            .httpBasic { it.disable() }
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }
+            .authorizeHttpRequests {
+                it.requestMatchers(
+                    "/api/auth/**",
+                    "/swagger-ui/**", "/v3/api-docs/**",
+                    "/h2-console/**"
+                ).permitAll()
+                    .anyRequest().authenticated()
+            }
+            .exceptionHandling {
+                it.authenticationEntryPoint(authenticationEntryPoint)
+            }
+            .addFilterBefore(
+                JwtAuthenticationFilter(jwtTokenProvider),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
+
+        return http.build()
+    }
+}
