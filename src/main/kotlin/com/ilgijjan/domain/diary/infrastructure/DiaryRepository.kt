@@ -1,7 +1,9 @@
 package com.ilgijjan.domain.diary.infrastructure
 
 import com.ilgijjan.domain.diary.domain.Diary
+import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
@@ -22,4 +24,8 @@ interface DiaryRepository : JpaRepository<Diary, Long> {
         @Param("startOfMonth") startOfMonth: LocalDateTime,
         @Param("endOfMonth") endOfMonth: LocalDateTime
     ): List<Diary>
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select d from Diary d where d.id = :id")
+    fun findByIdWithLock(id: Long): Diary?
 }

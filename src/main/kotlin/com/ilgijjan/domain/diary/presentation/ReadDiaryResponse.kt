@@ -31,7 +31,10 @@ data class ReadDiaryResponse(
     val musicUrl: String,
 
     @field:Schema(description = "가사", example = "...")
-    val lyrics: String
+    val lyrics: String,
+
+    @field:Schema(description = "좋아요 수", example = "10")
+    val likeCount: Long
 ) {
     companion object {
         private val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
@@ -46,7 +49,8 @@ data class ReadDiaryResponse(
                 photoUrl = diary.photoUrl,
                 imageUrl = diary.imageUrl,
                 musicUrl = diary.musicUrl,
-                lyrics = diary.lyrics
+                lyrics = diary.lyrics,
+                likeCount = diary.likeCount
             )
         }
     }

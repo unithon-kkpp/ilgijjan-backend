@@ -1,6 +1,8 @@
 package com.ilgijjan.domain.diary.domain
 
 import com.ilgijjan.common.domain.BaseEntity
+import com.ilgijjan.common.exception.CustomException
+import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.domain.user.domain.User
 import jakarta.persistence.*
 
@@ -29,6 +31,19 @@ class Diary (
     @Lob
     var lyrics: String,
 
-    var mood: Int
+    var mood: Int,
 
-) : BaseEntity()
+    var likeCount: Long = 0
+
+) : BaseEntity() {
+    fun increaseLikeCount() {
+        this.likeCount++
+    }
+
+    fun decreaseLikeCount() {
+        if (this.likeCount <= 0) {
+            throw CustomException(ErrorCode.INVALID_LIKE_COUNT)
+        }
+        this.likeCount--
+    }
+}
