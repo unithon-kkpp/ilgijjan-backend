@@ -29,5 +29,8 @@ enum class ErrorCode(
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "요청 헤더에 토큰이 존재하지 않습니다."),
 
     // User
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보를 찾을 수 없습니다.");
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보를 찾을 수 없습니다."),
+
+    // Like
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요 정보를 찾을 수 없습니다.");
 }

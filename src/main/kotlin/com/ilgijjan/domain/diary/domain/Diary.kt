@@ -29,6 +29,18 @@ class Diary (
     @Lob
     var lyrics: String,
 
-    var mood: Int
+    var mood: Int,
 
-) : BaseEntity()
+    var likeCount: Long = 0
+
+) : BaseEntity() {
+    fun increaseLikeCount() {
+        this.likeCount++
+    }
+
+    fun decreaseLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--
+        }
+    }
+}
