@@ -12,6 +12,11 @@ class DiaryReader(
     private val diaryRepository: DiaryRepository
 ) {
     fun getDiaryById(diaryId: Long): Diary {
+        return diaryRepository.findById(diaryId)
+            .orElseThrow { CustomException(ErrorCode.DIARY_NOT_FOUND) }
+    }
+
+    fun getDiaryByIdWithLock(diaryId: Long): Diary {
         return diaryRepository.findByIdWithLock(diaryId)
             ?: throw CustomException(ErrorCode.DIARY_NOT_FOUND)
     }

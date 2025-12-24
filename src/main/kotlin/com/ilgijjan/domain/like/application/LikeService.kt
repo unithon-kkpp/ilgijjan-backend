@@ -15,7 +15,7 @@ class LikeService (
 ) {
     @Transactional
     fun addLike(diaryId: Long, userId: Long) {
-        val diary = diaryReader.getDiaryById(diaryId)
+        val diary = diaryReader.getDiaryByIdWithLock(diaryId)
         val user = userReader.getUserById(userId)
         val existingLike = likeReader.findByDiaryAndUser(diary, user)
         likeManager.add(diary, user, existingLike)
@@ -23,7 +23,7 @@ class LikeService (
 
     @Transactional
     fun removeLike(diaryId: Long, userId: Long) {
-        val diary = diaryReader.getDiaryById(diaryId)
+        val diary = diaryReader.getDiaryByIdWithLock(diaryId)
         val user = userReader.getUserById(userId)
         val like = likeReader.getByDiaryAndUser(diary, user)
         likeManager.remove(diary, like)
