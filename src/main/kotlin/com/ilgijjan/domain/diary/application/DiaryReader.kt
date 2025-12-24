@@ -12,8 +12,8 @@ class DiaryReader(
     private val diaryRepository: DiaryRepository
 ) {
     fun getDiaryById(diaryId: Long): Diary {
-        return diaryRepository.findById(diaryId)
-            .orElseThrow { CustomException(ErrorCode.DIARY_NOT_FOUND) }
+        return diaryRepository.findByIdWithLock(diaryId)
+            ?: throw CustomException(ErrorCode.DIARY_NOT_FOUND)
     }
 
     fun findAllByUserIdAndDate(userId: Long, year: Int, month: Int): List<Diary> {
