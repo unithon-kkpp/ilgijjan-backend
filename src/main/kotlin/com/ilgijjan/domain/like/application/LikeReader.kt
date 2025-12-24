@@ -13,7 +13,7 @@ class LikeReader(
     private val likeRepository: LikeRepository
 ) {
     fun getByDiaryAndUser(diary: Diary, user: User): Like {
-        return likeRepository.findByDiaryAndUser(diary, user)
+        return findByDiaryAndUser(diary, user)
             ?: throw CustomException(ErrorCode.LIKE_NOT_FOUND)
     }
 
