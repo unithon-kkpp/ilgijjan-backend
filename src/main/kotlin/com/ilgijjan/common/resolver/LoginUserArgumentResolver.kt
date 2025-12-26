@@ -3,6 +3,7 @@ package com.ilgijjan.common.resolver
 import com.ilgijjan.common.annotation.LoginUser
 import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorCode
+import com.ilgijjan.common.utils.SecurityUtil
 import org.springframework.core.MethodParameter
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
@@ -12,7 +13,9 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 
 @Component
-class LoginUserArgumentResolver : HandlerMethodArgumentResolver {
+class LoginUserArgumentResolver(
+    private val securityUtil: SecurityUtil
+) : HandlerMethodArgumentResolver{
 
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.hasParameterAnnotation(LoginUser::class.java) &&
@@ -25,12 +28,6 @@ class LoginUserArgumentResolver : HandlerMethodArgumentResolver {
         webRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?
     ): Any {
-        val principal = SecurityContextHolder.getContext().authentication?.principal
-
-        if (principal !is Long) {
-            throw CustomException(ErrorCode.INVALID_TOKEN)
-        }
-
-        return principal
+        return securityUtil.getCurrentUserId()
     }
 }

@@ -1,5 +1,6 @@
 package com.ilgijjan.domain.diary.application
 
+import com.ilgijjan.common.annotation.CheckDiaryOwner
 import com.ilgijjan.integration.image.application.ImageGenerator
 import com.ilgijjan.integration.music.application.MusicGenerator
 import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 class DiaryService(
     private val diaryCreator: DiaryCreator,
     private val diaryReader: DiaryReader,
+    private val diaryUpdater: DiaryUpdater,
     private val textExtractor: TextExtractor,
     private val textRefiner: GeminiTextRefiner,
     private val imageGenerator: ImageGenerator,
@@ -67,5 +69,17 @@ class DiaryService(
     fun findMyDiariesByYearAndMonth(userId: Long, year: Int, month: Int): ReadDiariesResponse {
         val diaries = diaryReader.findAllByUserIdAndDate(userId, year, month)
         return ReadDiariesResponse.from(diaries)
+    }
+
+    @Transactional
+    @CheckDiaryOwner
+        fun publishDiary(diaryId: Long) {
+        diaryUpdater.publish(diaryId)
+    }
+
+    @Transactional
+    @CheckDiaryOwner
+    fun unpublishDiary(diaryId: Long) {
+        diaryUpdater.unpublish(diaryId)
     }
 }

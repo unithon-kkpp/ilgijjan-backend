@@ -52,4 +52,24 @@ class DiaryController(
         val response = diaryService.findMyDiariesByYearAndMonth(userId, year, month)
         return ResponseEntity(response, HttpStatus.OK)
     }
+
+    @PatchMapping("/{diaryId}/publish")
+    @Operation(summary = "일기 공개 설정")
+    fun publishDiary(
+        @PathVariable diaryId: Long,
+        @LoginUser userId: Long 
+    ): ResponseEntity<Unit> {
+        diaryService.publishDiary(diaryId)
+        return ResponseEntity.ok().build()
+    }
+
+    @PatchMapping("/{diaryId}/unpublish")
+    @Operation(summary = "일기 비공개 설정")
+    fun unpublishDiary(
+        @PathVariable diaryId: Long,
+        @LoginUser userId: Long
+    ): ResponseEntity<Unit> {
+        diaryService.unpublishDiary(diaryId)
+        return ResponseEntity.ok().build()
+    }
 }
