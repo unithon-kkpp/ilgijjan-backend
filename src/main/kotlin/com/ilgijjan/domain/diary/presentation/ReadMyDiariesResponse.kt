@@ -1,34 +1,32 @@
 package com.ilgijjan.domain.diary.presentation
 
+import com.ilgijjan.common.utils.DateFormatter
 import com.ilgijjan.domain.diary.domain.Diary
 import com.ilgijjan.domain.diary.domain.Weather
 import io.swagger.v3.oas.annotations.media.Schema
-import java.time.format.DateTimeFormatter
 
-data class ReadDiariesResponse(
+data class ReadMyDiariesResponse(
     @field:Schema(description = "일기 목록")
-    val diaryList: List<DiaryItem>
+    val diaryList: List<MyDiaryItem>
 ) {
     companion object {
-        private val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
-
-        fun from(diaries: List<Diary>): ReadDiariesResponse {
+        fun from(diaries: List<Diary>): ReadMyDiariesResponse {
             val items = diaries.map { diary ->
-                DiaryItem(
+                MyDiaryItem(
                     id = diary.id!!,
-                    date = diary.createdAt?.format(formatter) ?: "0000.00.00",
+                    date = diary.createdAt?.format(DateFormatter.DOT_DATE_FORMATTER)!!,
                     imageUrl = diary.imageUrl,
                     weather = diary.weather,
                     mood = diary.mood,
                     introLines = diary.lyrics.take(9)
                 )
             }
-            return ReadDiariesResponse(items)
+            return ReadMyDiariesResponse(items)
         }
     }
 }
 
-data class DiaryItem(
+data class MyDiaryItem(
     @field:Schema(description = "일기 ID", example = "123")
     val id: Long,
 

@@ -5,6 +5,7 @@ import com.ilgijjan.domain.diary.application.DiaryService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Max
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -45,13 +46,35 @@ class DiaryController(
     }
 
     @GetMapping
-    @Operation(summary = "내 일기 목록 조회")
-    fun findMyDiaries(
+    @Operation(
+        summary = "본인 일기 목록 조회",
+        description = "연도와 월을 기준으로 사용자 본인이 작성한 일기 목록을 조회합니다."
+    )
+    fun getMyDiaries(
         @LoginUser userId: Long,
         @RequestParam year: Int,
         @RequestParam month: Int
-    ): ResponseEntity<ReadDiariesResponse> {
-        val response = diaryService.findMyDiariesByYearAndMonth(userId, year, month)
+    ): ResponseEntity<ReadMyDiariesResponse> {
+        val response = diaryService.getMyDiariesByYearAndMonth(userId, year, month)
+        return ResponseEntity(response, HttpStatus.OK)
+    }
+
+    @GetMapping("/public")
+    @Operation(
+        summary = "공개 일기 목록 조회",
+        description = """
+            공개 설정된 일기들을 최신순으로 조회합니다. 무한 스크롤 방식을 지원합니다.
+            
+            1. 첫 요청 시: lastId를 비우고 요청합니다. (최신글부터 조회)
+            2. 추가 스크롤 시: 이전 응답에서 받은 'lastId' 값을 쿼리 파라미터에 넣어서 요청합니다.
+            3. hasNext가 false가 될 때까지 반복 호출 가능합니다.
+        """
+    )
+    fun getPublicDiaries(
+        @RequestParam(required = false) lastId: Long?,
+        @RequestParam(defaultValue = "20") @Max(100) size: Int
+    ): ResponseEntity<ReadPublicDiariesResponse> {
+        val response = diaryService.getPublicDiaries(lastId, size)
         return ResponseEntity(response, HttpStatus.OK)
     }
 

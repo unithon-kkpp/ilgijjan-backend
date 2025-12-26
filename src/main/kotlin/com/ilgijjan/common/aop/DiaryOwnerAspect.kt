@@ -1,8 +1,6 @@
 package com.ilgijjan.common.aop
 
 import com.ilgijjan.common.annotation.CheckDiaryOwner
-import com.ilgijjan.common.exception.CustomException
-import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.common.utils.SecurityUtil
 import com.ilgijjan.domain.diary.application.DiaryReader
 import org.aspectj.lang.JoinPoint
@@ -14,12 +12,11 @@ import org.springframework.stereotype.Component
 @Aspect
 @Component
 class DiaryOwnerAspect(
-    private val diaryReader: DiaryReader,
-    private val securityUtil: SecurityUtil
+    private val diaryReader: DiaryReader
 ) {
     @Before("@annotation(checkDiaryOwner)")
     fun checkOwner(joinPoint: JoinPoint, checkDiaryOwner: CheckDiaryOwner) {
-        val currentUserId = securityUtil.getCurrentUserId()
+        val currentUserId = SecurityUtil.getCurrentUserId()
         val diaryId = getDiaryId(joinPoint, checkDiaryOwner.value)
         val diary = diaryReader.getDiaryById(diaryId)
         diary.validateOwner(currentUserId)

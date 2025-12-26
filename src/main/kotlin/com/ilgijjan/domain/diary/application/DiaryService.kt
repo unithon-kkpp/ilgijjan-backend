@@ -6,7 +6,8 @@ import com.ilgijjan.integration.music.application.MusicGenerator
 import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
 import com.ilgijjan.domain.diary.presentation.CreateDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadDiaryResponse
-import com.ilgijjan.domain.diary.presentation.ReadDiariesResponse
+import com.ilgijjan.domain.diary.presentation.ReadMyDiariesResponse
+import com.ilgijjan.domain.diary.presentation.ReadPublicDiariesResponse
 import com.ilgijjan.domain.user.application.UserReader
 import com.ilgijjan.integration.ocr.application.OcrProcessor
 import com.ilgijjan.integration.text.infrastructure.GeminiTextRefiner
@@ -67,9 +68,14 @@ class DiaryService(
         return ReadDiaryResponse.from(diary, isOwner)
     }
 
-    fun findMyDiariesByYearAndMonth(userId: Long, year: Int, month: Int): ReadDiariesResponse {
+    fun getMyDiariesByYearAndMonth(userId: Long, year: Int, month: Int): ReadMyDiariesResponse {
         val diaries = diaryReader.findAllByUserIdAndDate(userId, year, month)
-        return ReadDiariesResponse.from(diaries)
+        return ReadMyDiariesResponse.from(diaries)
+    }
+
+    fun getPublicDiaries(lastId: Long?, size: Int): ReadPublicDiariesResponse {
+        val diariesSlice = diaryReader.findAllPublicWithSlice(lastId, size)
+        return ReadPublicDiariesResponse.from(diariesSlice)
     }
 
     @Transactional
