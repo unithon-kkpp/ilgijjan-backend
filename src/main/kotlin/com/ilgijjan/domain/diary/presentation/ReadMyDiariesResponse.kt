@@ -16,7 +16,7 @@ data class ReadMyDiariesResponse(
             val items = diaries.map { diary ->
                 MyDiaryItem(
                     id = diary.id!!,
-                    date = diary.createdAt?.format(formatter) ?: "0000.00.00",
+                    date = diary.createdAt?.format(formatter)!!,
                     imageUrl = diary.imageUrl,
                     weather = diary.weather,
                     mood = diary.mood,

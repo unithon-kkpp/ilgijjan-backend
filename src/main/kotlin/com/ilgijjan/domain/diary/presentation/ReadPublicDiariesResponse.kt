@@ -22,7 +22,7 @@ data class ReadPublicDiariesResponse(
             val items = slice.content.map { diary ->
                 PublicDiaryItem(
                     id = diary.id!!,
-                    date = diary.createdAt?.format(formatter) ?: "0000.00.00",
+                    date = diary.createdAt?.format(formatter)!!,
                     imageUrl = diary.imageUrl,
                     authorName = diary.user.name
                 )

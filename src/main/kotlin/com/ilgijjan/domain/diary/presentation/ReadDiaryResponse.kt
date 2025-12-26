@@ -39,7 +39,7 @@ data class ReadDiaryResponse(
         fun from(diary: Diary, isOwner: Boolean): ReadDiaryResponse {
             return ReadDiaryResponse(
                 diaryId = diary.id!!,
-                date = diary.createdAt?.format(formatter) ?: "0000.00.00",
+                date = diary.createdAt?.format(formatter)!!,
                 weather = diary.weather,
                 mood = diary.mood,
                 photoUrl = if (isOwner) diary.photoUrl else null,

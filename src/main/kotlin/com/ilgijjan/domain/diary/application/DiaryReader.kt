@@ -32,10 +32,9 @@ class DiaryReader(
     fun findAllPublicWithSlice(lastId: Long?, size: Int): Slice<Diary> {
         val pageRequest = PageRequest.of(0, size)
 
-        return if (lastId == null) {
-            diaryRepository.findPublicDiariesFirstPage(pageRequest)
-        } else {
-            diaryRepository.findPublicDiariesNextPage(lastId, pageRequest)
+        return when(lastId) {
+            null -> diaryRepository.findPublicDiariesFirstPage(pageRequest)
+            else -> diaryRepository.findPublicDiariesNextPage(lastId, pageRequest)
         }
     }
 }
