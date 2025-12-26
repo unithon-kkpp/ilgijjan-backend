@@ -33,9 +33,9 @@ class DiaryReader(
         val pageRequest = PageRequest.of(0, size)
 
         return if (lastId == null) {
-            diaryRepository.findByIsPublicTrueOrderByIdDesc(pageRequest)
+            diaryRepository.findPublicDiariesFirstPage(pageRequest)
         } else {
-            diaryRepository.findByIsPublicTrueAndIdLessThanOrderByIdDesc(lastId, pageRequest)
+            diaryRepository.findPublicDiariesNextPage(lastId, pageRequest)
         }
     }
 }
