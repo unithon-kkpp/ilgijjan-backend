@@ -1,9 +1,9 @@
 package com.ilgijjan.domain.diary.presentation
 
+import com.ilgijjan.common.utils.DateFormatter
 import com.ilgijjan.domain.diary.domain.Diary
 import com.ilgijjan.domain.diary.domain.Weather
 import io.swagger.v3.oas.annotations.media.Schema
-import java.time.format.DateTimeFormatter
 
 data class ReadDiaryResponse(
     @field:Schema(description = "일기 ID", example = "123")
@@ -34,12 +34,10 @@ data class ReadDiaryResponse(
     val likeCount: Long
 ) {
     companion object {
-        private val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
-
         fun from(diary: Diary, isOwner: Boolean): ReadDiaryResponse {
             return ReadDiaryResponse(
                 diaryId = diary.id!!,
-                date = diary.createdAt?.format(formatter)!!,
+                date = diary.createdAt?.format(DateFormatter.DOT_DATE_FORMATTER)!!,
                 weather = diary.weather,
                 mood = diary.mood,
                 photoUrl = if (isOwner) diary.photoUrl else null,
