@@ -46,13 +46,16 @@ class DiaryController(
     }
 
     @GetMapping
-    @Operation(summary = "내 일기 목록 조회")
-    fun findMyDiaries(
+    @Operation(
+        summary = "본인 일기 목록 조회",
+        description = "연도와 월을 기준으로 사용자 본인이 작성한 일기 목록을 조회합니다."
+    )
+    fun getMyDiaries(
         @LoginUser userId: Long,
         @RequestParam year: Int,
         @RequestParam month: Int
-    ): ResponseEntity<ReadDiariesResponse> {
-        val response = diaryService.findMyDiariesByYearAndMonth(userId, year, month)
+    ): ResponseEntity<ReadMyDiariesResponse> {
+        val response = diaryService.getMyDiariesByYearAndMonth(userId, year, month)
         return ResponseEntity(response, HttpStatus.OK)
     }
 
@@ -69,7 +72,7 @@ class DiaryController(
     )
     fun getPublicDiaries(
         @RequestParam(required = false) lastId: Long?,
-        @RequestParam(defaultValue = "10") @Max(100) size: Int
+        @RequestParam(defaultValue = "20") @Max(100) size: Int
     ): ResponseEntity<ReadPublicDiariesResponse> {
         val response = diaryService.getPublicDiaries(lastId, size)
         return ResponseEntity(response, HttpStatus.OK)
