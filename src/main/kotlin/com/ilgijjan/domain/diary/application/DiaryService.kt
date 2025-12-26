@@ -74,7 +74,7 @@ class DiaryService(
 
     @Transactional
     @CheckDiaryOwner
-        fun publishDiary(diaryId: Long) {
+    fun publishDiary(diaryId: Long) {
         diaryUpdater.publish(diaryId)
     }
 
