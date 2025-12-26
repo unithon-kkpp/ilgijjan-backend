@@ -39,7 +39,7 @@ data class ReadDiaryResponse(
     companion object {
         private val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
 
-        fun from(diary: Diary): ReadDiaryResponse {
+        fun from(diary: Diary, isOwner: Boolean): ReadDiaryResponse {
             return ReadDiaryResponse(
                 diaryId = diary.id!!,
                 date = diary.createdAt?.format(formatter) ?: "0000.00.00",

@@ -5,10 +5,9 @@ import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
 import com.ilgijjan.domain.user.domain.User
 
 data class CreateDiaryCommand(
-    val text: String,
     val user: User,
     val weather: Weather,
-    val photoUrl: String?,
+    val photoUrl: String,
     val imageUrl: String,
     val musicUrl: String,
     val lyrics: String,
@@ -18,13 +17,11 @@ data class CreateDiaryCommand(
         fun of(
             request: CreateDiaryRequest,
             user: User,
-            text: String,
             imageUrl: String,
             musicUrl: String,
             lyrics: String
         ): CreateDiaryCommand {
             return CreateDiaryCommand(
-                text = text,
                 user = user,
                 weather = request.weather,
                 photoUrl = request.photoUrl,

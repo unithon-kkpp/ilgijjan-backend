@@ -17,12 +17,12 @@ class Diary (
     val user: User,
 
     @Lob
-    var text: String,
+    var text: String? = null,
 
     @Enumerated(EnumType.STRING)
     var weather: Weather,
 
-    var photoUrl: String? = null,
+    var photoUrl: String,
 
     var imageUrl: String,
 
