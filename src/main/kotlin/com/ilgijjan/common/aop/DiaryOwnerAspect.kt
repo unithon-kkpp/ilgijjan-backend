@@ -29,6 +29,8 @@ class DiaryOwnerAspect(
         val signature = joinPoint.signature as MethodSignature
         val index = signature.parameterNames.indexOf(paramName)
         if (index == -1) throw IllegalArgumentException("[CheckDiaryOwner]: '$paramName' 파라미터를 찾을 수 없습니다.")
-        return joinPoint.args[index] as Long
+        val diaryIdArg = joinPoint.args[index]
+        require(diaryIdArg is Long) { "[CheckDiaryOwner] '$paramName' must be Long" }
+        return diaryIdArg
     }
 }
