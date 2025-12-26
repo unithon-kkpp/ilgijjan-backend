@@ -18,9 +18,6 @@ data class ReadDiaryResponse(
     @field:Schema(description = "감정 정보", example = "5")
     val mood: Int,
 
-    @field:Schema(description = "일기 내용", example = "오늘은 행복한 하루였다.")
-    val text: String?,
-
     @field:Schema(description = "일기장 사진 URL", nullable = true, example = "https://example.com/photo.jpg")
     val photoUrl: String?,
 
@@ -39,14 +36,13 @@ data class ReadDiaryResponse(
     companion object {
         private val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
 
-        fun from(diary: Diary): ReadDiaryResponse {
+        fun from(diary: Diary, isOwner: Boolean): ReadDiaryResponse {
             return ReadDiaryResponse(
                 diaryId = diary.id!!,
                 date = diary.createdAt?.format(formatter) ?: "0000.00.00",
                 weather = diary.weather,
                 mood = diary.mood,
-                text = if (diary.photoUrl != null) null else diary.text,
-                photoUrl = diary.photoUrl,
+                photoUrl = if (isOwner) diary.photoUrl else null,
                 imageUrl = diary.imageUrl,
                 musicUrl = diary.musicUrl,
                 lyrics = diary.lyrics,

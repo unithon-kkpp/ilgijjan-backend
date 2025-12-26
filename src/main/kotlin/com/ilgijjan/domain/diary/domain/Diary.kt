@@ -17,12 +17,12 @@ class Diary (
     val user: User,
 
     @Lob
-    var text: String,
+    var text: String? = null,
 
     @Enumerated(EnumType.STRING)
     var weather: Weather,
 
-    var photoUrl: String? = null,
+    var photoUrl: String,
 
     var imageUrl: String,
 
@@ -33,7 +33,9 @@ class Diary (
 
     var mood: Int,
 
-    var likeCount: Long = 0
+    var likeCount: Long = 0,
+
+    var isPublic: Boolean = false
 
 ) : BaseEntity() {
     fun increaseLikeCount() {
@@ -45,5 +47,19 @@ class Diary (
             throw CustomException(ErrorCode.INVALID_LIKE_COUNT)
         }
         this.likeCount--
+    }
+
+    fun publish() {
+        this.isPublic = true
+    }
+
+    fun unpublish() {
+        this.isPublic = false
+    }
+
+    fun validateOwner(userId: Long) {
+        if (this.user.id != userId) {
+            throw CustomException(ErrorCode.NOT_DIARY_OWNER)
+        }
     }
 }
