@@ -2,6 +2,8 @@ package com.ilgijjan.domain.diary.infrastructure
 
 import com.ilgijjan.domain.diary.domain.Diary
 import jakarta.persistence.LockModeType
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
@@ -28,4 +30,7 @@ interface DiaryRepository : JpaRepository<Diary, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select d from Diary d where d.id = :id")
     fun findByIdWithLock(id: Long): Diary?
+
+    fun findByIsPublicTrueOrderByIdDesc(pageable: Pageable): Slice<Diary>
+    fun findByIsPublicTrueAndIdLessThanOrderByIdDesc(lastId: Long, pageable: Pageable): Slice<Diary>
 }

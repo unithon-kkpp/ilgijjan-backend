@@ -7,6 +7,7 @@ import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
 import com.ilgijjan.domain.diary.presentation.CreateDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadDiariesResponse
+import com.ilgijjan.domain.diary.presentation.ReadPublicDiariesResponse
 import com.ilgijjan.domain.user.application.UserReader
 import com.ilgijjan.integration.ocr.application.OcrProcessor
 import com.ilgijjan.integration.text.infrastructure.GeminiTextRefiner
@@ -70,6 +71,11 @@ class DiaryService(
     fun findMyDiariesByYearAndMonth(userId: Long, year: Int, month: Int): ReadDiariesResponse {
         val diaries = diaryReader.findAllByUserIdAndDate(userId, year, month)
         return ReadDiariesResponse.from(diaries)
+    }
+
+    fun getPublicDiaries(lastId: Long?, size: Int): ReadPublicDiariesResponse {
+        val diariesSlice = diaryReader.findAllPublicWithSlice(lastId, size)
+        return ReadPublicDiariesResponse.from(diariesSlice)
     }
 
     @Transactional

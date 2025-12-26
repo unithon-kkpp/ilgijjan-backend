@@ -4,6 +4,8 @@ import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.domain.diary.domain.Diary
 import com.ilgijjan.domain.diary.infrastructure.DiaryRepository
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -25,5 +27,15 @@ class DiaryReader(
         val startOfMonth = LocalDateTime.of(year, month, 1, 0, 0)
         val endOfMonth = startOfMonth.plusMonths(1)
         return diaryRepository.findAllByUserIdAndDateRange(userId, startOfMonth, endOfMonth)
+    }
+
+    fun findAllPublicWithSlice(lastId: Long?, size: Int): Slice<Diary> {
+        val pageRequest = PageRequest.of(0, size)
+
+        return if (lastId == null) {
+            diaryRepository.findByIsPublicTrueOrderByIdDesc(pageRequest)
+        } else {
+            diaryRepository.findByIsPublicTrueAndIdLessThanOrderByIdDesc(lastId, pageRequest)
+        }
     }
 }
