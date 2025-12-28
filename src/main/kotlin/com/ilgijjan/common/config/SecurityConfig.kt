@@ -32,6 +32,7 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/api/auth/**",
+                    "/api/music/**",
                     "/swagger-ui/**", "/v3/api-docs/**"
                 ).permitAll()
                     .anyRequest().authenticated()

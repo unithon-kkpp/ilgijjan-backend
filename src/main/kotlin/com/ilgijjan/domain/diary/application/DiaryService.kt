@@ -1,16 +1,14 @@
 package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.CheckDiaryOwner
-import com.ilgijjan.integration.image.application.ImageGenerator
-import com.ilgijjan.integration.music.application.MusicGenerator
+import com.ilgijjan.common.config.RabbitMqConfig
 import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
 import com.ilgijjan.domain.diary.presentation.CreateDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadMyDiariesResponse
 import com.ilgijjan.domain.diary.presentation.ReadPublicDiariesResponse
 import com.ilgijjan.domain.user.application.UserReader
-import com.ilgijjan.integration.ocr.application.OcrProcessor
-import com.ilgijjan.integration.text.infrastructure.GeminiTextRefiner
+import com.ilgijjan.integration.messaging.application.MessageProducer
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,25 +18,15 @@ class DiaryService(
     private val diaryCreator: DiaryCreator,
     private val diaryReader: DiaryReader,
     private val diaryUpdater: DiaryUpdater,
-    private val ocrProcessor: OcrProcessor,
-    private val textRefiner: GeminiTextRefiner,
-    private val imageGenerator: ImageGenerator,
-    private val musicGenerator: MusicGenerator,
+    private val diaryValidator: DiaryValidator,
+    private val messageProducer: MessageProducer,
     private val userReader: UserReader
 ) {
 
     @Transactional
     fun createDiaryWithDummy(userId: Long, request: CreateDiaryRequest): CreateDiaryResponse {
         val user = userReader.getUserById(userId)
-
-        // Dummy
-        val command = CreateDiaryCommand.of(
-            request,
-            user,
-            "https://storage.googleapis.com/kkpp-bucket/46763f45-6ed8-4cfa-8d69-bdfd2950278d",
-            "https://apiboxfiles.erweima.ai/ZWZjZDg4OTAtNmUwMC00ZjM4LWE5OTQtZjdlYzE3MzgwNWYy.mp3",
-            "노래 가사..")
-
+        val command = CreateDiaryCommand.of(request, user)
         val diary = diaryCreator.create(command)
         return CreateDiaryResponse(diary.id!!)
     }
@@ -46,24 +34,21 @@ class DiaryService(
     @Transactional
     fun createDiary(userId: Long, request: CreateDiaryRequest): CreateDiaryResponse {
         val user = userReader.getUserById(userId)
-
-        val text = ocrProcessor.extractText(request.photoUrl)
-        val refinedText = textRefiner.refineText(text)
-
-        val musicFuture = musicGenerator.generateMusicAsync(refinedText)
-        val imageFuture = imageGenerator.generateImageAsync(refinedText, request.weather)
-
-        val musicResult = musicFuture.get()
-        val imageUrl = imageFuture.get()
-
-        val command = CreateDiaryCommand.of(request, user, imageUrl, musicResult.audioUrl, musicResult.lyrics)
-
+        val command = CreateDiaryCommand.of(request, user)
         val diary = diaryCreator.create(command)
-        return CreateDiaryResponse(diary.id!!)
+
+        messageProducer.sendMessage(
+            exchange = RabbitMqConfig.DIARY_EXCHANGE,
+            routingKey = RabbitMqConfig.DIARY_ROUTING_KEY,
+            payload = diary.id!!
+        )
+
+        return CreateDiaryResponse(diary.id)
     }
 
     fun getDiaryById(diaryId: Long, userId: Long): ReadDiaryResponse {
         val diary = diaryReader.getDiaryById(diaryId)
+        diaryValidator.validateAccess(diary, userId)
         val isOwner = diary.user.id == userId
         return ReadDiaryResponse.from(diary, isOwner)
     }

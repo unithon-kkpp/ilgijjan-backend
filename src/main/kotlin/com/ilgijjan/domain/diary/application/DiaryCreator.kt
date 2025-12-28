@@ -13,6 +13,7 @@ class DiaryCreator (
     fun create(command: CreateDiaryCommand): Diary {
         val diary = Diary(
             user = command.user,
+            text = command.text,
             weather = command.weather,
             photoUrl = command.photoUrl,
             imageUrl = command.imageUrl,
