@@ -6,6 +6,7 @@ import com.ilgijjan.domain.user.domain.User
 
 data class CreateDiaryCommand(
     val user: User,
+    val text: String,
     val weather: Weather,
     val photoUrl: String,
     val imageUrl: String,
@@ -14,20 +15,13 @@ data class CreateDiaryCommand(
     val mood: Int
 ) {
     companion object {
-        fun of(
-            request: CreateDiaryRequest,
-            user: User,
-            imageUrl: String,
-            musicUrl: String,
-            lyrics: String
-        ): CreateDiaryCommand {
+        fun of(request: CreateDiaryRequest, user: User): CreateDiaryCommand {
             return CreateDiaryCommand(
                 user = user,
+                text = "",
                 weather = request.weather,
                 photoUrl = request.photoUrl,
-                imageUrl = imageUrl,
-                musicUrl = musicUrl,
-                lyrics = lyrics,
+                imageUrl = "", musicUrl = "", lyrics = "",
                 mood = request.mood
             )
         }

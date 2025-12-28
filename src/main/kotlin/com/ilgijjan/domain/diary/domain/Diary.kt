@@ -17,7 +17,7 @@ class Diary (
     val user: User,
 
     @Lob
-    var text: String? = null,
+    var text: String,
 
     @Enumerated(EnumType.STRING)
     var weather: Weather,
@@ -35,7 +35,10 @@ class Diary (
 
     var likeCount: Long = 0,
 
-    var isPublic: Boolean = false
+    var isPublic: Boolean = false,
+
+    @Enumerated(EnumType.STRING)
+    var status: DiaryStatus = DiaryStatus.PROCESSING
 
 ) : BaseEntity() {
     fun increaseLikeCount() {
@@ -61,5 +64,13 @@ class Diary (
         if (this.user.id != userId) {
             throw CustomException(ErrorCode.NOT_DIARY_OWNER)
         }
+    }
+
+    fun complete() {
+        this.status = DiaryStatus.COMPLETED
+    }
+
+    fun fail() {
+        this.status = DiaryStatus.FAILED
     }
 }
