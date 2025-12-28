@@ -18,6 +18,7 @@ class DiaryService(
     private val diaryCreator: DiaryCreator,
     private val diaryReader: DiaryReader,
     private val diaryUpdater: DiaryUpdater,
+    private val diaryValidator: DiaryValidator,
     private val messageProducer: MessageProducer,
     private val userReader: UserReader
 ) {
@@ -47,6 +48,7 @@ class DiaryService(
 
     fun getDiaryById(diaryId: Long, userId: Long): ReadDiaryResponse {
         val diary = diaryReader.getDiaryById(diaryId)
+        diaryValidator.validateAccess(diary, userId)
         val isOwner = diary.user.id == userId
         return ReadDiaryResponse.from(diary, isOwner)
     }

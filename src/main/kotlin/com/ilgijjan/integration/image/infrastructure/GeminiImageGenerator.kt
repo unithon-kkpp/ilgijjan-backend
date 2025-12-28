@@ -47,7 +47,7 @@ class GeminiImageGenerator(
 
         return try {
             val imageUrl = generateImage(text, weather)
-            log.info("[generateImageAsync] 비동기 작업 종료 - 성공")
+            log.info("[generateImageAsync] 비동기 작업 종료 - 성공, URL: $imageUrl")
             CompletableFuture.completedFuture(imageUrl)
         } catch (e: Exception) {
             log.error("[generateImageAsync] 작업 실패 - 스레드: ${Thread.currentThread().name}", e)

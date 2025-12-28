@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ilgijjan.common.jwt.JwtAuthenticationEntryPoint
 import com.ilgijjan.common.jwt.JwtAuthenticationFilter
 import com.ilgijjan.common.jwt.JwtTokenProvider
+import org.springframework.boot.util.LambdaSafe.callback
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -32,6 +33,7 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/api/auth/**",
+                    "/api/music/**",
                     "/swagger-ui/**", "/v3/api-docs/**"
                 ).permitAll()
                     .anyRequest().authenticated()

@@ -38,7 +38,7 @@ class Diary (
     var isPublic: Boolean = false,
 
     @Enumerated(EnumType.STRING)
-    var status: DiaryStatus = DiaryStatus.PROCESSING
+    var status: DiaryStatus = DiaryStatus.PENDING
 
 ) : BaseEntity() {
     fun increaseLikeCount() {

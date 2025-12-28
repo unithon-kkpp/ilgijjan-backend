@@ -30,6 +30,9 @@ data class ReadDiaryResponse(
     @field:Schema(description = "가사", example = "...")
     val lyrics: String,
 
+    @field:Schema(description = "공개 여부", example = "true")
+    val isPublic: Boolean,
+
     @field:Schema(description = "좋아요 수", example = "10")
     val likeCount: Long
 ) {
@@ -42,8 +45,9 @@ data class ReadDiaryResponse(
                 mood = diary.mood,
                 photoUrl = if (isOwner) diary.photoUrl else null,
                 imageUrl = diary.imageUrl,
-                musicUrl = diary.musicUrl,
+                musicUrl  = diary.musicUrl,
                 lyrics = diary.lyrics,
+                isPublic = diary.isPublic,
                 likeCount = diary.likeCount
             )
         }
