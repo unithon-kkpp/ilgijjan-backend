@@ -1,9 +1,9 @@
 package com.ilgijjan.domain.fcmtoken.application
 
 import com.ilgijjan.domain.fcmtoken.infrastructure.FcmTokenRepository
-import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class FcmTokenDeleter(

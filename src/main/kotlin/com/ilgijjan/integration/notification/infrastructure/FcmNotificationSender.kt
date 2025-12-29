@@ -2,7 +2,6 @@ package com.ilgijjan.integration.notification.infrastructure
 
 import com.ilgijjan.integration.notification.application.NotificationSender
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 
 @Component
 class FcmNotificationSender(
