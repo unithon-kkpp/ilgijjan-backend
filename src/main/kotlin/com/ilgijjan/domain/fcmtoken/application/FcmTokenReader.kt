@@ -19,6 +19,11 @@ class FcmTokenReader(
             ?: throw CustomException(ErrorCode.FCM_TOKEN_NOT_FOUND)
     }
 
+    fun findByToken(token: String): FcmToken? {
+        return fcmTokenRepository.findByToken(token)
+    }
+
+
     fun existsByToken(token: String): Boolean {
         return fcmTokenRepository.existsByToken(token)
     }

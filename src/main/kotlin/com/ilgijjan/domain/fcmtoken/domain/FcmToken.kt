@@ -15,7 +15,7 @@ class FcmToken(
     val id: Long? = null,
 
     @Column(nullable = false)
-    val userId: Long,
+    var userId: Long,
 
     @Column(nullable = false, unique = true)
     val token: String,
@@ -24,5 +24,9 @@ class FcmToken(
 ): BaseEntity() {
     fun updateLastUsed() {
         this.lastUsedAt = LocalDateTime.now()
+    }
+
+    fun updateUserId(userId: Long) {
+        this.userId = userId
     }
 }

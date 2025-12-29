@@ -10,8 +10,16 @@ class FcmTokenCreator(
     private val fcmTokenRepository: FcmTokenRepository
 ) {
     fun create(userId: Long, token: String) {
-        if (!fcmTokenReader.existsByToken(token)) {
+
+        val existingToken = fcmTokenReader.findByToken(token)
+
+        if (existingToken == null) {
             fcmTokenRepository.save(FcmToken(userId = userId, token = token))
+        } else {
+            if (existingToken.userId != userId) {
+                existingToken.updateUserId(userId)
+            }
+            existingToken.updateLastUsed()
         }
     }
 }
