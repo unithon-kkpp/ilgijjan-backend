@@ -27,4 +27,10 @@ class FcmTokenController(
     fun renew(@RequestBody request: FcmTokenRequest) {
         fcmTokenService.renewToken(request.token)
     }
+
+    @PostMapping("/test")
+    @Operation(summary = "FCM 알림 테스트 (본인 기기 발송)")
+    fun testNotification(@LoginUser userId: Long) {
+        fcmTokenService.sendTestNotification(userId)
+    }
 }
