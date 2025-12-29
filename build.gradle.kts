@@ -55,6 +55,9 @@ dependencies {
 
     // RabbitMQ
     implementation("org.springframework.boot:spring-boot-starter-amqp")
+
+    // Firebase
+    implementation("com.google.firebase:firebase-admin:9.2.0")
 }
 
 kotlin {

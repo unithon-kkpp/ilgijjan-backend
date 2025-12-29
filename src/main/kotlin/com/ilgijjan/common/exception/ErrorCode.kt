@@ -34,5 +34,8 @@ enum class ErrorCode(
 
     // Like
     LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요 정보를 찾을 수 없습니다."),
-    INVALID_LIKE_COUNT(HttpStatus.BAD_REQUEST, "좋아요 개수가 0개인 상태에서는 차감할 수 없습니다.")
+    INVALID_LIKE_COUNT(HttpStatus.BAD_REQUEST, "좋아요 개수가 0개인 상태에서는 차감할 수 없습니다."),
+
+    // Notification
+    FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "FCM 토큰 정보를 찾을 수 없습니다.");
 }
