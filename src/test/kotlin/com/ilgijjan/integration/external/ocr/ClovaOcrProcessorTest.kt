@@ -1,5 +1,6 @@
-package com.ilgijjan.integration.ocr.infrastructure
+package com.ilgijjan.integration.external.ocr
 
+import com.ilgijjan.integration.ocr.infrastructure.ClovaOcrProcessor
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Disabled

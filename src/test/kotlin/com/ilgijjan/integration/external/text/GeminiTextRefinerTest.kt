@@ -1,9 +1,9 @@
-package com.ilgijjan.integration.text.infrastructure
+package com.ilgijjan.integration.external.text
 
 import com.ilgijjan.fixtures.DiaryTextFixtures
-import org.junit.jupiter.api.Test
-
+import com.ilgijjan.integration.text.infrastructure.GeminiTextRefiner
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 

@@ -1,12 +1,15 @@
-package com.ilgijjan.common.jwt
+package com.ilgijjan.unit.common.jwt
 
 import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorCode
+import com.ilgijjan.common.jwt.JwtTokenProvider
+import com.ilgijjan.common.jwt.TokenType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
@@ -14,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest
 class JwtTokenProviderTest @Autowired constructor(
     private val jwtTokenProvider: JwtTokenProvider
 ) {
-    private val log = org.slf4j.LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
 
     @Test
     @Disabled("개발 시 임시 토큰이 필요할 때만 수동으로 실행")

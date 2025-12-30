@@ -1,9 +1,10 @@
-package com.ilgijjan.integration.music.infrastructure
+package com.ilgijjan.integration.external.music
 
-import com.ilgijjan.integration.music.application.MusicResult
 import com.ilgijjan.fixtures.DiaryTextFixtures
-import org.junit.jupiter.api.Test
+import com.ilgijjan.integration.music.application.MusicResult
+import com.ilgijjan.integration.music.infrastructure.SunoMusicGenerator
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 

@@ -1,4 +1,4 @@
-package com.ilgijjan.common.resolver
+package com.ilgijjan.integration.common.resolver
 
 import com.ilgijjan.common.annotation.LoginUser
 import com.ilgijjan.common.jwt.JwtTokenProvider
@@ -9,10 +9,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -40,21 +39,21 @@ class LoginUserArgumentResolverTest @Autowired constructor(
 
         // when & then
         mockMvc.perform(
-            get("/test/auth")
+            MockMvcRequestBuilders.get("/test/auth")
                 .header("Authorization", "Bearer $token")
         )
-            .andExpect(status().isOk)
-            .andExpect(content().string(userId.toString()))
-            .andDo { print() }
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.content().string(userId.toString()))
+            .andDo { MockMvcResultHandlers.print() }
     }
 
     @Test
     fun `토큰(헤더)이 없으면 401 에러가 터진다`() {
         // when & then
         mockMvc.perform(
-            get("/test/auth")
+            MockMvcRequestBuilders.get("/test/auth")
         )
-            .andExpect(status().isUnauthorized)
-            .andDo { print() }
+            .andExpect(MockMvcResultMatchers.status().isUnauthorized)
+            .andDo { MockMvcResultHandlers.print() }
     }
 }

@@ -1,7 +1,8 @@
-package com.ilgijjan.integration.image.infrastructure
+package com.ilgijjan.integration.external.image
 
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.fixtures.DiaryTextFixtures
+import com.ilgijjan.integration.image.infrastructure.GeminiImageGenerator
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

@@ -1,5 +1,6 @@
-package com.ilgijjan.integration.ocr.infrastructure
+package com.ilgijjan.integration.external.ocr
 
+import com.ilgijjan.integration.ocr.infrastructure.GoogleVisionOcrProcessor
 import org.junit.jupiter.api.Disabled
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest

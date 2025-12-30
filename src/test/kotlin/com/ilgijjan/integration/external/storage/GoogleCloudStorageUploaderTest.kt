@@ -1,9 +1,9 @@
-package com.ilgijjan.integration.storage.infrastructure
+package com.ilgijjan.integration.external.storage
 
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import com.ilgijjan.integration.storage.infrastructure.GoogleCloudStorageUploader
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
@@ -19,6 +19,6 @@ class GoogleCloudStorageUploaderTest @Autowired constructor(
 
         println("업로드된 GCS URL: $gcsUrl")
 
-        assertTrue(gcsUrl.startsWith("https://storage.googleapis.com/"))
+        Assertions.assertTrue(gcsUrl.startsWith("https://storage.googleapis.com/"))
     }
 }
