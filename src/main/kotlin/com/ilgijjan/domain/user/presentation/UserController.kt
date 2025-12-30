@@ -26,7 +26,7 @@ class UserController(
         return ResponseEntity.ok(response)
     }
 
-    @PatchMapping("name")
+    @PatchMapping("/name")
     @Operation(summary = "이름 변경")
     fun updateName(
         @LoginUser userId: Long,
