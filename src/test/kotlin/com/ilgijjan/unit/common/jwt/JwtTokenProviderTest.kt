@@ -14,7 +14,7 @@ class JwtTokenProviderTest {
 
     companion object {
         private const val TEST_SECRET_KEY =
-            "v3S6v9y$&BE)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2s5u8x/A?D(G+KbPeSh"
+            "v3S6v9yBEHMcQfTjWmZq4t7wzCFJaNdRgUkXp2s5u8xA2DnGKbPeShVmYp3s6v9y"
     }
 
     private lateinit var jwtTokenProvider: JwtTokenProvider
