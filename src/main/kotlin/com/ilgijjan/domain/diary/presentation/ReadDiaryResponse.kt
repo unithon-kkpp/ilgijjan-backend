@@ -5,7 +5,7 @@ import com.ilgijjan.domain.diary.domain.Diary
 import com.ilgijjan.domain.diary.domain.Weather
 import io.swagger.v3.oas.annotations.media.Schema
 
-data class ReadDiaryResponse(
+data class  ReadDiaryResponse(
     @field:Schema(description = "일기 ID", example = "123")
     val diaryId: Long,
 

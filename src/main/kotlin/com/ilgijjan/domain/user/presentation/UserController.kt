@@ -6,18 +6,27 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/users/me")
 @Tag(name = "User", description = "User 관련 API입니다.")
 class UserController(
     private val userService: UserService
 ) {
-    @PatchMapping("/name")
+
+    @GetMapping
+    @Operation(summary = "본인 정보 조회", description = "로그인한 사용자의 이름, 캐릭터, 알림 설정을 조회합니다.")
+    fun getMe(@LoginUser userId: Long): ResponseEntity<ReadMeResponse> {
+        val response = userService.getMe(userId)
+        return ResponseEntity.ok(response)
+    }
+
+    @PatchMapping("name")
     @Operation(summary = "이름 변경")
     fun updateName(
         @LoginUser userId: Long,
