@@ -18,14 +18,20 @@ class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    var name: String,
+    name: String,
+
+    character: Character,
 
     @Embedded
-    val oauthInfo: OauthInfo,
+    val oauthInfo: OauthInfo
+) : BaseEntity() {
+
+    var name: String = name
+        private set
 
     @Enumerated(EnumType.STRING)
-    var character : Character
-) : BaseEntity() {
+    var character: Character = character
+        private set
 
     fun updateName(name: String) {
         this.name = name
