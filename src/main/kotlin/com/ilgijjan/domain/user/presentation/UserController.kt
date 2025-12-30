@@ -26,4 +26,14 @@ class UserController(
         userService.updateName(userId, request.name)
         return ResponseEntity.ok().build()
     }
+
+    @PatchMapping("/character")
+    @Operation(summary = "캐릭터 변경")
+    fun updateCharacter(
+        @LoginUser userId: Long,
+        @RequestBody @Valid request: UpdateCharacterRequest
+    ): ResponseEntity<Unit> {
+        userService.updateCharacter(userId, request.character)
+        return ResponseEntity.ok().build()
+    }
 }
