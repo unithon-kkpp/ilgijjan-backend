@@ -41,6 +41,7 @@ class User(
         private set
 
     fun updateName(name: String) {
+        require(name.isNotBlank()) { "이름은 비어 있을 수 없습니다." }
         this.name = name
     }
 
