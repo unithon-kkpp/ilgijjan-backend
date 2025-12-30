@@ -5,31 +5,23 @@ import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.common.jwt.JwtTokenProvider
 import com.ilgijjan.common.jwt.TokenType
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest
-class JwtTokenProviderTest @Autowired constructor(
-    private val jwtTokenProvider: JwtTokenProvider
-) {
-    private val log = LoggerFactory.getLogger(javaClass)
+class JwtTokenProviderTest {
 
-    @Test
-    @Disabled("개발 시 임시 토큰이 필요할 때만 수동으로 실행")
-    fun `개발용 토큰 발급`() {
-        // given
-        val userId = 1L
+    companion object {
+        private const val TEST_SECRET_KEY =
+            "v3S6v9y$&BE)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2s5u8x/A?D(G+KbPeSh"
+    }
 
-        // when
-        val accessToken = jwtTokenProvider.createToken(userId, TokenType.TEST)
+    private lateinit var jwtTokenProvider: JwtTokenProvider
 
-        // then
-        log.info("Access Token: $accessToken")
+    @BeforeEach
+    fun setUp() {
+        jwtTokenProvider = JwtTokenProvider(TEST_SECRET_KEY)
     }
 
     @Test
@@ -47,7 +39,7 @@ class JwtTokenProviderTest @Autowired constructor(
     @Test
     fun `유효하지 않은 토큰이면 INVALID_TOKEN 예외가 터진다`() {
         // given
-        val invalidToken = "..."
+        val invalidToken = "eyJhbGciOiJIUzI1NiJ9.wrong.payload"
 
         // when & then
         val exception = assertThrows<CustomException> {
@@ -57,17 +49,15 @@ class JwtTokenProviderTest @Autowired constructor(
     }
 
     @Test
-    fun `getAuthentication - 토큰을 해석해서 유저 ID와 권한을 정확히 가져온다`() {
+    fun `getAuthentication - 토큰을 해석해서 유저 ID를 정확히 가져온다`() {
         // given
         val expectedUserId = 33L
         val token = jwtTokenProvider.createToken(expectedUserId, TokenType.ACCESS)
 
         // when
         val authentication = jwtTokenProvider.getAuthentication(token)
-        val roles = authentication.authorities.map { it.authority }
 
         // then
         assertThat(authentication.principal).isEqualTo(expectedUserId)
-        assertThat(roles).contains("ROLE_USER")
-    }
+        assertThat(authentication.authorities.map { it.authority }).contains("ROLE_USER")    }
 }
