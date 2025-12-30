@@ -1,5 +1,5 @@
 package com.ilgijjan.domain.user.domain
 
-enum class Avatar {
+enum class Character {
     DODO, RERE, MIMI
 }
