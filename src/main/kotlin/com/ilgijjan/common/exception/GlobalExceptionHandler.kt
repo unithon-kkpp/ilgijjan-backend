@@ -99,8 +99,7 @@ class GlobalExceptionHandler {
 
 	@ExceptionHandler(CustomException::class)
 	fun handleCustomException(e: CustomException): ResponseEntity<ErrorResponse> {
-		println(">>> CustomException 잡힘! 메시지: ${e.errorCode.message}")
-		log.warn(e.message, e)
+        log.warn("CustomException 발생: {} - {}", e.errorCode.status, e.errorCode.message)
 		val errorResponse = ErrorResponse.of(e.errorCode)
 		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}

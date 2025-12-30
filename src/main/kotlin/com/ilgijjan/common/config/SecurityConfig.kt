@@ -33,7 +33,8 @@ class SecurityConfig(
                 it.requestMatchers(
                     "/api/auth/**",
                     "/api/music/**",
-                    "/swagger-ui/**", "/v3/api-docs/**"
+                    "/swagger-ui/**", "/v3/api-docs/**",
+                    "/health"
                 ).permitAll()
                     .anyRequest().authenticated()
             }
