@@ -18,4 +18,9 @@ class UserService(
     fun updateCharacter(userId: Long, character: Character) {
         userUpdater.updateCharacter(userId, character)
     }
+
+    @Transactional
+    fun updateNotification(userId: Long, isEnabled: Boolean) {
+        userUpdater.updateNotification(userId, isEnabled)
+    }
 }

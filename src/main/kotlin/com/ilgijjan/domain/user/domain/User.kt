@@ -2,6 +2,7 @@ package com.ilgijjan.domain.user.domain
 
 import com.ilgijjan.common.domain.BaseEntity
 import com.ilgijjan.domain.auth.domain.OauthInfo
+import jakarta.persistence.Column
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -22,6 +23,8 @@ class User(
 
     character: Character,
 
+    isNotificationEnabled: Boolean = true,
+
     @Embedded
     val oauthInfo: OauthInfo
 ) : BaseEntity() {
@@ -30,7 +33,11 @@ class User(
         private set
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "`character`")
     var character: Character = character
+        private set
+
+    var isNotificationEnabled: Boolean = isNotificationEnabled
         private set
 
     fun updateName(name: String) {
@@ -39,5 +46,9 @@ class User(
 
     fun updateCharacter(character: Character) {
         this.character = character
+    }
+
+    fun updateNotification(isEnabled: Boolean) {
+        this.isNotificationEnabled = isEnabled
     }
 }

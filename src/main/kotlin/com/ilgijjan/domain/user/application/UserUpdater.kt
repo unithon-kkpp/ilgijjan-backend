@@ -16,4 +16,9 @@ class UserUpdater(
         val user = userReader.getUserById(userId)
         user.updateCharacter(character)
     }
+
+    fun updateNotification(userId: Long, isEnabled: Boolean) {
+        val user = userReader.getUserById(userId)
+        user.updateNotification(isEnabled)
+    }
 }

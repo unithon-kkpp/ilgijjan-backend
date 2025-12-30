@@ -36,4 +36,14 @@ class UserController(
         userService.updateCharacter(userId, request.character)
         return ResponseEntity.ok().build()
     }
+
+    @PatchMapping("/notification")
+    @Operation(summary = "알림 수신 여부 설정", description = "true: 켜기, false: 끄기")
+    fun updateNotification(
+        @LoginUser userId: Long,
+        @RequestBody @Valid request: UpdateNotificationRequest
+    ): ResponseEntity<Unit> {
+        userService.updateNotification(userId, request.isEnabled)
+        return ResponseEntity.ok().build()
+    }
 }
