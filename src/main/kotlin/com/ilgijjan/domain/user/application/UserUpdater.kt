@@ -5,9 +5,11 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserUpdater(
-    private val userReader: UserReader
+    private val userReader: UserReader,
+    private val userValidator: UserValidator
 ) {
     fun updateName(userId: Long, name: String) {
+        userValidator.validateDuplicateName(userId, name)
         val user = userReader.getUserById(userId)
         user.updateName(name)
     }

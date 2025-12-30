@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
+
+    fun existsByNameAndIdNot(name: String, id: Long): Boolean
 }
