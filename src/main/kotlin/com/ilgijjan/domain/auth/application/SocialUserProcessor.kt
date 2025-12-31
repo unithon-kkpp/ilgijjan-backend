@@ -7,7 +7,7 @@ import com.ilgijjan.integration.oauth.application.OauthClients
 import org.springframework.stereotype.Component
 
 @Component
-class SocialUserProvider(
+class SocialUserProcessor(
     private val oauthClients: OauthClients,
     private val oauthCommandValidator: OauthCommandValidator,
     private val userReader: UserReader,
@@ -21,5 +21,11 @@ class SocialUserProvider(
 
         return userReader.findByProviderId(command.provider, providerId)
             ?: userCreator.createSocialUser(command.provider, providerId)
+    }
+
+    fun logout(command: OauthCommand) {
+        oauthCommandValidator.validate(command)
+        val client = oauthClients.getClient(command.provider)
+        client.logout(command)
     }
 }

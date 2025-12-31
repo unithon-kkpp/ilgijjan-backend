@@ -2,6 +2,7 @@ package com.ilgijjan.domain.auth.application
 
 import com.ilgijjan.domain.auth.domain.OauthProvider
 import com.ilgijjan.domain.auth.presentation.LoginRequest
+import com.ilgijjan.domain.auth.presentation.LogoutRequest
 
 data class OauthCommand(
     val provider: OauthProvider,
@@ -9,6 +10,13 @@ data class OauthCommand(
 ) {
     companion object {
         fun from(request: LoginRequest): OauthCommand {
+            return OauthCommand(
+                provider = request.provider,
+                accessToken = request.accessToken
+            )
+        }
+
+        fun from(request: LogoutRequest): OauthCommand {
             return OauthCommand(
                 provider = request.provider,
                 accessToken = request.accessToken

@@ -1,5 +1,6 @@
 package com.ilgijjan.domain.auth.presentation
 
+import com.ilgijjan.common.annotation.LoginUser
 import com.ilgijjan.domain.auth.application.AuthService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -7,6 +8,7 @@ import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -22,5 +24,15 @@ class AuthController (
     fun login(@RequestBody @Valid request: LoginRequest): ResponseEntity<LoginResponse> {
         val response = authService.login(request)
         return ResponseEntity.ok(response)
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃")
+    fun logout(
+        @LoginUser userId: Long,
+        @RequestHeader("Refresh-Token") refreshToken: String,
+        @RequestBody @Valid request: LogoutRequest): ResponseEntity<Unit> {
+        val response = authService.logout(userId, refreshToken, request)
+        return ResponseEntity.noContent().build()
     }
 }
