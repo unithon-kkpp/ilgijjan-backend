@@ -32,6 +32,7 @@ class KakaoOauthClient(
             )
             response.body?.id?.toString() ?: throw CustomException(ErrorCode.KAKAO_SERVER_ERROR)
         } catch (e: HttpClientErrorException) {
+            println("Kakao Error Body: ${e.responseBodyAsString}")
             throw CustomException(ErrorCode.INVALID_KAKAO_TOKEN)
         } catch (e: Exception) {
             throw CustomException(ErrorCode.KAKAO_SERVER_ERROR)

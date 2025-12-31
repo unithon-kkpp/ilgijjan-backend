@@ -1,5 +1,6 @@
 package com.ilgijjan.domain.user.domain
 
+import com.ilgijjan.common.constants.UserConstants
 import com.ilgijjan.common.domain.BaseEntity
 import com.ilgijjan.domain.auth.domain.OauthInfo
 import jakarta.persistence.Column
@@ -63,6 +64,6 @@ class User(
     }
 
     fun isOnboarded(): Boolean {
-        return !this.name.startsWith("tmp_")
+        return !this.name.startsWith(UserConstants.TEMPORARY_NAME_PREFIX)
     }
 }
