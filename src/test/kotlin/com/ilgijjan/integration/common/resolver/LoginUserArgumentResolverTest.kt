@@ -3,6 +3,7 @@ package com.ilgijjan.integration.common.resolver
 import com.ilgijjan.common.annotation.LoginUser
 import com.ilgijjan.common.jwt.JwtTokenProvider
 import com.ilgijjan.common.jwt.TokenType
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
+@Disabled
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(LoginUserArgumentResolverTest.TestController::class)

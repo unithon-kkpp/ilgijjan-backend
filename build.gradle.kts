@@ -58,6 +58,9 @@ dependencies {
 
     // Firebase
     implementation("com.google.firebase:firebase-admin:9.2.0")
+
+    // H2
+    testImplementation("com.h2database:h2")
 }
 
 kotlin {
