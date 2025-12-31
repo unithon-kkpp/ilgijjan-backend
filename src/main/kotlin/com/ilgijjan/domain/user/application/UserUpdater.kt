@@ -9,7 +9,7 @@ class UserUpdater(
     private val userValidator: UserValidator
 ) {
     fun updateName(userId: Long, name: String) {
-        userValidator.validateDuplicateName(userId, name)
+        userValidator.validateName(userId, name)
         val user = userReader.getUserById(userId)
         user.updateName(name)
     }
