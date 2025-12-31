@@ -1,5 +1,6 @@
 package com.ilgijjan.domain.user.application
 
+import com.ilgijjan.common.constants.UserConstants
 import com.ilgijjan.domain.auth.domain.OauthInfo
 import com.ilgijjan.domain.auth.domain.OauthProvider
 import com.ilgijjan.domain.user.domain.Character
@@ -12,7 +13,7 @@ class UserCreator(
     private val userRepository: UserRepository
 ) {
     fun createSocialUser(provider: OauthProvider, providerId: String): User {
-        val tempNickname = "tmp_${providerId.take(8)}"
+        val tempNickname = "${UserConstants.TEMPORARY_NAME_PREFIX}${providerId.take(8)}"
         val newUser = User(
             name = tempNickname,
             character = Character.DODO,
