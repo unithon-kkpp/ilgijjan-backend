@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Disabled
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(LoginUserArgumentResolverTest.TestController::class)
