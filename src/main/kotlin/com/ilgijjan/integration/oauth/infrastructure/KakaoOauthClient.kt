@@ -5,6 +5,7 @@ import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.domain.auth.application.OauthCommand
 import com.ilgijjan.domain.auth.domain.OauthProvider
 import com.ilgijjan.integration.oauth.application.OauthClient
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -17,6 +18,8 @@ import kotlin.jvm.java
 class KakaoOauthClient(
     private val restTemplate: RestTemplate
 ) : OauthClient {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     override fun supports(provider: OauthProvider) = provider == OauthProvider.KAKAO
 
     override fun getProviderId(command: OauthCommand): String {
@@ -32,7 +35,7 @@ class KakaoOauthClient(
             )
             response.body?.id?.toString() ?: throw CustomException(ErrorCode.KAKAO_SERVER_ERROR)
         } catch (e: HttpClientErrorException) {
-            println("Kakao Error Body: ${e.responseBodyAsString}")
+            log.warn("Kakao Error Body: ${e.responseBodyAsString}")
             throw CustomException(ErrorCode.INVALID_KAKAO_TOKEN)
         } catch (e: Exception) {
             throw CustomException(ErrorCode.KAKAO_SERVER_ERROR)
