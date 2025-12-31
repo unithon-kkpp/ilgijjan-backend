@@ -1,0 +1,25 @@
+package com.ilgijjan.domain.auth.application
+
+import com.ilgijjan.domain.user.application.UserCreator
+import com.ilgijjan.domain.user.application.UserReader
+import com.ilgijjan.domain.user.domain.User
+import com.ilgijjan.integration.oauth.application.OauthClients
+import org.springframework.stereotype.Component
+
+@Component
+class SocialUserProvider(
+    private val oauthClients: OauthClients,
+    private val oauthCommandValidator: OauthCommandValidator,
+    private val userReader: UserReader,
+    private val userCreator: UserCreator
+) {
+    fun getOrCreateUser(command: OauthCommand): User {
+        oauthCommandValidator.validate(command)
+
+        val client = oauthClients.getClient(command.provider)
+        val providerId = client.getProviderId(command)
+
+        return userReader.findByProviderId(command.provider, providerId)
+            ?: userCreator.createSocialUser(command.provider, providerId)
+    }
+}

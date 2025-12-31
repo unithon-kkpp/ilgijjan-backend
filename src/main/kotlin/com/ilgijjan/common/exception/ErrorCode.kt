@@ -38,5 +38,10 @@ enum class ErrorCode(
     INVALID_LIKE_COUNT(HttpStatus.BAD_REQUEST, "좋아요 개수가 0개인 상태에서는 차감할 수 없습니다."),
 
     // Notification
-    FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "FCM 토큰 정보를 찾을 수 없습니다.");
+    FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "FCM 토큰 정보를 찾을 수 없습니다."),
+
+    // Auth
+    KAKAO_REQUIRED_FIELD_MISSING(HttpStatus.BAD_REQUEST, "카카오 로그인에 필요한 필드가 누락되었습니다."),
+    KAKAO_SERVER_ERROR(HttpStatus.BAD_GATEWAY, "카카오 서버와 통신 중 에러가 발생했습니다."),
+    INVALID_KAKAO_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 카카오 토큰입니다.");
 }
