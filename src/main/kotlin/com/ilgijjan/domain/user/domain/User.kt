@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
+import java.time.LocalDateTime
 
 @Entity
 @Table(
@@ -29,27 +30,19 @@ class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    name: String,
-
-    character: Character,
-
-    isNotificationEnabled: Boolean = true,
-
-    @Embedded
-    val oauthInfo: OauthInfo
-) : BaseEntity() {
-
-    var name: String = name
-        private set
+    var name: String,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "`character`")
-    var character: Character = character
-        private set
+    var character: Character,
 
-    var isNotificationEnabled: Boolean = isNotificationEnabled
-        private set
+    var isNotificationEnabled: Boolean = true,
 
+    @Embedded
+    val oauthInfo: OauthInfo,
+
+    var deletedAt: LocalDateTime? = null
+) : BaseEntity() {
     fun updateName(name: String) {
         require(name.isNotBlank()) { "이름은 비어 있을 수 없습니다." }
         this.name = name
@@ -65,5 +58,13 @@ class User(
 
     fun isOnboarded(): Boolean {
         return !this.name.startsWith(UserConstants.TEMPORARY_NAME_PREFIX)
+    }
+
+    fun getMaskedName(): String {
+        return if (this.deletedAt != null) "탈퇴한 유저" else this.name
+    }
+
+    fun withdraw() {
+        this.deletedAt = LocalDateTime.now()
     }
 }

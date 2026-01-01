@@ -22,7 +22,7 @@ data class ReadPublicDiariesResponse(
                     id = diary.id!!,
                     date = diary.createdAt?.format(DateFormatter.DOT_DATE_FORMATTER)!!,
                     imageUrl = diary.imageUrl,
-                    authorName = diary.user.name
+                    authorName = diary.user.getMaskedName()
                 )
             }
 

@@ -6,4 +6,7 @@ import com.ilgijjan.domain.auth.domain.OauthProvider
 interface OauthClient {
     fun supports(provider: OauthProvider): Boolean
     fun getProviderId(command: OauthCommand): String
+
+    fun logout(command: OauthCommand)
+    fun unlink(command: OauthCommand)
 }
