@@ -32,7 +32,7 @@ class AuthController (
         @LoginUser userId: Long,
         @RequestHeader("Refresh-Token") refreshToken: String,
         @RequestBody @Valid request: LogoutRequest): ResponseEntity<Unit> {
-        val response = authService.logout(userId, refreshToken, request)
+        authService.logout(userId, refreshToken, request)
         return ResponseEntity.noContent().build()
     }
 
