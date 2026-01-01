@@ -70,6 +70,10 @@ class User(
         return !this.name.startsWith(UserConstants.TEMPORARY_NAME_PREFIX)
     }
 
+    fun getMaskedName(): String {
+        return if (this.deletedAt != null) "탈퇴한 회원" else this.name
+    }
+
     fun withdraw() {
         this.deletedAt = LocalDateTime.now()
     }
