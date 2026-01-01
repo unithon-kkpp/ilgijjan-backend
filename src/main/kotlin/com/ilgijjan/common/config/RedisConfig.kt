@@ -19,8 +19,8 @@ class RedisConfig(
     }
 
     @Bean
-    fun redisTemplate(): RedisTemplate<String, Any> {
-        val redisTemplate = RedisTemplate<String, Any>()
+    fun redisTemplate(): RedisTemplate<String, String> {
+        val redisTemplate = RedisTemplate<String, String>()
         redisTemplate.connectionFactory = redisConnectionFactory()
 
         redisTemplate.keySerializer = StringRedisSerializer()
