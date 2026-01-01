@@ -30,29 +30,19 @@ class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    name: String,
+    var name: String,
 
-    character: Character,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "`character`")
+    var character: Character,
 
-    isNotificationEnabled: Boolean = true,
+    var isNotificationEnabled: Boolean = true,
 
     @Embedded
     val oauthInfo: OauthInfo,
 
     var deletedAt: LocalDateTime? = null
 ) : BaseEntity() {
-
-    var name: String = name
-        private set
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "`character`")
-    var character: Character = character
-        private set
-
-    var isNotificationEnabled: Boolean = isNotificationEnabled
-        private set
-
     fun updateName(name: String) {
         require(name.isNotBlank()) { "이름은 비어 있을 수 없습니다." }
         this.name = name
@@ -71,7 +61,7 @@ class User(
     }
 
     fun getMaskedName(): String {
-        return if (this.deletedAt != null) "탈퇴한 회원" else this.name
+        return if (this.deletedAt != null) "탈퇴한 유저" else this.name
     }
 
     fun withdraw() {
