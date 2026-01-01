@@ -15,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional
 class AuthService(
     private val socialUserProcessor: SocialUserProcessor,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val userDeleter: UserDeleter
+    private val userDeleter: UserDeleter,
+    private val tokenManager: TokenManager
 ) {
     @Transactional
     fun login(request: LoginRequest): LoginResponse {
@@ -23,6 +24,8 @@ class AuthService(
 
         val accessToken = jwtTokenProvider.createToken(user.id!!, TokenType.ACCESS)
         val refreshToken = jwtTokenProvider.createToken(user.id, TokenType.REFRESH)
+
+        tokenManager.saveRefreshToken(user.id, refreshToken)
 
         return LoginResponse(
             accessToken = accessToken,
@@ -34,13 +37,13 @@ class AuthService(
     @Transactional
     fun logout(userId: Long, refreshToken: String, request: LogoutRequest) {
         socialUserProcessor.logout(OauthCommand.from(request))
-        // TODO: 일기짠 토큰 무효화
+        tokenManager.deleteRefreshToken(userId)
     }
 
     @Transactional
     fun withdraw(userId: Long, request: WithdrawRequest) {
         userDeleter.deleteById(userId)
         socialUserProcessor.unlink(OauthCommand.from(request))
-        // TODO: 일기짠 토큰 무효화
+        tokenManager.deleteRefreshToken(userId)
     }
 }
