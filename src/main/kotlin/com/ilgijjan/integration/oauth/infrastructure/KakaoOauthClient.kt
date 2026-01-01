@@ -64,4 +64,26 @@ class KakaoOauthClient(
             throw CustomException(ErrorCode.KAKAO_SERVER_ERROR)
         }
     }
+
+    override fun unlink(command: OauthCommand) {
+        val accessToken = checkNotNull(command.accessToken) { "accessToken must not be null" }
+
+        try {
+            val headers = HttpHeaders().apply {
+                setBearerAuth(accessToken)
+                contentType = MediaType.APPLICATION_FORM_URLENCODED
+            }
+            restTemplate.exchange(
+                "https://kapi.kakao.com/v1/user/unlink",
+                HttpMethod.POST,
+                HttpEntity<Unit>(headers),
+                String::class.java
+            )
+        } catch (e: HttpClientErrorException) {
+            log.warn("Kakao Unlink Error Body: ${e.responseBodyAsString}")
+            throw CustomException(ErrorCode.INVALID_KAKAO_TOKEN)
+        } catch (e: Exception) {
+            throw CustomException(ErrorCode.KAKAO_SERVER_ERROR)
+        }
+    }
 }

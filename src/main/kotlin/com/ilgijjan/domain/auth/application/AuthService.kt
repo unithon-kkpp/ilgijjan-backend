@@ -5,6 +5,8 @@ import com.ilgijjan.common.jwt.TokenType
 import com.ilgijjan.domain.auth.presentation.LoginRequest
 import com.ilgijjan.domain.auth.presentation.LoginResponse
 import com.ilgijjan.domain.auth.presentation.LogoutRequest
+import com.ilgijjan.domain.auth.presentation.WithdrawRequest
+import com.ilgijjan.domain.user.application.UserDeleter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -12,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class AuthService(
     private val socialUserProcessor: SocialUserProcessor,
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val userDeleter: UserDeleter
 ) {
     @Transactional
     fun login(request: LoginRequest): LoginResponse {
@@ -31,6 +34,13 @@ class AuthService(
     @Transactional
     fun logout(userId: Long, refreshToken: String, request: LogoutRequest) {
         socialUserProcessor.logout(OauthCommand.from(request))
+        // TODO: 일기짠 토큰 무효화
+    }
+
+    @Transactional
+    fun withdraw(userId: Long, request: WithdrawRequest) {
+        userDeleter.deleteById(userId)
+        socialUserProcessor.unlink(OauthCommand.from(request))
         // TODO: 일기짠 토큰 무효화
     }
 }

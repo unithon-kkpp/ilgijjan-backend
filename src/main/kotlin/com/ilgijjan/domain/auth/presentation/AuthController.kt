@@ -35,4 +35,14 @@ class AuthController (
         val response = authService.logout(userId, refreshToken, request)
         return ResponseEntity.noContent().build()
     }
+
+    @PostMapping("/withdraw")
+    @Operation(summary = "회원 탈퇴")
+    fun withdraw(
+        @LoginUser userId: Long,
+        @RequestBody @Valid request: WithdrawRequest
+    ): ResponseEntity<Unit> {
+        authService.withdraw(userId, request)
+        return ResponseEntity.noContent().build()
+    }
 }

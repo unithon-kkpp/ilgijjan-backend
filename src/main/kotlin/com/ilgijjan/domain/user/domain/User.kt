@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
+import java.time.LocalDateTime
 
 @Entity
 @Table(
@@ -36,7 +37,9 @@ class User(
     isNotificationEnabled: Boolean = true,
 
     @Embedded
-    val oauthInfo: OauthInfo
+    val oauthInfo: OauthInfo,
+
+    var deletedAt: LocalDateTime? = null
 ) : BaseEntity() {
 
     var name: String = name
@@ -65,5 +68,9 @@ class User(
 
     fun isOnboarded(): Boolean {
         return !this.name.startsWith(UserConstants.TEMPORARY_NAME_PREFIX)
+    }
+
+    fun withdraw() {
+        this.deletedAt = LocalDateTime.now()
     }
 }

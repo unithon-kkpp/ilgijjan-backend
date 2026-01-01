@@ -8,4 +8,5 @@ interface OauthClient {
     fun getProviderId(command: OauthCommand): String
 
     fun logout(command: OauthCommand)
+    fun unlink(command: OauthCommand)
 }

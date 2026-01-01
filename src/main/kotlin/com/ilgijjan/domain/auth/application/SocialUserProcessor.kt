@@ -15,8 +15,8 @@ class SocialUserProcessor(
 ) {
     fun getOrCreateUser(command: OauthCommand): User {
         oauthCommandValidator.validate(command)
-
         val client = oauthClients.getClient(command.provider)
+
         val providerId = client.getProviderId(command)
 
         return userReader.findByProviderId(command.provider, providerId)
@@ -26,6 +26,14 @@ class SocialUserProcessor(
     fun logout(command: OauthCommand) {
         oauthCommandValidator.validate(command)
         val client = oauthClients.getClient(command.provider)
+
         client.logout(command)
+    }
+
+    fun unlink(command: OauthCommand) {
+        oauthCommandValidator.validate(command)
+        val client = oauthClients.getClient(command.provider)
+
+        client.unlink(command)
     }
 }
