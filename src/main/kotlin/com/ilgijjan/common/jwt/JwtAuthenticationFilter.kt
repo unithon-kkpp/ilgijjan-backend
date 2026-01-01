@@ -1,11 +1,11 @@
 package com.ilgijjan.common.jwt
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.ilgijjan.common.constants.AuthConstants
 import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorResponse
+import com.ilgijjan.domain.auth.application.TokenManager
 import jakarta.servlet.FilterChain
-import jakarta.servlet.ServletRequest
-import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
@@ -16,7 +16,8 @@ import java.io.IOException
 
 class JwtAuthenticationFilter(
     private val jwtTokenProvider: JwtTokenProvider,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val tokenManager: TokenManager
 ) : OncePerRequestFilter() {
 
     private val log = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
@@ -27,6 +28,8 @@ class JwtAuthenticationFilter(
 
             if (token != null) {
                 jwtTokenProvider.validateToken(token)
+                tokenManager.validateNotBlacklisted(token)
+                request.setAttribute(AuthConstants.ACCESS_TOKEN_ATTRIBUTE, token)
                 val authentication = jwtTokenProvider.getAuthentication(token)
                 SecurityContextHolder.getContext().authentication = authentication
             }

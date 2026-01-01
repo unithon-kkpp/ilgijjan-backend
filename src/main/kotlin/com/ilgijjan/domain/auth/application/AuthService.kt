@@ -2,6 +2,8 @@ package com.ilgijjan.domain.auth.application
 
 import com.ilgijjan.common.jwt.JwtTokenProvider
 import com.ilgijjan.common.jwt.TokenType
+import com.ilgijjan.common.utils.SecurityUtil
+import com.ilgijjan.domain.auth.domain.BlacklistReason
 import com.ilgijjan.domain.auth.presentation.LoginRequest
 import com.ilgijjan.domain.auth.presentation.LoginResponse
 import com.ilgijjan.domain.auth.presentation.LogoutRequest
@@ -15,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 class AuthService(
     private val socialUserProcessor: SocialUserProcessor,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val userDeleter: UserDeleter
+    private val userDeleter: UserDeleter,
+    private val tokenManager: TokenManager
 ) {
     @Transactional
     fun login(request: LoginRequest): LoginResponse {
@@ -23,6 +26,8 @@ class AuthService(
 
         val accessToken = jwtTokenProvider.createToken(user.id!!, TokenType.ACCESS)
         val refreshToken = jwtTokenProvider.createToken(user.id, TokenType.REFRESH)
+
+        tokenManager.saveRefreshToken(user.id, refreshToken)
 
         return LoginResponse(
             accessToken = accessToken,
@@ -34,13 +39,15 @@ class AuthService(
     @Transactional
     fun logout(userId: Long, refreshToken: String, request: LogoutRequest) {
         socialUserProcessor.logout(OauthCommand.from(request))
-        // TODO: 일기짠 토큰 무효화
+        tokenManager.deleteRefreshToken(userId, refreshToken)
+        tokenManager.registerBlacklist(SecurityUtil.getCurrentAccessToken(), BlacklistReason.LOGOUT)
     }
 
     @Transactional
-    fun withdraw(userId: Long, request: WithdrawRequest) {
+    fun withdraw(userId: Long, refreshToken: String, request: WithdrawRequest) {
         userDeleter.deleteById(userId)
         socialUserProcessor.unlink(OauthCommand.from(request))
-        // TODO: 일기짠 토큰 무효화
+        tokenManager.deleteRefreshToken(userId, refreshToken)
+        tokenManager.registerBlacklist(SecurityUtil.getCurrentAccessToken(), BlacklistReason.WITHDRAW)
     }
 }

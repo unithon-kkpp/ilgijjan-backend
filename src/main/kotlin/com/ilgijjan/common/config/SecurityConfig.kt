@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ilgijjan.common.jwt.JwtAuthenticationEntryPoint
 import com.ilgijjan.common.jwt.JwtAuthenticationFilter
 import com.ilgijjan.common.jwt.JwtTokenProvider
+import com.ilgijjan.domain.auth.application.TokenManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -17,7 +18,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class SecurityConfig(
     private val jwtTokenProvider: JwtTokenProvider,
     private val authenticationEntryPoint: JwtAuthenticationEntryPoint,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val tokenManager: TokenManager
 ) {
 
     @Bean
@@ -42,7 +44,7 @@ class SecurityConfig(
                 it.authenticationEntryPoint(authenticationEntryPoint)
             }
             .addFilterBefore(
-                JwtAuthenticationFilter(jwtTokenProvider, objectMapper),
+                JwtAuthenticationFilter(jwtTokenProvider, objectMapper, tokenManager),
                 UsernamePasswordAuthenticationFilter::class.java
             )
 
