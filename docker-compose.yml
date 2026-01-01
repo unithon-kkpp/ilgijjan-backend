@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  application:
+    image: ${DOCKER_IMAGE}
+    container_name: ilgijjan-server
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - ilgijjan-net
+
+  redis:
+    image: redis:latest
+    container_name: ilgijjan-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - ilgijjan-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ilgijjan-rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - ilgijjan-net
+
+networks:
+  ilgijjan-net:
+    external: true
