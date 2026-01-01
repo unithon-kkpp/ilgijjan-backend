@@ -46,4 +46,15 @@ class AuthController (
         authService.withdraw(userId, refreshToken, request)
         return ResponseEntity.noContent().build()
     }
+
+    @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급")
+    fun reissue(
+        @LoginUser userId: Long,
+        @RequestHeader("Refresh-Token") refreshToken: String,
+        @RequestBody @Valid request: WithdrawRequest
+    ): ResponseEntity<Unit> {
+        authService.withdraw(userId, refreshToken, request)
+        return ResponseEntity.noContent().build()
+    }
 }

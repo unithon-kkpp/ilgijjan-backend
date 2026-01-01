@@ -1,5 +1,6 @@
 package com.ilgijjan.common.utils
 
+import com.ilgijjan.common.constants.AuthConstants
 import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorCode
 import org.springframework.security.core.context.SecurityContextHolder
@@ -19,7 +20,7 @@ object SecurityUtil {
 
     fun getCurrentAccessToken(): String {
         val request = (RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes).request
-        val token = request.getAttribute("ACCESS_TOKEN") as? String ?: throw CustomException(ErrorCode.TOKEN_NOT_FOUND)
+        val token = request.getAttribute(AuthConstants.ACCESS_TOKEN_ATTRIBUTE) as? String ?: throw CustomException(ErrorCode.TOKEN_NOT_FOUND)
         return token
     }
 }

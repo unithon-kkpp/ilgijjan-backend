@@ -1,8 +1,8 @@
 package com.ilgijjan.common.jwt
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.ilgijjan.common.constants.AuthConstants
 import com.ilgijjan.common.exception.CustomException
-import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.common.exception.ErrorResponse
 import com.ilgijjan.domain.auth.application.TokenManager
 import jakarta.servlet.FilterChain
@@ -29,7 +29,7 @@ class JwtAuthenticationFilter(
             if (token != null) {
                 jwtTokenProvider.validateToken(token)
                 tokenManager.validateNotBlacklisted(token)
-                request.setAttribute("ACCESS_TOKEN", token)
+                request.setAttribute(AuthConstants.ACCESS_TOKEN_ATTRIBUTE, token)
                 val authentication = jwtTokenProvider.getAuthentication(token)
                 SecurityContextHolder.getContext().authentication = authentication
             }
