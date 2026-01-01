@@ -40,9 +40,10 @@ class AuthController (
     @Operation(summary = "회원 탈퇴")
     fun withdraw(
         @LoginUser userId: Long,
+        @RequestHeader("Refresh-Token") refreshToken: String,
         @RequestBody @Valid request: WithdrawRequest
     ): ResponseEntity<Unit> {
-        authService.withdraw(userId, request)
+        authService.withdraw(userId, refreshToken, request)
         return ResponseEntity.noContent().build()
     }
 }

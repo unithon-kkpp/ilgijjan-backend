@@ -3,6 +3,8 @@ package com.ilgijjan.common.utils
 import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorCode
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletRequestAttributes
 
 object SecurityUtil {
     fun getCurrentUserId(): Long {
@@ -13,5 +15,11 @@ object SecurityUtil {
         }
 
         return principal
+    }
+
+    fun getCurrentAccessToken(): String {
+        val request = (RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes).request
+        val token = request.getAttribute("ACCESS_TOKEN") as? String ?: throw CustomException(ErrorCode.TOKEN_NOT_FOUND)
+        return token
     }
 }

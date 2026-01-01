@@ -2,6 +2,8 @@ package com.ilgijjan.domain.auth.application
 
 import com.ilgijjan.common.jwt.JwtTokenProvider
 import com.ilgijjan.common.jwt.TokenType
+import com.ilgijjan.common.utils.SecurityUtil
+import com.ilgijjan.domain.auth.domain.BlacklistReason
 import com.ilgijjan.domain.auth.presentation.LoginRequest
 import com.ilgijjan.domain.auth.presentation.LoginResponse
 import com.ilgijjan.domain.auth.presentation.LogoutRequest
@@ -37,13 +39,15 @@ class AuthService(
     @Transactional
     fun logout(userId: Long, refreshToken: String, request: LogoutRequest) {
         socialUserProcessor.logout(OauthCommand.from(request))
-        tokenManager.deleteRefreshToken(userId)
+        tokenManager.deleteRefreshToken(userId, refreshToken)
+        tokenManager.registerBlacklist(SecurityUtil.getCurrentAccessToken(), BlacklistReason.LOGOUT)
     }
 
     @Transactional
-    fun withdraw(userId: Long, request: WithdrawRequest) {
+    fun withdraw(userId: Long, refreshToken: String, request: WithdrawRequest) {
         userDeleter.deleteById(userId)
         socialUserProcessor.unlink(OauthCommand.from(request))
-        tokenManager.deleteRefreshToken(userId)
+        tokenManager.deleteRefreshToken(userId, refreshToken)
+        tokenManager.registerBlacklist(SecurityUtil.getCurrentAccessToken(), BlacklistReason.WITHDRAW)
     }
 }
