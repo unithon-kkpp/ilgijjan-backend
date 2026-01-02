@@ -21,7 +21,7 @@ class TokenManager(
 
     fun saveRefreshToken(userId: Long, refreshToken: String) {
         cacheService.set(
-            key = "$REFRESH_TOKEN_PREFIX$refreshToken",
+            key = getRefreshTokenKey(refreshToken),
             value = userId.toString(),
             duration = Duration.ofMillis(TokenType.REFRESH.lifeTime)
         )
@@ -40,24 +40,28 @@ class TokenManager(
         return userIdStr.toLong()
     }
 
-    private fun getAndDeleteRefreshToken(refreshToken: String): String? {
-        return cacheService.getAndDelete("$REFRESH_TOKEN_PREFIX$refreshToken")
-    }
-
     fun registerBlacklist(accessToken: String, reason: BlacklistReason) {
         val remainingTime = jwtTokenProvider.getRemainingTime(accessToken)
         if (remainingTime.isNegative || remainingTime.isZero) return
 
         cacheService.set(
-            key = "$BLACK_LIST_PREFIX$accessToken",
+            key = getBlacklistKey(accessToken),
             value = reason.name,
             duration = remainingTime
         )
     }
 
     fun validateNotBlacklisted(accessToken: String) {
-        if (cacheService.hasKey("$BLACK_LIST_PREFIX$accessToken")) {
+        if (cacheService.hasKey(getBlacklistKey(accessToken))) {
             throw CustomException(ErrorCode.INVALID_TOKEN)
         }
+    }
+
+    private fun getRefreshTokenKey(refreshToken: String) = "$REFRESH_TOKEN_PREFIX$refreshToken"
+
+    private fun getBlacklistKey(accessToken: String) = "$BLACK_LIST_PREFIX$accessToken"
+
+    private fun getAndDeleteRefreshToken(refreshToken: String): String? {
+        return cacheService.getAndDelete(getRefreshTokenKey(refreshToken))
     }
 }
