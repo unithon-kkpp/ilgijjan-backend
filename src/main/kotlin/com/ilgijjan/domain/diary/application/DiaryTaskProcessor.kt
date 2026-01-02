@@ -1,5 +1,6 @@
 package com.ilgijjan.domain.diary.application
 
+import com.ilgijjan.common.annotation.LogExecutionTime
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenDeleter
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenReader
 import com.ilgijjan.integration.image.application.ImageGenerator
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import sun.jvm.hotspot.HelloWorld.e
 
 @Component
 class DiaryTaskProcessor(
@@ -27,6 +27,7 @@ class DiaryTaskProcessor(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    @LogExecutionTime
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     fun process(diaryId: Long) {
         log.info("비동기 일기 생성 시작 - ID: $diaryId")
