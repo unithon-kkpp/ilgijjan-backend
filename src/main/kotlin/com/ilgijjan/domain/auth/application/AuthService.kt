@@ -54,6 +54,7 @@ class AuthService(
 
     @Transactional
     fun reissue(refreshToken: String): ReissueResponse {
+        jwtTokenProvider.validateToken(refreshToken)
         val userId = tokenManager.consumeRefreshToken(refreshToken)
 
         val newAccessToken = jwtTokenProvider.createToken(userId, TokenType.ACCESS)
