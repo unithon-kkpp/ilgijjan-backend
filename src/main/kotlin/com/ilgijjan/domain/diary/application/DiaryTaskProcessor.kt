@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import sun.jvm.hotspot.HelloWorld.e
 
 @Component
 class DiaryTaskProcessor(
@@ -44,9 +45,11 @@ class DiaryTaskProcessor(
             val updateCommand = UpdateDiaryResultCommand.of(refinedText, imageUrl, musicResult)
             diaryUpdater.updateResult(diaryId, updateCommand)
 
-            val tokens = fcmTokenReader.findAllByUserId(diary.user.id!!).map { it.token }
-            val deadTokens = notificationSender.sendDiaryCompletion(tokens, diaryId)
-            fcmTokenDeleter.deleteByTokens(deadTokens)
+            if (diary.user.isNotificationEnabled) {
+                val tokens = fcmTokenReader.findAllByUserId(diary.user.id!!).map { it.token }
+                val deadTokens = notificationSender.sendDiaryCompletion(tokens, diaryId)
+                fcmTokenDeleter.deleteByTokens(deadTokens)
+            }
 
             log.info("비동기 일기 생성 완료 - ID: $diaryId")
         } catch (e: Exception) {
