@@ -46,4 +46,13 @@ class AuthController (
         authService.withdraw(userId, refreshToken, request)
         return ResponseEntity.noContent().build()
     }
+
+    @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급", description = "Refresh Token을 사용하여 Access/Refresh 토큰을 재발급합니다.")
+    fun reissue(
+        @RequestHeader("Refresh-Token") refreshToken: String
+    ): ResponseEntity<ReissueResponse> {
+        val response = authService.reissue(refreshToken)
+        return ResponseEntity.ok(response)
+    }
 }

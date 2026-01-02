@@ -7,4 +7,5 @@ interface CacheService {
     fun get(key: String): String?
     fun hasKey(key: String): Boolean
     fun delete(key: String)
+    fun getAndDelete(key: String): String?
 }

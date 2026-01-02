@@ -21,19 +21,23 @@ class TokenManager(
 
     fun saveRefreshToken(userId: Long, refreshToken: String) {
         cacheService.set(
-            key = "$REFRESH_TOKEN_PREFIX$refreshToken",
+            key = getRefreshTokenKey(refreshToken),
             value = userId.toString(),
             duration = Duration.ofMillis(TokenType.REFRESH.lifeTime)
         )
     }
 
-    fun deleteRefreshToken(userId: Long, refreshToken: String) {
-        val key = "$REFRESH_TOKEN_PREFIX$refreshToken"
-        val savedUserId = cacheService.get(key)
-        if (savedUserId == null || savedUserId != userId.toString()) {
+    fun validateAndDeleteRefreshToken(userId: Long, refreshToken: String) {
+        val userIdStr = getAndDeleteRefreshToken(refreshToken)
+        if (userIdStr == null || userIdStr != userId.toString()) {
             throw CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND)
         }
-        cacheService.delete(key)
+    }
+
+    fun consumeRefreshToken(refreshToken: String): Long {
+        val userIdStr = getAndDeleteRefreshToken(refreshToken)
+            ?: throw CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND)
+        return userIdStr.toLong()
     }
 
     fun registerBlacklist(accessToken: String, reason: BlacklistReason) {
@@ -41,15 +45,23 @@ class TokenManager(
         if (remainingTime.isNegative || remainingTime.isZero) return
 
         cacheService.set(
-            key = "$BLACK_LIST_PREFIX$accessToken",
+            key = getBlacklistKey(accessToken),
             value = reason.name,
             duration = remainingTime
         )
     }
 
     fun validateNotBlacklisted(accessToken: String) {
-        if (cacheService.hasKey("$BLACK_LIST_PREFIX$accessToken")) {
+        if (cacheService.hasKey(getBlacklistKey(accessToken))) {
             throw CustomException(ErrorCode.INVALID_TOKEN)
         }
+    }
+
+    private fun getRefreshTokenKey(refreshToken: String) = "$REFRESH_TOKEN_PREFIX$refreshToken"
+
+    private fun getBlacklistKey(accessToken: String) = "$BLACK_LIST_PREFIX$accessToken"
+
+    private fun getAndDeleteRefreshToken(refreshToken: String): String? {
+        return cacheService.getAndDelete(getRefreshTokenKey(refreshToken))
     }
 }
