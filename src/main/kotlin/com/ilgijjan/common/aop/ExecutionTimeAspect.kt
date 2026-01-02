@@ -18,14 +18,18 @@ class ExecutionTimeAspect {
         val stopWatch = StopWatch()
 
         stopWatch.start()
-        val result = joinPoint.proceed()
-        stopWatch.stop()
+        try {
+            return joinPoint.proceed()
+        } finally {
+            if (stopWatch.isRunning) {
+                stopWatch.stop()
+            }
 
-        val methodName = joinPoint.signature.name
-        val taskTime = stopWatch.totalTimeSeconds
+            val className = joinPoint.signature.declaringType.simpleName
+            val methodName = joinPoint.signature.name
+            val taskTime = stopWatch.totalTimeSeconds
 
-        log.info("⏱️ Execution Time: [$methodName] - ${taskTime}s")
-
-        return result
+            log.info("⏱️ Execution Time: [$className.$methodName] - ${taskTime}s")
+        }
     }
 }
