@@ -20,4 +20,7 @@ class RedisCacheAdapter(
     override fun delete(key: String) {
         redisTemplate.delete(key)
     }
+    override fun getAndDelete(key: String): String? {
+        return redisTemplate.opsForValue().getAndDelete(key)
+    }
 }
