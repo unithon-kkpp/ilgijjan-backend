@@ -7,6 +7,7 @@ import com.ilgijjan.domain.auth.domain.BlacklistReason
 import com.ilgijjan.domain.auth.presentation.LoginRequest
 import com.ilgijjan.domain.auth.presentation.LoginResponse
 import com.ilgijjan.domain.auth.presentation.LogoutRequest
+import com.ilgijjan.domain.auth.presentation.ReissueResponse
 import com.ilgijjan.domain.auth.presentation.WithdrawRequest
 import com.ilgijjan.domain.user.application.UserDeleter
 import org.springframework.stereotype.Service
@@ -39,7 +40,7 @@ class AuthService(
     @Transactional
     fun logout(userId: Long, refreshToken: String, request: LogoutRequest) {
         socialUserProcessor.logout(OauthCommand.from(request))
-        tokenManager.deleteRefreshToken(userId, refreshToken)
+        tokenManager.validateAndDeleteRefreshToken(userId, refreshToken)
         tokenManager.registerBlacklist(SecurityUtil.getCurrentAccessToken(), BlacklistReason.LOGOUT)
     }
 
@@ -47,7 +48,19 @@ class AuthService(
     fun withdraw(userId: Long, refreshToken: String, request: WithdrawRequest) {
         userDeleter.deleteById(userId)
         socialUserProcessor.unlink(OauthCommand.from(request))
-        tokenManager.deleteRefreshToken(userId, refreshToken)
+        tokenManager.validateAndDeleteRefreshToken(userId, refreshToken)
         tokenManager.registerBlacklist(SecurityUtil.getCurrentAccessToken(), BlacklistReason.WITHDRAW)
+    }
+
+    @Transactional
+    fun reissue(refreshToken: String): ReissueResponse {
+        val userId = tokenManager.consumeRefreshToken(refreshToken)
+
+        val newAccessToken = jwtTokenProvider.createToken(userId, TokenType.ACCESS)
+        val newRefreshToken = jwtTokenProvider.createToken(userId, TokenType.REFRESH)
+
+        tokenManager.saveRefreshToken(userId, newRefreshToken)
+
+        return ReissueResponse(newAccessToken, newRefreshToken)
     }
 }

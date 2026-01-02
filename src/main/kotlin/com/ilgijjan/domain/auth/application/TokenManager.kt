@@ -27,13 +27,20 @@ class TokenManager(
         )
     }
 
-    fun deleteRefreshToken(userId: Long, refreshToken: String) {
+    fun validateAndDeleteRefreshToken(userId: Long, refreshToken: String) {
         val key = "$REFRESH_TOKEN_PREFIX$refreshToken"
         val savedUserId = cacheService.get(key)
         if (savedUserId == null || savedUserId != userId.toString()) {
             throw CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND)
         }
         cacheService.delete(key)
+    }
+
+    fun consumeRefreshToken(refreshToken: String): Long {
+        val key = "$REFRESH_TOKEN_PREFIX$refreshToken"
+        val userIdStr = cacheService.get(key) ?: throw CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND)
+        cacheService.delete(key)
+        return userIdStr.toLong()
     }
 
     fun registerBlacklist(accessToken: String, reason: BlacklistReason) {
