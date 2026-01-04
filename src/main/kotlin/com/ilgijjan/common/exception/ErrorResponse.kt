@@ -13,5 +13,12 @@ data class ErrorResponse(
                 message = errorCode.message
             )
         }
+
+        fun of(errorCode: ErrorCode, detailMessage: String): ErrorResponse {
+            return ErrorResponse(
+                status = errorCode.status,
+                message = detailMessage
+            )
+        }
     }
 }

@@ -4,5 +4,5 @@ import com.ilgijjan.domain.auth.domain.OauthProvider
 
 data class LogoutRequest (
     override val provider: OauthProvider,
-    override val accessToken: String
+    override val accessToken: String?
 ) : OauthRequest

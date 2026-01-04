@@ -11,11 +11,12 @@ class GeminiTextRefiner(
     @Value("\${gemini.api.text-url}")
     private val apiUrl: String,
     @Value("\${gemini.api.key}")
-    private val apiKey: String
+    private val apiKey: String,
+    webClientBuilder: WebClient.Builder
 ): TextRefiner {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private val webClient = WebClient.builder()
+    private val webClient = webClientBuilder
         .baseUrl(apiUrl)
         .defaultHeader("x-goog-api-key", apiKey)
         .defaultHeader("Content-Type", "application/json")

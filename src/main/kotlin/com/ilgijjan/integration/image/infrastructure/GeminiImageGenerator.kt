@@ -23,11 +23,12 @@ class GeminiImageGenerator(
     private val apiUrl: String,
     @Value("\${gemini.api.key}")
     private val apiKey: String,
-    private val fileUploader: FileUploader
+    private val fileUploader: FileUploader,
+    webClientBuilder: WebClient.Builder
 ) : ImageGenerator {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private val webClient: WebClient = WebClient.builder()
+    private val webClient: WebClient = webClientBuilder
         .baseUrl(apiUrl)
         .defaultHeader("x-goog-api-key", apiKey)
         .defaultHeader("Content-Type", "application/json")

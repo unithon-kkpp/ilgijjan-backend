@@ -1,0 +1,17 @@
+package com.ilgijjan.domain.billing.infrastructure
+
+import com.ilgijjan.domain.billing.domain.UserWallet
+import jakarta.persistence.LockModeType
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Lock
+import org.springframework.data.jpa.repository.Query
+import org.springframework.stereotype.Repository
+import java.util.Optional
+
+@Repository
+interface UserWalletRepository : JpaRepository<UserWallet, Long> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select w from UserWallet w where w.userId = :userId")
+    fun findByUserIdWithLock(userId: Long): Optional<UserWallet>
+}

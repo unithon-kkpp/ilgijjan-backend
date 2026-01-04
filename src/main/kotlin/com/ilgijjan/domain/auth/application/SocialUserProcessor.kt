@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component
 @Component
 class SocialUserProcessor(
     private val oauthClients: OauthClients,
-    private val oauthCommandValidator: OauthCommandValidator,
     private val userReader: UserReader,
-    private val userCreator: UserCreator
+    private val userCreator: UserCreator,
+
 ) {
     fun getOrCreateUser(command: OauthCommand): User {
-        val client = getValidatedClient(command)
+        val client = oauthClients.getClient(command.provider)
         val providerId = client.getProviderId(command)
 
         return userReader.findByProviderId(command.provider, providerId)
@@ -23,17 +23,12 @@ class SocialUserProcessor(
     }
 
     fun logout(command: OauthCommand) {
-        val client = getValidatedClient(command)
+        val client = oauthClients.getClient(command.provider)
         client.logout(command)
     }
 
     fun unlink(command: OauthCommand) {
-        val client = getValidatedClient(command)
+        val client = oauthClients.getClient(command.provider)
         client.unlink(command)
-    }
-
-    private fun getValidatedClient(command: OauthCommand): OauthClient {
-        oauthCommandValidator.validate(command)
-        return oauthClients.getClient(command.provider)
     }
 }
