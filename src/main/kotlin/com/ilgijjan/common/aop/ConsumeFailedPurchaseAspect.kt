@@ -24,7 +24,7 @@ class ConsumeFailedPurchaseAspect(
             val purchaseToken = getPurchaseToken(joinPoint, markConsumeFailedPurchase.value)
             paymentHistoryUpdater.consumeFail(purchaseToken)
             log.error("[Consume Fail] 구매 토큰: $purchaseToken | 메시지: ${e.message}", e)
-            null
+            throw e
         }
     }
 
