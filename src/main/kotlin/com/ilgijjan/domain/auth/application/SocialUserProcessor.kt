@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component
 class SocialUserProcessor(
     private val oauthClients: OauthClients,
     private val userReader: UserReader,
-    private val userCreator: UserCreator
+    private val userCreator: UserCreator,
+
 ) {
     fun getOrCreateUser(command: OauthCommand): User {
         val client = oauthClients.getClient(command.provider)
