@@ -14,15 +14,18 @@ class OneStoreAuthClient(
     @Value("\${onestore.client-secret}") private val clientSecret: String,
     webClientBuilder: WebClient.Builder
 ) {
-    private var cachedToken: String? = null
+    @Volatile private var cachedToken: OneStoreAccessToken? = null
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
 
+    @Synchronized
     fun getAccessToken(): String {
-        // TODO: 유효시간 체크 로직 추가 (보통 1시간)
-        return cachedToken ?: fetchNewToken()
+        if (cachedToken == null || cachedToken!!.isExpired()) {
+            cachedToken = fetchNewToken()
+        }
+        return cachedToken!!.accessToken
     }
 
-    private fun fetchNewToken(): String {
+    private fun fetchNewToken(): OneStoreAccessToken {
         val response = webClient.post()
             .uri("/v7/oauth/token")
             .header("x-market-code", "MKT_GLB")
@@ -33,6 +36,9 @@ class OneStoreAuthClient(
             .bodyToMono(OneStoreTokenResponse::class.java)
             .block() ?: throw CustomException(ErrorCode.ONE_STORE_AUTH_FAILED)
 
-        return response.accessToken.also { cachedToken = it }
+        return OneStoreAccessToken(
+            accessToken = response.accessToken,
+            expiresInSeconds = response.expiresIn
+        )
     }
 }
