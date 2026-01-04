@@ -20,7 +20,7 @@ object SecurityUtil {
 
     fun getCurrentAccessToken(): String {
         val request = (RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes).request
-        val token = request.getAttribute(AuthConstants.ACCESS_TOKEN_ATTRIBUTE) as? String ?: throw CustomException(ErrorCode.TOKEN_NOT_FOUND)
+        val token = request.getAttribute(AuthConstants.ACCESS_TOKEN_ATTRIBUTE) as? String ?: throw CustomException(ErrorCode.MISSING_AUTH_TOKEN)
         return token
     }
 }

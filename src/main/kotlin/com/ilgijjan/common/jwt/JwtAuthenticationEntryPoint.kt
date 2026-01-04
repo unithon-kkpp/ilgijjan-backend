@@ -24,7 +24,7 @@ class JwtAuthenticationEntryPoint(
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         response.characterEncoding = "UTF-8"
 
-        val errorResponse = ErrorResponse.of(ErrorCode.TOKEN_NOT_FOUND)
+        val errorResponse = ErrorResponse.of(ErrorCode.MISSING_AUTH_TOKEN)
 
         response.writer.write(objectMapper.writeValueAsString(errorResponse))
     }
