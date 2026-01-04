@@ -19,7 +19,14 @@ class BillingController(
 ) {
 
     @PostMapping("/verify")
-    @Operation(summary = "인앱 결제 영수증 검증")
+    @Operation(
+        summary = "인앱 결제 영수증 검증 및 아이템 지급",
+        description = """
+            스토어 SDK를 통해 결제가 완료된 직후 호출합니다.
+            전달받은 `purchaseToken`을 기반으로 영수증을 검증하며,
+            검증에 성공하면 유료 아이템을 즉시 지급합니다.
+        """
+    )
     fun verify(
         @LoginUser userId: Long,
         @RequestBody @Valid request: BillingVerifyRequest
