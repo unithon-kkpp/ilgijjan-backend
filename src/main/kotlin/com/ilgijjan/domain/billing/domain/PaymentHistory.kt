@@ -22,4 +22,13 @@ class PaymentHistory(
 
     @Enumerated(EnumType.STRING)
     var status: PaymentStatus
-) : BaseEntity()
+) : BaseEntity() {
+
+    fun complete() {
+        this.status = PaymentStatus.COMPLETED
+    }
+
+    fun consumeFail() {
+        this.status = PaymentStatus.CONSUME_FAILED
+    }
+}

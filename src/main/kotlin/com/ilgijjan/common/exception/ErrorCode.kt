@@ -50,6 +50,7 @@ enum class ErrorCode(
 
     // Billing
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상품 정보입니다."),
+    PAYMENT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 결제 내역입니다."),
     DUPLICATE_PURCHASE_TOKEN(HttpStatus.CONFLICT, "이미 처리 완료된 결제 토큰입니다."),
     INVALID_PURCHASE_STATE(HttpStatus.BAD_REQUEST, "결제 완료 상태가 아닙니다. (취소 또는 미결제)"),
     ALREADY_CONSUMED_PURCHASE(HttpStatus.CONFLICT, "이미 소비 처리된 상품입니다."),

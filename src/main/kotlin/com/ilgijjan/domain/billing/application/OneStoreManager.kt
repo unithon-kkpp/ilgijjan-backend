@@ -1,5 +1,6 @@
 package com.ilgijjan.domain.billing.application
 
+import com.ilgijjan.common.annotation.TraceConsumeFailedPurchase
 import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.integration.billing.infrastructure.OneStoreBillingClient
@@ -20,6 +21,7 @@ class OneStoreManager(
         }
     }
 
+    @TraceConsumeFailedPurchase
     fun consumePurchase(storeProductId: String, purchaseToken: String) {
         oneStoreClient.consumePurchase(storeProductId, purchaseToken)
     }
