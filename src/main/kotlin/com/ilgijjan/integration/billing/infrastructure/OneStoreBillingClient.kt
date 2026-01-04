@@ -11,11 +11,10 @@ import kotlin.jvm.java
 class OneStoreBillingClient(
     private val authClient: OneStoreAuthClient,
     @Value("\${onestore.base-url}") private val baseUrl: String,
-    @Value("\${onestore.client-id}") private val clientId: String
+    @Value("\${onestore.client-id}") private val clientId: String,
+    webClientBuilder: WebClient.Builder
 ) {
-    private val webClient = WebClient.builder()
-        .baseUrl(baseUrl)
-        .build()
+    private val webClient = webClientBuilder.baseUrl(baseUrl).build()
 
     fun getPurchaseDetails(productId: String, purchaseToken: String): OneStoreGetPurchaseDetailsResponse {
         return webClient.get()

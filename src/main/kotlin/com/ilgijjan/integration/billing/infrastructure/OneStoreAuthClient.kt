@@ -11,13 +11,11 @@ import org.springframework.web.reactive.function.client.WebClient
 class OneStoreAuthClient(
     @Value("\${onestore.base-url}") private val baseUrl: String,
     @Value("\${onestore.client-id}") private val clientId: String,
-    @Value("\${onestore.client-secret}") private val clientSecret: String
+    @Value("\${onestore.client-secret}") private val clientSecret: String,
+    webClientBuilder: WebClient.Builder
 ) {
     private var cachedToken: String? = null
-
-    private val webClient = WebClient.builder()
-        .baseUrl(baseUrl)
-        .build()
+    private val webClient = webClientBuilder.baseUrl(baseUrl).build()
 
     fun getAccessToken(): String {
         // TODO: 유효시간 체크 로직 추가 (보통 1시간)
