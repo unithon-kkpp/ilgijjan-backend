@@ -18,13 +18,17 @@ class OneStoreWebhookHandler(
 ) : BillingWebhookHandler {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    companion object {
+        private const val PURCHASE_STATE_CANCELED = "CANCELED"
+    }
+
     override fun getStoreType(): StoreType = StoreType.ONE_STORE
 
     override fun handle(rawBody: String) {
         val request = objectMapper.readValue(rawBody, OneStorePnsRequest::class.java)
         oneStoreSignatureVerifier.validate(rawBody, request.signature)
 
-        if (request.purchaseState == "CANCELED") {
+        if (request.purchaseState == PURCHASE_STATE_CANCELED) {
             try {
                 billingTransactionHandler.refund(request.purchaseToken)
             } catch (e: CustomException) {
