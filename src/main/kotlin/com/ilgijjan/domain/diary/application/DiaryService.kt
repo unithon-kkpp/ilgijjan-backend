@@ -9,7 +9,6 @@ import com.ilgijjan.domain.diary.presentation.ReadDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadMyDiariesResponse
 import com.ilgijjan.domain.diary.presentation.ReadPublicDiariesResponse
 import com.ilgijjan.domain.user.application.UserReader
-import com.ilgijjan.domain.wallet.application.UserWalletReader
 import com.ilgijjan.domain.wallet.application.UserWalletUpdater
 import com.ilgijjan.integration.messaging.application.MessageProducer
 import org.springframework.stereotype.Service
@@ -24,7 +23,7 @@ class DiaryService(
     private val diaryValidator: DiaryValidator,
     private val messageProducer: MessageProducer,
     private val userReader: UserReader,
-    private val walletUpdater: UserWalletUpdater
+    private val userWalletUpdater: UserWalletUpdater
 ) {
 
     @Transactional
@@ -37,7 +36,7 @@ class DiaryService(
 
     @Transactional
     fun createDiary(userId: Long, request: CreateDiaryRequest): CreateDiaryResponse {
-        walletUpdater.consume(userId, WalletConstants.DIARY_CREATION_COST)
+        userWalletUpdater.consume(userId, WalletConstants.DIARY_CREATION_COST)
 
         val user = userReader.getUserById(userId)
         val command = CreateDiaryCommand.of(request, user)
