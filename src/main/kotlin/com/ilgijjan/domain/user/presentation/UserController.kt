@@ -26,6 +26,13 @@ class UserController(
         return ResponseEntity.ok(response)
     }
 
+    @GetMapping("/notes")
+    @Operation(summary = "보유 음표 조회", description = "로그인한 사용자가 현재 보유 중인 음표 개수를 조회합니다.")
+    fun getMyNoteCount(@LoginUser userId: Long): ResponseEntity<ReadNoteResponse> {
+        val response = userService.getMyNoteCount(userId)
+        return ResponseEntity.ok(response)
+    }
+
     @PatchMapping("/name")
     @Operation(summary = "이름 변경")
     fun updateName(

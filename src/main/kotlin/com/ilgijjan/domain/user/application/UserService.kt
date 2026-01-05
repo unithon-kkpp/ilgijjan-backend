@@ -2,6 +2,8 @@ package com.ilgijjan.domain.user.application
 
 import com.ilgijjan.domain.user.domain.Character
 import com.ilgijjan.domain.user.presentation.ReadMeResponse
+import com.ilgijjan.domain.user.presentation.ReadNoteResponse
+import com.ilgijjan.domain.wallet.application.UserWalletReader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -9,11 +11,17 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class UserService(
     private val userReader: UserReader,
-    private val userUpdater: UserUpdater
+    private val userUpdater: UserUpdater,
+    private val userWalletReader: UserWalletReader
 ) {
     fun getMe(userId: Long): ReadMeResponse {
         val user = userReader.getUserById(userId)
         return ReadMeResponse.from(user)
+    }
+
+    fun getMyNoteCount(userId: Long): ReadNoteResponse {
+        val wallet = userWalletReader.getByUserId(userId)
+        return ReadNoteResponse(wallet.noteCount)
     }
 
     @Transactional

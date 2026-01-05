@@ -1,6 +1,7 @@
 package com.ilgijjan.domain.billing.application
 
 import com.ilgijjan.domain.billing.domain.PaymentStatus
+import com.ilgijjan.domain.wallet.application.UserWalletUpdater
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -24,7 +25,7 @@ class BillingTransactionHandler(
         if (history.status == PaymentStatus.REFUNDED) return
 
         val amountToRevoke = history.storeProduct.product.noteAmount
-        userWalletUpdater.revoke(history.userId, amountToRevoke)
+        userWalletUpdater.subtract(history.userId, amountToRevoke)
 
         history.refund()
     }
