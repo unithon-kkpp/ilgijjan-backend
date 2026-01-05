@@ -2,12 +2,15 @@ package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.CheckDiaryOwner
 import com.ilgijjan.common.config.RabbitMqConfig
+import com.ilgijjan.common.constants.WalletConstants
 import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
 import com.ilgijjan.domain.diary.presentation.CreateDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadMyDiariesResponse
 import com.ilgijjan.domain.diary.presentation.ReadPublicDiariesResponse
 import com.ilgijjan.domain.user.application.UserReader
+import com.ilgijjan.domain.wallet.application.UserWalletReader
+import com.ilgijjan.domain.wallet.application.UserWalletUpdater
 import com.ilgijjan.integration.messaging.application.MessageProducer
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,7 +23,8 @@ class DiaryService(
     private val diaryUpdater: DiaryUpdater,
     private val diaryValidator: DiaryValidator,
     private val messageProducer: MessageProducer,
-    private val userReader: UserReader
+    private val userReader: UserReader,
+    private val walletUpdater: UserWalletUpdater
 ) {
 
     @Transactional
@@ -33,6 +37,8 @@ class DiaryService(
 
     @Transactional
     fun createDiary(userId: Long, request: CreateDiaryRequest): CreateDiaryResponse {
+        walletUpdater.consume(userId, WalletConstants.DIARY_CREATION_COST)
+
         val user = userReader.getUserById(userId)
         val command = CreateDiaryCommand.of(request, user)
         val diary = diaryCreator.create(command)

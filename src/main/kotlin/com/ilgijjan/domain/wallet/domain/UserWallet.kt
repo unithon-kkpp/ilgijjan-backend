@@ -17,10 +17,10 @@ class UserWallet(
         this.noteCount += amount
     }
 
-    fun revoke(amount: Int) {
-        require(amount > 0) { "회수 금액은 0보다 커야 합니다." }
+    fun subtract(amount: Int) {
+        require(amount > 0) { "차감 수량은 0보다 커야 합니다." }
         require(this.noteCount >= amount) {
-            "잔액이 부족하여 환불(회수) 처리를 할 수 없습니다. (userId: $userId, balance: $noteCount, requested: $amount)"
+            "보유 개수가 부족합니다. (userId: $userId, 보유: $noteCount, 요청: $amount)"
         }
         this.noteCount -= amount
     }
