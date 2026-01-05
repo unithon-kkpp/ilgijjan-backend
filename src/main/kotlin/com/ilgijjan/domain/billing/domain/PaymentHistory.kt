@@ -31,4 +31,8 @@ class PaymentHistory(
     fun consumeFail() {
         this.status = PaymentStatus.CONSUME_FAILED
     }
+
+    fun refund() {
+        this.status = PaymentStatus.REFUNDED
+    }
 }
