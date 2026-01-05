@@ -2,7 +2,6 @@ package com.ilgijjan.domain.billing.presentation
 
 import com.ilgijjan.domain.billing.domain.StoreProduct
 import io.swagger.v3.oas.annotations.media.Schema
-import kotlin.collections.map
 
 data class ReadProductsResponse(
     @field:Schema(description = "상품 목록")
