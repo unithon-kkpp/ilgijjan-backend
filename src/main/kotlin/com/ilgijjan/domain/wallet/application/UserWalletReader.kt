@@ -1,9 +1,9 @@
-package com.ilgijjan.domain.billing.application
+package com.ilgijjan.domain.wallet.application
 
 import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorCode
-import com.ilgijjan.domain.billing.domain.UserWallet
-import com.ilgijjan.domain.billing.infrastructure.UserWalletRepository
+import com.ilgijjan.domain.wallet.domain.UserWallet
+import com.ilgijjan.domain.wallet.infrastructure.UserWalletRepository
 import org.springframework.stereotype.Component
 
 @Component

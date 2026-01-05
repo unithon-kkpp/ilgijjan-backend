@@ -1,4 +1,4 @@
-package com.ilgijjan.domain.billing.domain
+package com.ilgijjan.domain.wallet.domain
 
 import com.ilgijjan.common.domain.BaseEntity
 import jakarta.persistence.Entity

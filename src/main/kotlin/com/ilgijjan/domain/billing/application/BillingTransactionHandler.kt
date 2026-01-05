@@ -1,6 +1,7 @@
 package com.ilgijjan.domain.billing.application
 
 import com.ilgijjan.domain.billing.domain.PaymentStatus
+import com.ilgijjan.domain.wallet.application.UserWalletUpdater
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 

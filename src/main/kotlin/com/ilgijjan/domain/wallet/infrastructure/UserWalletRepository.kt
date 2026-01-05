@@ -1,6 +1,6 @@
-package com.ilgijjan.domain.billing.infrastructure
+package com.ilgijjan.domain.wallet.infrastructure
 
-import com.ilgijjan.domain.billing.domain.UserWallet
+import com.ilgijjan.domain.wallet.domain.UserWallet
 import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock

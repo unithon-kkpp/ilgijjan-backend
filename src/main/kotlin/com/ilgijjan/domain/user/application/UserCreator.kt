@@ -1,10 +1,11 @@
 package com.ilgijjan.domain.user.application
 
 import com.ilgijjan.common.constants.UserConstants
+import com.ilgijjan.common.constants.WalletConstants
 import com.ilgijjan.domain.auth.domain.OauthInfo
 import com.ilgijjan.domain.auth.domain.OauthProvider
-import com.ilgijjan.domain.billing.domain.UserWallet
-import com.ilgijjan.domain.billing.infrastructure.UserWalletRepository
+import com.ilgijjan.domain.wallet.domain.UserWallet
+import com.ilgijjan.domain.wallet.infrastructure.UserWalletRepository
 import com.ilgijjan.domain.user.domain.Character
 import com.ilgijjan.domain.user.domain.User
 import com.ilgijjan.domain.user.infrastructure.UserRepository
@@ -26,7 +27,7 @@ class UserCreator(
             )
         )
         val savedUser = userRepository.save(newUser)
-        walletRepository.save(UserWallet(userId = savedUser.id!!))
+        walletRepository.save(UserWallet(userId = savedUser.id!!, WalletConstants.INITIAL_NOTES))
         return savedUser
     }
 }

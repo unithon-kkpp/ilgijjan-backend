@@ -1,4 +1,4 @@
-package com.ilgijjan.domain.billing.application
+package com.ilgijjan.domain.wallet.application
 
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
