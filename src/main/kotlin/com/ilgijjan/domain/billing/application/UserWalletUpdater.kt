@@ -12,4 +12,10 @@ class UserWalletUpdater(
         val wallet = userWalletReader.getByUserIdForUpdate(userId)
         wallet.charge(amount)
     }
+
+    @Transactional
+    fun revoke(userId: Long, amount: Int) {
+        val wallet = userWalletReader.getByUserIdForUpdate(userId)
+        wallet.revoke(amount)
+    }
 }

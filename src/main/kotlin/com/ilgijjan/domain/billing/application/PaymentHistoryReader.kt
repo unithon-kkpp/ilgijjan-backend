@@ -14,4 +14,9 @@ class PaymentHistoryReader(
         return paymentHistoryRepository.findById(purchaseToken)
             .orElseThrow { CustomException(ErrorCode.PAYMENT_HISTORY_NOT_FOUND) }
     }
+
+    fun getByPurchaseTokenWithProduct(purchaseToken: String): PaymentHistory {
+        return paymentHistoryRepository.findByPurchaseTokenWithProduct(purchaseToken)
+            ?: throw CustomException(ErrorCode.PAYMENT_HISTORY_NOT_FOUND)
+    }
 }
