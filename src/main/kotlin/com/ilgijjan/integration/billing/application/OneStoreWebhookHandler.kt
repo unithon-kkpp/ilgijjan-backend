@@ -32,12 +32,20 @@ class OneStoreWebhookHandler(
             try {
                 billingTransactionHandler.refund(request.purchaseToken)
             } catch (e: CustomException) {
-                if (e.errorCode == ErrorCode.PAYMENT_HISTORY_NOT_FOUND) {
-                    log.warn("[Webhook Info] 원스토어 환불 처리를 중단합니다. DB에 결제 이력이 존재하지 않아 재시도해도 처리가 불가능합니다. token: {}", request.purchaseToken)
-                    return
+                when (e.errorCode) {
+                    ErrorCode.PAYMENT_HISTORY_NOT_FOUND -> {
+                        log.warn("[Refund Skip] 결제 이력이 존재하지 않아 환불을 중단합니다. token: {}", request.purchaseToken)
+                        return
+                    }
+                    ErrorCode.INSUFFICIENT_NOTES -> {
+                        log.warn("[Refund Denied] 보유 음표 부족으로 환불 처리가 불가능합니다. token: {}", request.purchaseToken)
+                        return
+                    }
+                    else -> {
+                        log.error("[Webhook Retry] 환불 로직 실행 중 비즈니스 예외 발생. 재시도를 위해 에러를 전파합니다. message: {}", e.message)
+                        throw e
+                    }
                 }
-                log.error("[Webhook Retry] 환불 로직 실행 중 비즈니스 예외 발생. 재시도를 위해 에러를 전파합니다. message: {}", e.message)
-                throw e
             }
         }
     }

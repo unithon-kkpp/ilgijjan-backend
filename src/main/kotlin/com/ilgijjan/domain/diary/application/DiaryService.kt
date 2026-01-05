@@ -36,7 +36,7 @@ class DiaryService(
 
     @Transactional
     fun createDiary(userId: Long, request: CreateDiaryRequest): CreateDiaryResponse {
-        userWalletUpdater.consume(userId, WalletConstants.DIARY_CREATION_COST)
+        userWalletUpdater.subtract(userId, WalletConstants.DIARY_CREATION_COST)
 
         val user = userReader.getUserById(userId)
         val command = CreateDiaryCommand.of(request, user)

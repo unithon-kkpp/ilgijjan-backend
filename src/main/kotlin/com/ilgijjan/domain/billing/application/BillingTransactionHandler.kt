@@ -25,7 +25,7 @@ class BillingTransactionHandler(
         if (history.status == PaymentStatus.REFUNDED) return
 
         val amountToRevoke = history.storeProduct.product.noteAmount
-        userWalletUpdater.revoke(history.userId, amountToRevoke)
+        userWalletUpdater.subtract(history.userId, amountToRevoke)
 
         history.refund()
     }
