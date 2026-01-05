@@ -14,4 +14,6 @@ interface UserWalletRepository : JpaRepository<UserWallet, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select w from UserWallet w where w.userId = :userId")
     fun findByUserIdWithLock(userId: Long): Optional<UserWallet>
+
+    fun findByUserId(userId: Long): Optional<UserWallet>
 }

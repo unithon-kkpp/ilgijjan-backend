@@ -14,4 +14,9 @@ class UserWalletReader(
         return walletRepository.findByUserIdWithLock(userId)
             .orElseThrow { CustomException(ErrorCode.WALLET_NOT_FOUND) }
     }
+
+    fun getByUserId(userId: Long): UserWallet {
+        return walletRepository.findByUserId(userId)
+            .orElseThrow { CustomException(ErrorCode.WALLET_NOT_FOUND) }
+    }
 }
