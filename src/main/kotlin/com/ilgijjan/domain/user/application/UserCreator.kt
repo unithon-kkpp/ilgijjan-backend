@@ -27,7 +27,7 @@ class UserCreator(
             )
         )
         val savedUser = userRepository.save(newUser)
-        walletRepository.save(UserWallet(userId = savedUser.id!!, WalletConstants.INITIAL_NOTES))
+        walletRepository.save(UserWallet(userId = savedUser.id!!, noteCount = WalletConstants.INITIAL_NOTES))
         return savedUser
     }
 }
