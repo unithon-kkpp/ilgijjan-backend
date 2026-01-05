@@ -2,13 +2,16 @@ package com.ilgijjan.domain.billing.presentation
 
 import com.ilgijjan.common.annotation.LoginUser
 import com.ilgijjan.domain.billing.application.BillingService
+import com.ilgijjan.domain.billing.domain.StoreType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -33,5 +36,14 @@ class BillingController(
     ): ResponseEntity<Unit> {
         billingService.verifyPurchase(userId, request)
         return ResponseEntity.ok().build()
+    }
+
+
+    @GetMapping("/products")
+    @Operation(summary = "스토어별 상품 목록 조회")
+    fun getProducts(
+        @RequestParam storeType: StoreType
+    ): ResponseEntity<ReadProductsResponse> {
+        return ResponseEntity.ok(billingService.getProducts(storeType))
     }
 }
