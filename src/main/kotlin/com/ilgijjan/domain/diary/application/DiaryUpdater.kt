@@ -20,12 +20,7 @@ class DiaryUpdater(
     @Transactional
     fun updateResult(diaryId: Long, command: UpdateDiaryResultCommand) {
         val diary = diaryReader.getDiaryById(diaryId)
-
-        diary.text = command.refinedText
-        diary.imageUrl = command.imageUrl
-        diary.musicUrl = command.musicUrl
-        diary.lyrics = command.lyrics
-
+        diary.setGeneratedContent(command.imageUrl, command.musicUrl, command.lyrics)
         diary.complete()
     }
 

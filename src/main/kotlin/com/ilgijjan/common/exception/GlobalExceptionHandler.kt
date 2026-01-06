@@ -43,7 +43,7 @@ class GlobalExceptionHandler {
 
 	@ExceptionHandler(MethodArgumentNotValidException::class)
 	fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
-        val message = e.bindingResult.fieldErrors.joinToString(", ") { "${it.field}: ${it.defaultMessage}" }
+        val message = e.bindingResult.fieldErrors.joinToString(", ") { it.defaultMessage ?: "부적절한 입력값입니다." }
 		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, message)
 		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}

@@ -1,6 +1,7 @@
 package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.LogExecutionTime
+import com.ilgijjan.domain.diary.domain.DiaryInputType
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenDeleter
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenReader
 import com.ilgijjan.integration.image.application.ImageGenerator
@@ -34,8 +35,18 @@ class DiaryTaskProcessor(
         val diary = diaryReader.getDiaryById(diaryId)
 
         try {
-            val extractedText = ocrProcessor.extractText(diary.photoUrl)
-            val refinedText = textRefiner.refineText(extractedText)
+            val baseText = when (diary.type) {
+                DiaryInputType.PHOTO -> {
+                    log.info("PHOTO 타입: OCR 추출 시작")
+                    ocrProcessor.extractText(diary.photoUrl!!)
+                }
+                DiaryInputType.TEXT -> {
+                    log.info("TEXT 타입: 입력된 텍스트 사용")
+                    diary.text
+                }
+            }
+
+            val refinedText = textRefiner.refineText(baseText!!)
 
             val musicFuture = musicGenerator.generateMusicAsync(refinedText)
             val imageFuture = imageGenerator.generateImageAsync(refinedText, diary.weather)
@@ -43,7 +54,7 @@ class DiaryTaskProcessor(
             val musicResult = musicFuture.get()
             val imageUrl = imageFuture.get()
 
-            val updateCommand = UpdateDiaryResultCommand.of(refinedText, imageUrl, musicResult)
+            val updateCommand = UpdateDiaryResultCommand.of(imageUrl, musicResult)
             diaryUpdater.updateResult(diaryId, updateCommand)
 
             if (diary.user.isNotificationEnabled) {

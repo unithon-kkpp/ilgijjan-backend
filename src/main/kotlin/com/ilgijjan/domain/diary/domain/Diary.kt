@@ -16,22 +16,25 @@ class Diary (
     @JoinColumn(name = "user_id", nullable = false)
     val user: User,
 
+    @Enumerated(EnumType.STRING)
+    val type: DiaryInputType,
+
     @Lob
-    var text: String,
+    val text: String?,
+
+    val photoUrl: String?,
 
     @Enumerated(EnumType.STRING)
-    var weather: Weather,
+    val weather: Weather,
 
-    var photoUrl: String,
+    val mood: Int,
 
-    var imageUrl: String,
+    var imageUrl: String? = null,
 
-    var musicUrl: String,
+    var musicUrl: String? = null,
 
     @Lob
-    var lyrics: String,
-
-    var mood: Int,
+    var lyrics: String? = null,
 
     var likeCount: Long = 0,
 
@@ -64,6 +67,12 @@ class Diary (
         if (this.user.id != userId) {
             throw CustomException(ErrorCode.NOT_DIARY_OWNER)
         }
+    }
+
+    fun setGeneratedContent(imageUrl: String, musicUrl: String, lyrics: String) {
+        this.imageUrl = imageUrl
+        this.musicUrl = musicUrl
+        this.lyrics = lyrics
     }
 
     fun complete() {

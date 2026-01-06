@@ -13,12 +13,10 @@ class DiaryCreator (
     fun create(command: CreateDiaryCommand): Diary {
         val diary = Diary(
             user = command.user,
+            type = command.type,
             text = command.text,
-            weather = command.weather,
             photoUrl = command.photoUrl,
-            imageUrl = command.imageUrl,
-            musicUrl = command.musicUrl,
-            lyrics = command.lyrics,
+            weather = command.weather,
             mood = command.mood
         )
         return diaryRepository.save(diary)

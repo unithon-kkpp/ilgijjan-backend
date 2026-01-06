@@ -21,7 +21,7 @@ data class ReadPublicDiariesResponse(
                 PublicDiaryItem(
                     id = diary.id!!,
                     date = diary.createdAt?.format(DateFormatter.DOT_DATE_FORMATTER)!!,
-                    imageUrl = diary.imageUrl,
+                    imageUrl = diary.imageUrl ?: "",
                     authorName = diary.user.getMaskedName()
                 )
             }
