@@ -2,6 +2,7 @@ package com.ilgijjan.domain.diary.presentation
 
 import com.ilgijjan.common.utils.DateFormatter
 import com.ilgijjan.domain.diary.domain.Diary
+import com.ilgijjan.domain.diary.domain.DiaryStatus
 import com.ilgijjan.domain.diary.domain.Weather
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -14,11 +15,12 @@ data class ReadMyDiariesResponse(
             val items = diaries.map { diary ->
                 MyDiaryItem(
                     id = diary.id!!,
+                    status = diary.status,
                     date = diary.createdAt?.format(DateFormatter.DOT_DATE_FORMATTER)!!,
                     imageUrl = diary.imageUrl,
                     weather = diary.weather,
                     mood = diary.mood,
-                    introLines = diary.lyrics.take(9)
+                    introLines = diary.lyrics?.take(9)
                 )
             }
             return ReadMyDiariesResponse(items)
@@ -30,11 +32,14 @@ data class MyDiaryItem(
     @field:Schema(description = "일기 ID", example = "123")
     val id: Long,
 
+    @field:Schema(description = "생성 상태 (PENDING, COMPLETED, FAILED)", example = "COMPLETED")
+    val status: DiaryStatus,
+
     @field:Schema(description = "작성 날짜", example = "2025.08.09")
     val date: String,
 
     @field:Schema(description = "생성된 이미지 URL", example = "https://example.com/image.jpg")
-    val imageUrl: String,
+    val imageUrl: String?,
 
     @field:Schema(description = "날씨 정보", example = "SUNNY")
     val weather: Weather,
@@ -43,5 +48,5 @@ data class MyDiaryItem(
     val mood: Int,
 
     @field:Schema(description = "가사 첫 두마디", example = "빨간 꽃 노란 꽃")
-    val introLines: String
+    val introLines: String?
 )
