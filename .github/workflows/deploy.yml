@@ -51,7 +51,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "docker-compose.yml,prometheus.yml"
+          source: "docker-compose.yml"
           target: "~/"
 
       - name: Deploy
@@ -71,7 +71,6 @@ jobs:
             
             echo "DOCKER_IMAGE=${IMAGE_TAG}" > .env
             echo "GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD }}" >> .env
-            echo "MONITORING_TARGET=ilgijjan-server" >> .env
             
             sudo docker stop ilgijjan-server || true
             sudo docker rm ilgijjan-server || true
