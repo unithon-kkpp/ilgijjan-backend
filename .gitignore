@@ -5,6 +5,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 **/resources/
+prometheus_data/
+grafana_data/
 
 ### STS ###
 .apt_generated
