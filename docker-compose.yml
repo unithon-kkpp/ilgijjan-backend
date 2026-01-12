@@ -10,6 +10,8 @@ services:
     depends_on:
       - redis
       - rabbitmq
+    volumes:
+      - ./logs:/logs
     networks:
       - ilgijjan-net
 
@@ -43,7 +45,7 @@ services:
       - ./prometheus_data:/prometheus
     ports:
       - "9090:9090"
-    restart: always 
+    restart: always
     networks:
       - ilgijjan-net
 
@@ -58,6 +60,30 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
     depends_on:
       - prometheus
+    networks:
+      - ilgijjan-net
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yml
+      - ./gcp-key.json:/etc/loki/gcp-key.json
+    command: -config.file=/etc/loki/local-config.yml
+    ports:
+      - "3100:3100"
+    restart: always
+    networks:
+      - ilgijjan-net
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./logs:/var/log/ilgijjan
+      - ./promtail-config.yml:/etc/promtail/promtail-config.yml
+    command: -config.file=/etc/promtail/promtail-config.yml
+    restart: always
     networks:
       - ilgijjan-net
 
