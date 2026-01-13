@@ -4,8 +4,8 @@ import com.ilgijjan.domain.user.domain.Character
 import com.ilgijjan.domain.user.domain.User
 
 data class ReadMeResponse(
-    val name: String,
-    val character: Character,
+    val name: String?,
+    val character: Character?,
     val isNotificationEnabled: Boolean
 ) {
     companion object {

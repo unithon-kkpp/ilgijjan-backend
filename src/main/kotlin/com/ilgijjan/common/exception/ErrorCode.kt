@@ -1,6 +1,5 @@
 package com.ilgijjan.common.exception
 
-import com.ilgijjan.common.constants.UserConstants
 import org.springframework.http.HttpStatus
 
 enum class ErrorCode(
@@ -34,7 +33,6 @@ enum class ErrorCode(
     // User
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보를 찾을 수 없습니다."),
     DUPLICATE_NAME(HttpStatus.CONFLICT, "이미 사용 중인 이름입니다."),
-    INVALID_NAME_FORMAT(HttpStatus.BAD_REQUEST, "정식 이름은 '${UserConstants.TEMPORARY_NAME_PREFIX}'로 시작할 수 없습니다."),
 
     // Like
     LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요 정보를 찾을 수 없습니다."),

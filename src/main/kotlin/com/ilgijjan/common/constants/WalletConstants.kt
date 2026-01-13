@@ -1,6 +1,6 @@
 package com.ilgijjan.common.constants
 
 object WalletConstants {
-    const val INITIAL_NOTES = 30
+    const val INITIAL_NOTES = 50
     const val DIARY_CREATION_COST = 10
 }
