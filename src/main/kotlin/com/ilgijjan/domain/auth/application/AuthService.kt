@@ -32,8 +32,7 @@ class AuthService(
 
         return LoginResponse(
             accessToken = accessToken,
-            refreshToken = refreshToken,
-            isOnboarded = user.isOnboarded()
+            refreshToken = refreshToken
         )
     }
 

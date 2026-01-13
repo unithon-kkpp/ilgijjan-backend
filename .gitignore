@@ -5,6 +5,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 **/resources/
+prometheus_data/
+prometheus.yml
 
 ### STS ###
 .apt_generated
