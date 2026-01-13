@@ -1,6 +1,5 @@
 package com.ilgijjan.domain.user.domain
 
-import com.ilgijjan.common.constants.UserConstants
 import com.ilgijjan.common.domain.BaseEntity
 import com.ilgijjan.domain.auth.domain.OauthInfo
 import jakarta.persistence.Column
@@ -30,11 +29,11 @@ class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    var name: String,
+    var name: String? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "`character`")
-    var character: Character,
+    var character: Character? = null,
 
     var isNotificationEnabled: Boolean = true,
 
@@ -56,12 +55,11 @@ class User(
         this.isNotificationEnabled = isEnabled
     }
 
-    fun isOnboarded(): Boolean {
-        return !this.name.startsWith(UserConstants.TEMPORARY_NAME_PREFIX)
-    }
-
     fun getMaskedName(): String {
-        return if (this.deletedAt != null) "탈퇴한 유저" else this.name
+        if (this.deletedAt != null) return "탈퇴한 유저"
+        val currentName = this.name
+        checkNotNull(currentName) { "데이터 정합성 오류: 유저(id=${this.id})의 이름이 없습니다.(회원가입 미완료)" }
+        return currentName
     }
 
     fun withdraw() {
