@@ -10,6 +10,8 @@ services:
     depends_on:
       - redis
       - rabbitmq
+    volumes:
+      - ./logs:/logs
     networks:
       - ilgijjan-net
 
@@ -29,6 +31,17 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - ilgijjan-net
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./logs:/var/log/ilgijjan
+      - ./promtail-config.yml:/etc/promtail/promtail-config.yml
+    command: -config.file=/etc/promtail/promtail-config.yml
+    restart: always
     networks:
       - ilgijjan-net
 

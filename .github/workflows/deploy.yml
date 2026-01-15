@@ -74,7 +74,7 @@ jobs:
             sudo docker stop ilgijjan-server || true
             sudo docker rm ilgijjan-server || true
             
-            sudo docker-compose up -d --no-deps application
+            sudo docker-compose up -d 
             
             CURRENT_IMAGE_ID=$(sudo docker images --format "{{.Repository}} {{.Tag}} {{.ID}}" | grep "${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }} ${GITHUB_SHA::7}" | awk '{print $3}')
             for IMAGE_ID in $(sudo docker images ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }} --format "{{.ID}}" | sort -u | grep -v "$CURRENT_IMAGE_ID"); do
