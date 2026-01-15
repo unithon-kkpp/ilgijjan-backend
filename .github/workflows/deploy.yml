@@ -70,7 +70,6 @@ jobs:
             sudo docker pull ${IMAGE_TAG}
             
             echo "DOCKER_IMAGE=${IMAGE_TAG}" > .env
-            echo "GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD }}" >> .env
             
             sudo docker stop ilgijjan-server || true
             sudo docker rm ilgijjan-server || true
