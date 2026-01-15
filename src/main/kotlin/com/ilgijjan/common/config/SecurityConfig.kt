@@ -37,7 +37,7 @@ class SecurityConfig(
                     "/api/music/**",
                     "/billing/webhooks/**",
                     "/swagger-ui/**", "/v3/api-docs/**",
-                    "/actuator/**", "/health"
+                    "/actuator/**"
                 ).permitAll()
                     .anyRequest().authenticated()
             }
