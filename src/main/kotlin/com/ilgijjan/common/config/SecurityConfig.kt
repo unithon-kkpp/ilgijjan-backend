@@ -33,7 +33,7 @@ class SecurityConfig(
             }
             .authorizeHttpRequests {
                 it.requestMatchers(
-                    "/api/auth/login", "api/auth/reissue",
+                    "/api/auth/login", "/api/auth/reissue",
                     "/api/music/**",
                     "/billing/webhooks/**",
                     "/swagger-ui/**", "/v3/api-docs/**",
