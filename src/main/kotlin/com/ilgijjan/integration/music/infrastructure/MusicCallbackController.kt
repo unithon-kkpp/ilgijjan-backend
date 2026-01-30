@@ -2,7 +2,7 @@ package com.ilgijjan.integration.music.infrastructure
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.swagger.v3.oas.annotations.Hidden
 import org.slf4j.Logger
@@ -18,67 +18,57 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/music")
 class MusicCallbackController(
     private val sunoMusicGenerator: SunoMusicGenerator,
+    private val objectMapper: ObjectMapper
 ) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    // 가사 생성 콜백 수신
     @PostMapping("/lyrics-callback")
     fun receiveLyricsCallback(@RequestBody rawBody: String): ResponseEntity<String> {
-        log.info("원본 바디: $rawBody")
-        val mapper = jacksonObjectMapper()
-        val callback = mapper.readValue<LyricsCallbackRequest>(rawBody)
-        log.info("파싱 결과: $callback")
+        val callback = objectMapper.readValue<LyricsCallbackRequest>(rawBody)
 
         if (callback.code == 200) {
             val lyricsData = callback.data.data
             if (lyricsData.isNullOrEmpty()) {
-                log.error("[lyrics-callback] 가사 데이터가 없습니다")
+                log.error("[Lyrics-CALLBACK-ERR] 가사 데이터가 비어있음")
                 return ResponseEntity.badRequest().body("No lyrics data")
             }
 
             val firstComplete = lyricsData.firstOrNull { it.status == "complete" }
             if (firstComplete == null) {
-                log.error("[lyrics-callback] 완료된 가사 없음")
+                log.error("[Lyrics-CALLBACK-ERR] 완료된 가사 없음")
                 return ResponseEntity.badRequest().body("No complete lyrics found")
             }
 
             val lyrics = firstComplete.text
-            log.info("[lyrics-callback] 가사 수신 완료, 길이=${lyrics.length}")
+            log.info("[Lyrics-CALLBACK-OK] 가사 수신 완료, 길이=${lyrics.length}")
 
-            // 여기서 음악 생성 요청
             val musicTaskId = sunoMusicGenerator.requestMusicGeneration(lyrics)
-            log.info("[lyrics-callback] 음악 생성 요청 완료, taskId=$musicTaskId")
+            log.info("[Lyrics-CALLBACK-INFO] 음악 생성 요청 완료, taskId=$musicTaskId")
 
-            // 여기서 중요한 부분: Future를 음악 taskId로 변경
             sunoMusicGenerator.transferFutureKey(callback.data.taskId ?: "", musicTaskId)
 
             return ResponseEntity.ok("Lyrics received and music generation started")
         } else {
-            log.error("[lyrics-callback] 가사 생성 실패 또는 오류: code=${callback.code}, msg=${callback.msg}")
-            // TODO: 실패 처리 로직
+            log.error("[Lyrics-CALLBACK-ERR] 가사 생성 실패: code={}, msg={}", callback.code, callback.msg)
             return ResponseEntity.status(500).body("Error in lyrics generation")
         }
     }
 
-    // 음악 생성 콜백 수신
     @PostMapping("/music-callback")
     fun receiveMusicCallback(@RequestBody rawBody: String): ResponseEntity<String> {
-        log.info("[music-callback] 원본 바디: $rawBody")
-
-        val mapper = jacksonObjectMapper()
-        val callback = mapper.readValue<MusicCallbackRequest>(rawBody)
-        log.info("[music-callback] 파싱 결과: $callback")
+        val callback = objectMapper.readValue<MusicCallbackRequest>(rawBody)
+        log.info(">>> [Music-CALLBACK] 타입: {}, TaskID: {}", callback.data.callbackType, callback.data.taskId)
 
         if (callback.code == 200) {
             when (callback.data.callbackType) {
                 "text" -> {
-                    log.info("[music-callback] 중간 텍스트 데이터 수신, 처리 생략")
+                    log.info("[Music-CALLBACK-PROGRESS] 중간 데이터(text) 수신")
                     return ResponseEntity.ok("Intermediate text received")
                 }
                 "complete" -> {
                     val musicDataList = callback.data.data
                     if (musicDataList.isEmpty()) {
-                        log.error("[music-callback] 음악 데이터가 없습니다")
+                        log.error("[Music-CALLBACK-ERR] 음악 데이터 없음")
                         return ResponseEntity.badRequest().body("No music data")
                     }
 
@@ -91,7 +81,7 @@ class MusicCallbackController(
                     ).firstOrNull { !it.isNullOrBlank() }
 
                     if (audioUrl == null) {
-                        log.error("[music-callback] 오디오 URL이 없습니다")
+                        log.error("[Music-CALLBACK-ERR] 오디오 URL 없음")
                         return ResponseEntity.badRequest().body("No audio URL")
                     }
 
@@ -104,12 +94,12 @@ class MusicCallbackController(
                     return ResponseEntity.ok("Music callback processed")
                 }
                 else -> {
-                    log.warn("[music-callback] 알 수 없는 callbackType: ${callback.data.callbackType}")
+                    log.warn("[Music-CALLBACK-WARN] 알 수 없는 콜백 타입: {}", callback.data.callbackType)
                     return ResponseEntity.badRequest().body("Unknown callbackType")
                 }
             }
         } else {
-            log.error("[music-callback] 음악 생성 실패 또는 오류: code=${callback.code}, msg=${callback.msg}")
+            log.error("[Music-CALLBACK-ERR] 음악 생성 실패: code={}, msg={}", callback.code, callback.msg)
             return ResponseEntity.status(500).body("Error in music generation")
         }
     }

@@ -23,6 +23,7 @@ class GeminiTextRefiner(
         .build()
 
     override fun refineText(text: String): String {
+        log.info(">>> [Gemini-REQ] originalText={}", text)
         val prompt = "$text Please refine this diary entry into concise English within 80 characters, capturing the core meaning. Output only the refined text without any extra explanations."
 
         val requestBody = mapOf(
@@ -36,24 +37,23 @@ class GeminiTextRefiner(
                 )
             )
         )
-        log.info("Gemini API 요청 바디: {}", requestBody)
 
-        val response = webClient.post()
-            .bodyValue(requestBody)
-            .retrieve()
-            .bodyToMono(GeminiEditResponse::class.java)
-            .block() ?: throw RuntimeException("Gemini API 응답이 없습니다.")
+        return try {
+            val response = webClient.post()
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(GeminiEditResponse::class.java)
+                .block() ?: throw RuntimeException("Gemini API 응답 바디가 비어있습니다.")
 
-        log.info("Gemini API 원본 응답 JSON: {}", response)
+            val refinedText = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text?.trim() ?: ""
 
-        return response.candidates
-            ?.firstOrNull()
-            ?.content
-            ?.parts
-            ?.firstOrNull()
-            ?.text
-            ?.trim()
-            ?: ""
+            log.info("<<< [Gemini-RES] result={}", refinedText)
+
+            refinedText
+        } catch (e: Exception) {
+            log.error("[Gemini-ERR] message={}", e.message)
+            throw e
+        }
     }
 }
 
