@@ -1,5 +1,6 @@
 package com.ilgijjan.common.log
 
+import com.ilgijjan.common.constants.LogConstants
 import com.ilgijjan.common.utils.IdGenerator
 import com.ilgijjan.common.utils.RequestUtil
 import com.ilgijjan.common.utils.StringUtil
@@ -51,10 +52,6 @@ class ApiAccessLogFilter : OncePerRequestFilter() {
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
         val path = request.requestURI
-        return path.startsWith("/actuator") ||
-                path.startsWith("/swagger-ui") ||
-                path.startsWith("/v3/api-docs") ||
-                path.startsWith("/favicon.ico") ||
-                path.startsWith("/error")
+        return LogConstants.EXCLUDE_PATHS.any { path.startsWith(it) }
     }
 }

@@ -1,5 +1,6 @@
 package com.ilgijjan.common.config
 
+import com.ilgijjan.common.constants.LogConstants
 import com.ilgijjan.common.log.LogContextInterceptor
 import com.ilgijjan.common.resolver.LoginUserArgumentResolver
 import org.springframework.context.annotation.Configuration
@@ -18,14 +19,10 @@ class WebConfig(
     }
 
     override fun addInterceptors(registry: InterceptorRegistry) {
+        val patterns = LogConstants.EXCLUDE_PATHS.flatMap { listOf(it, "$it/**") }
+
         registry.addInterceptor(logContextInterceptor)
             .addPathPatterns("/**")
-            .excludePathPatterns(
-                "/api/storage/upload",
-                "/actuator/**",
-                "/swagger-ui/**", "/v3/api-docs/**",
-                "/error",
-                "/favicon.ico"
-            )
+            .excludePathPatterns(*patterns.toTypedArray())
     }
 }
