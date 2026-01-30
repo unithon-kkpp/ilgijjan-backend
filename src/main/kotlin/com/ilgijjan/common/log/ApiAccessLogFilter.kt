@@ -26,9 +26,10 @@ class ApiAccessLogFilter : OncePerRequestFilter() {
         val wrappingRequest = ReadableRequestWrapper(request)
         val wrappingResponse = ContentCachingResponseWrapper(response)
 
-        val reqBody = wrappingRequest.getBody()
+        val reqBody = StringUtil.removeWhitespaces(StringUtil.maskSensitiveFields(wrappingRequest.getBody()))
+
         log.info(">>> [REQ] method={}, uri={}, body={}",
-            request.method, RequestUtil.getFullUri(request), StringUtil.removeWhitespaces(reqBody))
+            request.method, RequestUtil.getFullUri(request), reqBody)
 
         try {
             chain.doFilter(wrappingRequest, wrappingResponse)
@@ -36,9 +37,12 @@ class ApiAccessLogFilter : OncePerRequestFilter() {
             val duration = System.currentTimeMillis() - startTime
             val userId = MDC.get("userId") ?: "guest"
             val resBody = String(wrappingResponse.contentAsByteArray, Charsets.UTF_8)
+            val refinedResBody = StringUtil.maskSensitiveFields(resBody).let {
+                if (it.length > 1000) it.substring(0, 1000) + "...(truncated)" else it
+            }
 
             log.info("<<< [RES] [User:{}] status={}, duration={}ms, body={}",
-                userId, response.status, duration, resBody)
+                userId, response.status, duration, refinedResBody)
 
             wrappingResponse.copyBodyToResponse()
             MDC.clear()
