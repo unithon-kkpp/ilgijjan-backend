@@ -1,6 +1,7 @@
 package com.ilgijjan.common.exception
 
 import io.swagger.v3.oas.annotations.Hidden
+import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -22,84 +23,72 @@ class GlobalExceptionHandler {
 	private val log = LoggerFactory.getLogger(this::class.java)
 
 	@ExceptionHandler(Exception::class)
-	fun handleServerException(e: Exception): ResponseEntity<ErrorResponse> {
-		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR)
+	fun handleServerException(e: Exception, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR)
+        log.error("[InternalServerError] {} {}, message={}", request.method, request.requestURI, e.message, e)
 		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
-	@ExceptionHandler(NoResourceFoundException::class)
-	fun handleNoResourceFoundException(e: NoResourceFoundException): ResponseEntity<ErrorResponse> {
-		val errorResponse = ErrorResponse.of(ErrorCode.NOT_FOUND)
-		return ResponseEntity.status(errorResponse.status).body(errorResponse)
-	}
+    @ExceptionHandler(value = [NoResourceFoundException::class, NoHandlerFoundException::class])
+    fun handleNotFoundException(e: Exception, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse.of(ErrorCode.NOT_FOUND)
+        log.warn("[Not Found] {} {}, message={}", request.method, request.requestURI, errorResponse.message)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
 
 	@ExceptionHandler(HttpRequestMethodNotSupportedException::class)
-	fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException): ResponseEntity<ErrorResponse> {
-		log.error(e.message, e)
+	fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
 		val errorResponse = ErrorResponse.of(ErrorCode.METHOD_NOT_ALLOWED)
+        log.warn("[Method Not Allowed] {} {}, message={}", request.method, request.requestURI, errorResponse.message)
 		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException::class)
-	fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+	fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
 		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, e.bindingResult)
+        log.warn("[Validation Failed] {} {}, errors={}", request.method, request.requestURI, errorResponse.errors)
 		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
+
+    @ExceptionHandler(BindException::class)
+    fun handleBindException(e: BindException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, e.bindingResult)
+        log.warn("[Bind Failed] {} {}, errors={}", request.method, request.requestURI, errorResponse.errors)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
 
 	@ExceptionHandler(MethodArgumentTypeMismatchException::class)
-	fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
-		log.error(e.message, e)
+	fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
 		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_TYPE_VALUE)
-		return ResponseEntity.status(errorResponse.status).body(errorResponse)
-	}
-
-	@ExceptionHandler(BindException::class)
-	fun handleBindException(e: BindException): ResponseEntity<ErrorResponse> {
-		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
+        log.warn("[Type Mismatch] {} {}, parameter={}, message={}", request.method, request.requestURI, e.name, errorResponse.message)
 		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException::class)
-	fun handleHttpMessageNotReadableException(e: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> {
-		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
-		return ResponseEntity.status(errorResponse.status).body(errorResponse)
-	}
-
-	@ExceptionHandler(IllegalArgumentException::class)
-	fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> {
-		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
-		return ResponseEntity.status(errorResponse.status).body(errorResponse)
-	}
-
-	@ExceptionHandler(NoHandlerFoundException::class)
-	fun handleNoHandlerFoundException(e: NoHandlerFoundException): ResponseEntity<ErrorResponse> {
-		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.NOT_FOUND)
+	fun handleHttpMessageNotReadableException(e: HttpMessageNotReadableException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
+        log.warn("[Message Not Readable] {} {}, message={}", request.method, request.requestURI, errorResponse.message)
 		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
 	@ExceptionHandler(MissingServletRequestParameterException::class)
-	fun handleMissingServletRequestParameterException(e: MissingServletRequestParameterException): ResponseEntity<ErrorResponse> {
-		log.warn(e.message, e)
+	fun handleMissingServletRequestParameterException(e: MissingServletRequestParameterException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
 		val errorResponse = ErrorResponse.of(ErrorCode.MISSING_REQUEST_PARAMETER)
+        log.warn("[Missing Parameter] {} {}, parameter={}, message={}", request.method, request.requestURI, e.parameterName, errorResponse.message)
 		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 
-	@ExceptionHandler(HandlerMethodValidationException::class)
-	fun handleHandlerMethodValidationException(e: HandlerMethodValidationException): ResponseEntity<ErrorResponse> {
-		log.warn(e.message, e)
-		val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
-		return ResponseEntity.status(errorResponse.status).body(errorResponse)
-	}
+    @ExceptionHandler(value = [HandlerMethodValidationException::class, IllegalArgumentException::class])
+    fun handleBadRequestException(e: Exception, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE)
+        log.warn("[Bad Request] {} {}, type={}, message={}", request.method, request.requestURI, e::class.simpleName, e.message)
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
 
 	@ExceptionHandler(CustomException::class)
-	fun handleCustomException(e: CustomException): ResponseEntity<ErrorResponse> {
-        log.warn("CustomException 발생: {} - {}", e.errorCode.status, e.errorCode.message)
+	fun handleCustomException(e: CustomException, request: HttpServletRequest): ResponseEntity<ErrorResponse> {
 		val errorResponse = ErrorResponse.of(e.errorCode)
+        log.warn("[CustomException] {} {}, code={}, message={}", request.method, request.requestURI, errorResponse.code, errorResponse.message)
 		return ResponseEntity.status(errorResponse.status).body(errorResponse)
 	}
 }

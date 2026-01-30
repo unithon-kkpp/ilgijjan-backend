@@ -1,5 +1,6 @@
 package com.ilgijjan.common.config
 
+import com.ilgijjan.common.log.MdcTaskDecorator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableAsync
@@ -18,6 +19,7 @@ class AsyncConfig {
             queueCapacity = 100
             keepAliveSeconds = 30
             setThreadNamePrefix("AsyncThread-")
+            setTaskDecorator(MdcTaskDecorator())
             initialize()
         }
     }
