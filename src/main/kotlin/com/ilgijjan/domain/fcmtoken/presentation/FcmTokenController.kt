@@ -4,6 +4,7 @@ import com.ilgijjan.common.annotation.LoginUser
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -26,6 +27,12 @@ class FcmTokenController(
     @Operation(summary = "FCM Token 갱신")
     fun renew(@RequestBody request: FcmTokenRequest) {
         fcmTokenService.renewToken(request.token)
+    }
+
+    @GetMapping
+    @Operation(summary = "본인 FCM Token 목록 조회", description = "FCM 토큰이 정상 등록됐는지 확인하는 용도")
+    fun getTokens(@LoginUser userId: Long): List<FcmTokenResponse> {
+        return fcmTokenService.getTokens(userId)
     }
 
     @PostMapping("/test")

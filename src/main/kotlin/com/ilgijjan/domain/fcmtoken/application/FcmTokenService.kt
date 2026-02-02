@@ -1,5 +1,6 @@
 package com.ilgijjan.domain.fcmtoken.application
 
+import com.ilgijjan.domain.fcmtoken.presentation.FcmTokenResponse
 import com.ilgijjan.integration.notification.application.NotificationSender
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,6 +22,10 @@ class FcmTokenService (
     @Transactional
     fun renewToken(token: String) {
         fcmTokenUpdater.updateLastUsedAt(token)
+    }
+
+    fun getTokens(userId: Long): List<FcmTokenResponse> {
+        return fcmTokenReader.findAllByUserId(userId).map { FcmTokenResponse.from(it) }
     }
 
     @Transactional
