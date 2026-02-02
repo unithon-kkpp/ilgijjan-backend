@@ -65,12 +65,13 @@ jobs:
           script: |
             cd /home/${{ secrets.SSH_USERNAME }}
             
+            sudo docker-compose stop application || true
+            sudo docker-compose rm -f application || true
+            sudo docker image prune -af
+
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             IMAGE_TAG="${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}"
             sudo docker pull ${IMAGE_TAG}
-            
-            echo "DOCKER_IMAGE=${IMAGE_TAG}" > .env
-            
-            sudo docker-compose up -d --no-deps --force-recreate application
 
-            sudo docker image prune -f
+            echo "DOCKER_IMAGE=${IMAGE_TAG}" > .env
+            sudo docker-compose up -d --no-deps application
