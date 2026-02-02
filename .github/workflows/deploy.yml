@@ -28,7 +28,7 @@ jobs:
       - name: Set environment values
         run: |
           mkdir -p src/main/resources/gcp src/main/resources/firebase
-          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" | base64 --decode > src/main/resources/application.yml
           echo "${{ secrets.GCP_SERVICE_KEY }}" | base64 --decode > src/main/resources/gcp/service-key.json
           echo "${{ secrets.FIREBASE_SERVICE_KEY }}" | base64 --decode > src/main/resources/firebase/service-key.json
         shell: bash
@@ -71,8 +71,6 @@ jobs:
             
             echo "DOCKER_IMAGE=${IMAGE_TAG}" > .env
             
-            sudo docker-compose down --volumes --remove-orphans || true
-            
-            sudo docker-compose up -d 
-          
-            sudo docker system prune -a -f
+            sudo docker-compose up -d --no-deps --force-recreate application
+
+            sudo docker image prune -f
