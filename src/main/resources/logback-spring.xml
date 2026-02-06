@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Spring Boot 기본 설정 포함 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- 환경변수에서 설정 읽기 -->
+    <springProperty scope="context" name="DISCORD_WEBHOOK_URL" source="discord.webhook.url" defaultValue=""/>
+    <springProperty scope="context" name="DISCORD_ENABLED" source="discord.webhook.enabled" defaultValue="false"/>
+
+    <!-- 프로파일별 로그 파일 경로 -->
+    <springProfile name="local">
+        <property name="LOG_FILE" value="./logs/spring.log"/>
+    </springProfile>
+    <springProfile name="prod">
+        <property name="LOG_FILE" value="/logs/spring.log"/>
+    </springProfile>
+
+    <!-- 콘솔 출력 패턴 -->
+    <property name="CONSOLE_LOG_PATTERN" value="%d{HH:mm:ss.SSS} %5p [%X{requestId:-no-id}] --- [%t] %-40.40logger{39} : %m%n"/>
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%X{requestId:-no-id}] --- [%t] %-40.40logger{39} : %m%n"/>
+
+    <!-- 콘솔 Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 파일 Appender (롤링) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Discord Appender -->
+    <appender name="DISCORD" class="com.ilgijjan.common.log.DiscordAppender">
+        <webhookUrl>${DISCORD_WEBHOOK_URL}</webhookUrl>
+        <enabled>${DISCORD_ENABLED}</enabled>
+        <applicationName>ilgijjan</applicationName>
+        <!-- ERROR 레벨만 전송 -->
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- 비동기 Discord Appender (메인 스레드 블로킹 방지) -->
+    <appender name="ASYNC_DISCORD" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="DISCORD"/>
+        <queueSize>256</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <!-- Root Logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ASYNC_DISCORD"/>
+    </root>
+</configuration>

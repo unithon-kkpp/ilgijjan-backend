@@ -16,4 +16,13 @@ object StringUtil {
             "${result.groupValues[1]}*******${result.groupValues[4]}"
         }
     }
+
+    fun escapeJson(text: String): String {
+        return text
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+            .replace("\t", "\\t")
+    }
 }
