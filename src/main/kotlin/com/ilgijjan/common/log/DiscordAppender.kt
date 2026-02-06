@@ -14,6 +14,13 @@ import java.time.Instant
 
 class DiscordAppender : AppenderBase<ILoggingEvent>() {
 
+    companion object {
+        private const val MAX_MESSAGE_LENGTH = 500
+        private const val MAX_STACKTRACE_LENGTH = 800
+        private const val TIMEOUT_SECONDS = 5L
+        private const val STACKTRACE_LINES = 5
+    }
+
     var webhookUrl: String? = null
     var enabled: Boolean = true
     var applicationName: String = "ilgijjan"
@@ -36,7 +43,7 @@ class DiscordAppender : AppenderBase<ILoggingEvent>() {
         val requestId = event.mdcPropertyMap["requestId"] ?: "no-id"
         val userId = event.mdcPropertyMap["userId"] ?: "guest"
         val loggerName = event.loggerName.substringAfterLast(".")
-        val message = event.formattedMessage.take(500)
+        val message = event.formattedMessage.take(MAX_MESSAGE_LENGTH)
         val stackTrace = formatStackTrace(event.throwableProxy)
 
         val embed = buildString {
@@ -67,23 +74,32 @@ class DiscordAppender : AppenderBase<ILoggingEvent>() {
         return buildString {
             append("${throwableProxy.className}: ${throwableProxy.message}\n")
             throwableProxy.stackTraceElementProxyArray
-                ?.take(5)
+                ?.take(STACKTRACE_LINES)
                 ?.forEach { append("  at ${it.steAsString}\n") }
-        }.take(800)
+        }.take(MAX_STACKTRACE_LENGTH)
     }
 
     private fun sendToDiscord(jsonPayload: String) {
+        val url = webhookUrl ?: return
+
         val request = HttpRequest.newBuilder()
-            .uri(URI.create(webhookUrl!!))
+            .uri(URI.create(url))
             .header("Content-Type", "application/json; charset=utf-8")
             .POST(HttpRequest.BodyPublishers.ofString(jsonPayload, Charsets.UTF_8))
-            .timeout(Duration.ofSeconds(5))
+            .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
             .build()
 
         httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+            .whenComplete { response, throwable ->
+                if (throwable != null) {
+                    addError("Failed to send Discord notification", throwable)
+                } else if (response.statusCode() >= 400) {
+                    addError("Discord notification failed with status ${response.statusCode()}")
+                }
+            }
     }
 
     private val httpClient: HttpClient = HttpClient.newBuilder()
-        .connectTimeout(Duration.ofSeconds(5))
+        .connectTimeout(Duration.ofSeconds(TIMEOUT_SECONDS))
         .build()
 }
