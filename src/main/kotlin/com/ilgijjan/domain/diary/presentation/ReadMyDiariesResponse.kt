@@ -20,7 +20,7 @@ data class ReadMyDiariesResponse(
                     imageUrl = diary.imageUrl,
                     weather = diary.weather,
                     mood = diary.mood,
-                    introLines = diary.lyrics?.take(9)
+                    introLines = diary.lyrics?.substringBefore("\n")?.take(9)
                 )
             }
             return ReadMyDiariesResponse(items)
