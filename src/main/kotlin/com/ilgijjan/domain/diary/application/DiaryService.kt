@@ -8,6 +8,7 @@ import com.ilgijjan.domain.diary.presentation.CreateDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadMyDiariesResponse
 import com.ilgijjan.domain.diary.presentation.ReadPublicDiariesResponse
+import com.ilgijjan.domain.like.application.LikeReader
 import com.ilgijjan.domain.user.application.UserReader
 import com.ilgijjan.domain.wallet.application.UserWalletUpdater
 import com.ilgijjan.integration.messaging.application.MessageProducer
@@ -21,6 +22,7 @@ class DiaryService(
     private val diaryReader: DiaryReader,
     private val diaryUpdater: DiaryUpdater,
     private val diaryValidator: DiaryValidator,
+    private val likeReader: LikeReader,
     private val messageProducer: MessageProducer,
     private val userReader: UserReader,
     private val userWalletUpdater: UserWalletUpdater
@@ -54,8 +56,10 @@ class DiaryService(
     fun getDiaryById(diaryId: Long, userId: Long): ReadDiaryResponse {
         val diary = diaryReader.getDiaryById(diaryId)
         diaryValidator.validateAccess(diary, userId)
+        val user = userReader.getUserById(userId)
         val isOwner = diary.user.id == userId
-        return ReadDiaryResponse.from(diary, isOwner)
+        val isLiked = likeReader.findByDiaryAndUser(diary, user)?.isActive() ?: false
+        return ReadDiaryResponse.from(diary, isOwner, isLiked)
     }
 
     fun getMyDiariesByYearAndMonth(userId: Long, year: Int, month: Int): ReadMyDiariesResponse {
