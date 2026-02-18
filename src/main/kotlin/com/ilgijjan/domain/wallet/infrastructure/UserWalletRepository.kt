@@ -19,6 +19,6 @@ interface UserWalletRepository : JpaRepository<UserWallet, Long> {
     fun findByUserId(userId: Long): Optional<UserWallet>
 
     @Modifying
-    @Query("update UserWallet w set w.noteCount = 10")
-    fun resetAllNoteCount()
+    @Query("update UserWallet w set w.noteCount = :initialNotes")
+    fun resetAllNoteCount(initialNotes: Int)
 }

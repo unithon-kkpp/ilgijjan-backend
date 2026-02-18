@@ -1,5 +1,6 @@
 package com.ilgijjan.domain.wallet.application
 
+import com.ilgijjan.common.constants.WalletConstants
 import com.ilgijjan.domain.wallet.infrastructure.UserWalletRepository
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
@@ -15,7 +16,7 @@ class WalletResetScheduler(
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     @Transactional
     fun resetDailyNotes() {
-        userWalletRepository.resetAllNoteCount()
+        userWalletRepository.resetAllNoteCount(WalletConstants.INITIAL_NOTES)
         log.info("[WalletResetScheduler] 전체 유저 음표 초기화 완료")
     }
 }
