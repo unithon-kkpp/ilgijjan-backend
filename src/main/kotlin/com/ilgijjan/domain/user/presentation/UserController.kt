@@ -28,16 +28,9 @@ class UserController(
     }
 
     @PostMapping("/notes")
-    @Operation(summary = "음표 충전 (개발용)", description = "로그인한 사용자의 음표를 10개(1회 생성 분량) 충전합니다.")
+    @Operation(summary = "[개발용] 음표 충전", description = "로그인한 사용자의 음표를 10개(1회 생성 분량) 충전합니다.")
     fun chargeNotes(@LoginUser userId: Long): ResponseEntity<ReadNoteResponse> {
         val response = userService.chargeNotes(userId)
-        return ResponseEntity.ok(response)
-    }
-
-    @GetMapping("/notes")
-    @Operation(summary = "보유 음표 조회", description = "로그인한 사용자가 현재 보유 중인 음표 개수를 조회합니다.")
-    fun getMyNoteCount(@LoginUser userId: Long): ResponseEntity<ReadNoteResponse> {
-        val response = userService.getMyNoteCount(userId)
         return ResponseEntity.ok(response)
     }
 

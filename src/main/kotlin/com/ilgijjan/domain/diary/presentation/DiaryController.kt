@@ -17,7 +17,7 @@ class DiaryController(
     private val diaryService: DiaryService
 ) {
     @PostMapping("/test")
-    @Operation(summary = "일기 작성하기 테스트")
+    @Operation(summary = "[개발용] 일기 작성하기 테스트 (AI 데이터 생성 X → 비용 X)")
     fun createDiaryWithDummy(
         @LoginUser userId: Long,
         @RequestBody @Valid request: CreateDiaryRequest

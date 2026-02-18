@@ -3,6 +3,7 @@ package com.ilgijjan.domain.billing.presentation
 import com.ilgijjan.common.annotation.LoginUser
 import com.ilgijjan.domain.billing.application.BillingService
 import com.ilgijjan.domain.billing.domain.StoreType
+import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -21,6 +22,7 @@ class BillingController(
     private val billingService: BillingService
 ) {
 
+    @Hidden
     @PostMapping("/verify")
     @Operation(
         summary = "인앱 결제 영수증 검증 및 아이템 지급",
@@ -38,7 +40,7 @@ class BillingController(
         return ResponseEntity.ok().build()
     }
 
-
+    @Hidden
     @GetMapping("/products")
     @Operation(summary = "스토어별 상품 목록 조회")
     fun getProducts(

@@ -30,13 +30,13 @@ class FcmTokenController(
     }
 
     @GetMapping
-    @Operation(summary = "본인 FCM Token 목록 조회", description = "FCM 토큰이 정상 등록됐는지 확인하는 용도")
+    @Operation(summary = "[개발용] 본인 FCM Token 목록 조회", description = "FCM 토큰이 정상 등록됐는지 확인하는 용도")
     fun getTokens(@LoginUser userId: Long): List<FcmTokenResponse> {
         return fcmTokenService.getTokens(userId)
     }
 
     @PostMapping("/test")
-    @Operation(summary = "FCM 알림 테스트 (본인 기기 발송)")
+    @Operation(summary = "[개발용] FCM 알림 테스트 (본인 기기 발송)")
     fun testNotification(@LoginUser userId: Long) {
         fcmTokenService.sendTestNotification(userId)
     }
