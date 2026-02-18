@@ -97,4 +97,14 @@ class DiaryController(
         diaryService.unpublishDiary(diaryId)
         return ResponseEntity.ok().build()
     }
+
+    @DeleteMapping("/{diaryId}")
+    @Operation(summary = "일기 삭제")
+    fun deleteDiary(
+        @PathVariable diaryId: Long,
+        @LoginUser userId: Long
+    ): ResponseEntity<Unit> {
+        diaryService.deleteDiary(diaryId)
+        return ResponseEntity.noContent().build()
+    }
 }

@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 class DiaryService(
     private val diaryCreator: DiaryCreator,
     private val diaryReader: DiaryReader,
+    private val diaryDeleter: DiaryDeleter,
     private val diaryUpdater: DiaryUpdater,
     private val diaryValidator: DiaryValidator,
     private val likeReader: LikeReader,
@@ -82,5 +83,11 @@ class DiaryService(
     @CheckDiaryOwner
     fun unpublishDiary(diaryId: Long) {
         diaryUpdater.unpublish(diaryId)
+    }
+
+    @Transactional
+    @CheckDiaryOwner
+    fun deleteDiary(diaryId: Long) {
+        diaryDeleter.delete(diaryId)
     }
 }

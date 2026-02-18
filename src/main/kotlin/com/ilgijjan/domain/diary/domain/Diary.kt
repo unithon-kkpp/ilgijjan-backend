@@ -5,8 +5,10 @@ import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.domain.user.domain.User
 import jakarta.persistence.*
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
+@SQLRestriction("status <> 'DELETED'")
 class Diary (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,5 +83,10 @@ class Diary (
 
     fun fail() {
         this.status = DiaryStatus.FAILED
+    }
+
+    fun delete() {
+        this.status = DiaryStatus.DELETED
+        this.isPublic = false
     }
 }
