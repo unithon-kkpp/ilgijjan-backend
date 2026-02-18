@@ -22,7 +22,8 @@ data class ReadPublicDiariesResponse(
                     id = diary.id!!,
                     date = diary.createdAt?.format(DateFormatter.DOT_DATE_FORMATTER)!!,
                     imageUrl = diary.imageUrl ?: "",
-                    authorName = diary.user.getMaskedName()
+                    authorName = diary.user.getMaskedName(),
+                    introLines = diary.lyrics?.substringBefore("\n")?.take(9)
                 )
             }
 
@@ -46,5 +47,8 @@ data class PublicDiaryItem(
     val imageUrl: String,
 
     @field:Schema(description = "작성자 이름", example = "김철수")
-    val authorName: String
+    val authorName: String,
+
+    @field:Schema(description = "가사 첫 두마디", example = "빨간 꽃 노란 꽃")
+    val introLines: String?
 )

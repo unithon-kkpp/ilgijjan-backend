@@ -44,10 +44,13 @@ data class ReadDiaryResponse(
     val isPublic: Boolean,
 
     @field:Schema(description = "좋아요 수", example = "10")
-    val likeCount: Long
+    val likeCount: Long,
+
+    @field:Schema(description = "좋아요 여부", example = "false")
+    val isLiked: Boolean
 ) {
     companion object {
-        fun from(diary: Diary, isOwner: Boolean): ReadDiaryResponse {
+        fun from(diary: Diary, isOwner: Boolean, isLiked: Boolean): ReadDiaryResponse {
             return ReadDiaryResponse(
                 diaryId = diary.id!!,
                 type = diary.type,
@@ -61,7 +64,8 @@ data class ReadDiaryResponse(
                 musicUrl = diary.musicUrl,
                 lyrics = diary.lyrics,
                 isPublic = diary.isPublic,
-                likeCount = diary.likeCount
+                likeCount = diary.likeCount,
+                isLiked = isLiked
             )
         }
     }
