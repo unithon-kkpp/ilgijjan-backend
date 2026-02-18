@@ -57,9 +57,8 @@ class DiaryService(
     fun getDiaryById(diaryId: Long, userId: Long): ReadDiaryResponse {
         val diary = diaryReader.getDiaryById(diaryId)
         diaryValidator.validateAccess(diary, userId)
-        val user = userReader.getUserById(userId)
         val isOwner = diary.user.id == userId
-        val isLiked = likeReader.findByDiaryAndUser(diary, user)?.isActive() ?: false
+        val isLiked = likeReader.isLiked(diaryId, userId)
         return ReadDiaryResponse.from(diary, isOwner, isLiked)
     }
 
