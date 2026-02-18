@@ -6,14 +6,16 @@ import com.ilgijjan.domain.user.domain.User
 data class ReadMeResponse(
     val name: String?,
     val character: Character?,
-    val isNotificationEnabled: Boolean
+    val isNotificationEnabled: Boolean,
+    val noteCount: Int
 ) {
     companion object {
-        fun from(user: User): ReadMeResponse {
+        fun from(user: User, noteCount: Int): ReadMeResponse {
             return ReadMeResponse(
                 name = user.name,
                 character = user.character,
-                isNotificationEnabled = user.isNotificationEnabled
+                isNotificationEnabled = user.isNotificationEnabled,
+                noteCount = noteCount
             )
         }
     }

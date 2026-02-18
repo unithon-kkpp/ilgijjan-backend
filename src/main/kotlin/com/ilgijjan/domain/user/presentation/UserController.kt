@@ -20,7 +20,7 @@ class UserController(
 ) {
 
     @GetMapping
-    @Operation(summary = "본인 정보 조회", description = "로그인한 사용자의 이름, 캐릭터, 알림 설정을 조회합니다.")
+    @Operation(summary = "본인 정보 조회", description = "로그인한 사용자의 이름, 캐릭터, 알림 설정, 보유 음표 개수를 조회합니다.")
     fun getMe(@LoginUser userId: Long): ResponseEntity<ReadMeResponse> {
         val response = userService.getMe(userId)
         return ResponseEntity.ok(response)

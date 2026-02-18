@@ -16,7 +16,8 @@ class UserService(
 ) {
     fun getMe(userId: Long): ReadMeResponse {
         val user = userReader.getUserById(userId)
-        return ReadMeResponse.from(user)
+        val wallet = userWalletReader.getByUserId(userId)
+        return ReadMeResponse.from(user, wallet.noteCount)
     }
 
     fun getMyNoteCount(userId: Long): ReadNoteResponse {
