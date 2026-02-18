@@ -1,9 +1,11 @@
 package com.ilgijjan.domain.user.application
 
+import com.ilgijjan.common.constants.WalletConstants
 import com.ilgijjan.domain.user.domain.Character
 import com.ilgijjan.domain.user.presentation.ReadMeResponse
 import com.ilgijjan.domain.user.presentation.ReadNoteResponse
 import com.ilgijjan.domain.wallet.application.UserWalletReader
+import com.ilgijjan.domain.wallet.application.UserWalletUpdater
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -12,14 +14,23 @@ import org.springframework.transaction.annotation.Transactional
 class UserService(
     private val userReader: UserReader,
     private val userUpdater: UserUpdater,
-    private val userWalletReader: UserWalletReader
+    private val userWalletReader: UserWalletReader,
+    private val userWalletUpdater: UserWalletUpdater
 ) {
     fun getMe(userId: Long): ReadMeResponse {
         val user = userReader.getUserById(userId)
-        return ReadMeResponse.from(user)
+        val wallet = userWalletReader.getByUserId(userId)
+        return ReadMeResponse.from(user, wallet.noteCount)
     }
 
     fun getMyNoteCount(userId: Long): ReadNoteResponse {
+        val wallet = userWalletReader.getByUserId(userId)
+        return ReadNoteResponse(wallet.noteCount)
+    }
+
+    @Transactional
+    fun chargeNotes(userId: Long): ReadNoteResponse {
+        userWalletUpdater.charge(userId, WalletConstants.DIARY_CREATION_COST)
         val wallet = userWalletReader.getByUserId(userId)
         return ReadNoteResponse(wallet.noteCount)
     }

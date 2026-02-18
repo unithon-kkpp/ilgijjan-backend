@@ -35,10 +35,10 @@ interface DiaryRepository : JpaRepository<Diary, Long> {
     fun findPublicDiariesFirstPage(pageable: Pageable): Slice<Diary>
 
     @Query("""
-        SELECT d FROM Diary d 
-        JOIN FETCH d.user 
-        WHERE d.isPublic = true 
-          AND d.id < :lastId 
+        SELECT d FROM Diary d
+        JOIN FETCH d.user
+        WHERE d.isPublic = true
+          AND d.id < :lastId
         ORDER BY d.id DESC
     """)
     fun findPublicDiariesNextPage(@Param("lastId") lastId: Long, pageable: Pageable): Slice<Diary>

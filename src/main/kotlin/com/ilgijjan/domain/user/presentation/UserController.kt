@@ -8,6 +8,7 @@ import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -20,9 +21,16 @@ class UserController(
 ) {
 
     @GetMapping
-    @Operation(summary = "본인 정보 조회", description = "로그인한 사용자의 이름, 캐릭터, 알림 설정을 조회합니다.")
+    @Operation(summary = "본인 정보 조회", description = "로그인한 사용자의 이름, 캐릭터, 알림 설정, 보유 음표 개수를 조회합니다.")
     fun getMe(@LoginUser userId: Long): ResponseEntity<ReadMeResponse> {
         val response = userService.getMe(userId)
+        return ResponseEntity.ok(response)
+    }
+
+    @PostMapping("/notes")
+    @Operation(summary = "음표 충전 (개발용)", description = "로그인한 사용자의 음표를 10개(1회 생성 분량) 충전합니다.")
+    fun chargeNotes(@LoginUser userId: Long): ResponseEntity<ReadNoteResponse> {
+        val response = userService.chargeNotes(userId)
         return ResponseEntity.ok(response)
     }
 
