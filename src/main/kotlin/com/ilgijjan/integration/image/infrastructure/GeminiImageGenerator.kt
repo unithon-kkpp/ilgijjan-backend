@@ -1,5 +1,6 @@
 package com.ilgijjan.integration.image.infrastructure
 
+import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.integration.image.application.ImageGenerator
 import com.ilgijjan.integration.storage.application.FileUploader
@@ -79,9 +80,9 @@ class GeminiImageGenerator(
 
         var lastException: Exception? = null
 
-        for (attempt in 1..2) {
+        for (attempt in 1..5) {
             try {
-                log.info("Gemini 요청 시도 ($attempt/2)")
+                log.info("Gemini 요청 시도 ($attempt/5)")
 
                 val response = webClient.post()
                     .bodyValue(requestBody)
@@ -91,16 +92,18 @@ class GeminiImageGenerator(
 
                 return extractAndUploadImage(response)
 
+            } catch (e: NonRetryableException) {
+                throw e
             } catch (e: Exception) {
                 lastException = e
-                log.warn("Gemini 1차 시도 실패. 재시도합니다. 원인: ${e.message}")
+                log.warn("Gemini 시도 실패 ($attempt/5). 재시도합니다. 원인: ${e.message}")
 
-                if (attempt == 1) {
-                    Thread.sleep(1000)
+                if (attempt < 5) {
+                    Thread.sleep(1000L * attempt)
                 }
             }
         }
-        throw RuntimeException("Gemini API 2회 시도 모두 실패", lastException)
+        throw RuntimeException("Gemini API 5회 시도 모두 실패", lastException)
     }
 
     private fun buildPrompt(text: String, weather: Weather): String {
@@ -128,7 +131,7 @@ class GeminiImageGenerator(
         val candidate = candidates.firstOrNull() as? Map<*, *>
 
         if (candidate?.get("finishReason") != "STOP") {
-            throw RuntimeException("이미지 생성 거부됨 (사유: ${candidate?.get("finishReason")})")
+            throw NonRetryableException("이미지 생성 거부됨 (사유: ${candidate?.get("finishReason")})")
         }
 
         val base64Data = (((candidate["content"] as? Map<*, *>)
