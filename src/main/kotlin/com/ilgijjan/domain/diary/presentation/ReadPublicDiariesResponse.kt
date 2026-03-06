@@ -22,7 +22,7 @@ data class ReadPublicDiariesResponse(
                     id = diary.id!!,
                     date = diary.createdAt?.format(DateFormatter.DOT_DATE_FORMATTER)!!,
                     imageUrl = diary.imageUrl ?: "",
-                    authorName = diary.user.getMaskedName(),
+                    authorName = diary.user.name ?: "",
                     introLines = diary.lyrics?.substringBefore("\n")?.take(9)
                 )
             }

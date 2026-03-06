@@ -9,6 +9,7 @@ build/
 prometheus_data/
 grafana_data/
 logs/
+.claude
 
 ### STS ###
 .apt_generated

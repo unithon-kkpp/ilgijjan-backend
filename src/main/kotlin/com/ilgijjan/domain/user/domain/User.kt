@@ -12,9 +12,11 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
+import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
 
 @Entity
+@SQLRestriction("deleted_at IS NULL")
 @Table(
     name = "users",
     uniqueConstraints = [
@@ -53,13 +55,6 @@ class User(
 
     fun updateNotification(isEnabled: Boolean) {
         this.isNotificationEnabled = isEnabled
-    }
-
-    fun getMaskedName(): String {
-        if (this.deletedAt != null) return "탈퇴한 유저"
-        val currentName = this.name
-        checkNotNull(currentName) { "데이터 정합성 오류: 유저(id=${this.id})의 이름이 없습니다.(회원가입 미완료)" }
-        return currentName
     }
 
     fun withdraw() {
