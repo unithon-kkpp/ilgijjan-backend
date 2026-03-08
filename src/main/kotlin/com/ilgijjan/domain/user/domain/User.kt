@@ -40,7 +40,7 @@ class User(
     var isNotificationEnabled: Boolean = true,
 
     @Embedded
-    val oauthInfo: OauthInfo,
+    var oauthInfo: OauthInfo,
 
     var deletedAt: LocalDateTime? = null
 ) : BaseEntity() {
@@ -59,5 +59,6 @@ class User(
 
     fun withdraw() {
         this.deletedAt = LocalDateTime.now()
+        this.oauthInfo = oauthInfo.copy(providerId = "WITHDRAWN_${oauthInfo.providerId}")
     }
 }
