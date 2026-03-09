@@ -59,6 +59,6 @@ class User(
 
     fun withdraw() {
         this.deletedAt = LocalDateTime.now()
-        this.oauthInfo = oauthInfo.copy(providerId = "WITHDRAWN_${oauthInfo.providerId}")
+        this.oauthInfo = oauthInfo.copy(providerId = null)
     }
 }

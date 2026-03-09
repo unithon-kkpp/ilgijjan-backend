@@ -12,5 +12,5 @@ data class OauthInfo (
     val provider: OauthProvider,
 
     @Column(name = "provider_id")
-    val providerId: String
+    val providerId: String?
 )
