@@ -42,7 +42,7 @@ resource "google_compute_instance" "prod" {
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${var.ssh_public_key}"
+    ssh-keys = "${var.ssh_username}:${var.ssh_public_key}"
   }
 
   depends_on = [google_project_service.apis]
@@ -74,7 +74,7 @@ resource "google_compute_instance" "monitoring" {
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${var.ssh_public_key}"
+    ssh-keys = "${var.ssh_username}:${var.ssh_public_key}"
   }
 
   depends_on = [google_project_service.apis]

@@ -33,6 +33,11 @@ variable "db_password" {
   sensitive   = true
 }
 
+variable "ssh_username" {
+  description = "VM SSH 접속 유저명 (GCP 계정 이메일 @ 앞부분)"
+  type        = string
+}
+
 variable "ssh_public_key" {
   description = "VM에 등록할 SSH 공개키 (ssh-keygen으로 생성한 .pub 파일 내용)"
   type        = string
