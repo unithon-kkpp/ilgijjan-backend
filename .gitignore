@@ -45,3 +45,10 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### Terraform ###
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+terraform/*.json
