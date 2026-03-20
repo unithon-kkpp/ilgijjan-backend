@@ -52,7 +52,7 @@ class GoogleCloudStorageUploader(
         return generateFileUrl(uuid)
     }
 
-    override fun uploadFromUrl(imageUrl: String): String {
+    override fun uploadFromUrl(imageUrl: String, contentType: String): String {
         val uuid = UUID.randomUUID().toString()
 
         val uri = URI.create(imageUrl)
@@ -61,7 +61,7 @@ class GoogleCloudStorageUploader(
 
         connection.inputStream.use { inputStream ->
             val blobInfo = BlobInfo.newBuilder(bucketName, uuid)
-                .setContentType("image/png")
+                .setContentType(contentType)
                 .build()
 
             storage.writer(blobInfo).use { writeChannel ->

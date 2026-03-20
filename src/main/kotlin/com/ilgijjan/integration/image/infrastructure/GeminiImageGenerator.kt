@@ -99,7 +99,9 @@ class GeminiImageGenerator(
                 log.warn("Gemini 시도 실패 ($attempt/5). 재시도합니다. 원인: ${e.message}")
 
                 if (attempt < 5) {
-                    Thread.sleep(1000L * attempt)
+                    val sleepMs = (1L shl attempt) * 1_000L  // 2s, 4s, 8s, 16s
+                    log.info("Gemini 재시도 대기 중... ${sleepMs / 1000}초")
+                    Thread.sleep(sleepMs)
                 }
             }
         }

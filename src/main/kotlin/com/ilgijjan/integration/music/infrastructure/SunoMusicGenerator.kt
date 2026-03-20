@@ -5,6 +5,7 @@ import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorCode
 import com.ilgijjan.integration.music.application.MusicResult
 import com.ilgijjan.integration.music.application.MusicGenerator
+import com.ilgijjan.integration.storage.application.FileUploader
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeoutException
 @Component
 class SunoMusicGenerator(
     private val restTemplate: RestTemplate,
+    private val fileUploader: FileUploader,
     @Value("\${suno.api.token}")
     private val apiToken: String,
     @Value("\${suno.api.base-url}")
@@ -137,7 +139,8 @@ class SunoMusicGenerator(
         log.info("[onMusicCallback] 음악 수신, taskId=$taskId")
         val future = taskFutures.remove(taskId)
         if (future != null) {
-            future.complete(MusicResult(audioUrl, lyrics))  // 여기서 Future에 결과 전달
+            val gcsUrl = fileUploader.uploadFromUrl(audioUrl, "audio/mpeg")
+            future.complete(MusicResult(gcsUrl, lyrics))
         } else {
             log.warn("대기 중인 Future 없음, taskId=$taskId")
         }
