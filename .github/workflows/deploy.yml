@@ -65,8 +65,8 @@ jobs:
           script: |
             cd /home/${{ secrets.SSH_USERNAME }}
             
-            sudo docker-compose stop application || true
-            sudo docker-compose rm -f application || true
+            sudo docker compose stop application || true
+            sudo docker compose rm -f application || true
             sudo docker image prune -af
 
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -74,4 +74,4 @@ jobs:
             sudo docker pull ${IMAGE_TAG}
 
             echo "DOCKER_IMAGE=${IMAGE_TAG}" > .env
-            sudo docker-compose up -d --no-deps application
+            sudo docker compose up -d --no-deps application
