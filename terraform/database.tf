@@ -11,7 +11,11 @@ resource "google_sql_database_instance" "main" {
 
     ip_configuration {
       ipv4_enabled = true
-      # DataGrip 등 외부 접속 시 아래 주석 해제 후 본인 IP 입력
+      authorized_networks {
+        name  = "prod-vm"
+        value = google_compute_address.prod.address
+      }
+      # DataGrip 등 외부 접속 시 SSH 터널 사용 (prod VM 경유)
       # authorized_networks {
       #   name  = "my-ip"
       #   value = "YOUR_IP/32"
