@@ -12,14 +12,15 @@ resource "google_compute_address" "monitoring" {
 }
 
 # ============================================================
-# prod VM — e2-standard-2 (2 vCPU, 8GB)
+# prod VM — e2-medium (1 vCPU 공유, 4GB)
 # Spring Boot + Redis + RabbitMQ + Promtail + nginx
 # ============================================================
 resource "google_compute_instance" "prod" {
-  name         = "ilgijjan-prod"
-  machine_type = "e2-standard-2"
-  zone         = var.zone
-  tags         = ["ilgijjan-vm"]
+  name                      = "ilgijjan-prod"
+  machine_type              = "e2-medium"
+  zone                      = var.zone
+  tags                      = ["ilgijjan-vm"]
+  allow_stopping_for_update = true
 
   boot_disk {
     initialize_params {
