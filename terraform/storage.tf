@@ -22,3 +22,14 @@ resource "google_storage_bucket_iam_member" "public_read" {
   role   = "roles/storage.objectViewer"
   member = "allUsers"
 }
+
+# ============================================================
+# GCS 버킷 — Loki 로그 저장
+# ============================================================
+resource "google_storage_bucket" "logs" {
+  name          = "ilgijjan-490801-logs"
+  location      = var.region
+  force_destroy = false
+
+  uniform_bucket_level_access = true
+}

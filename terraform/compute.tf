@@ -54,10 +54,11 @@ resource "google_compute_instance" "prod" {
 # Grafana + Loki + Prometheus + nginx
 # ============================================================
 resource "google_compute_instance" "monitoring" {
-  name         = "ilgijjan-monitoring"
-  machine_type = "e2-small"
-  zone         = var.zone
-  tags         = ["ilgijjan-vm", "ilgijjan-monitoring"]
+  name                      = "ilgijjan-monitoring"
+  machine_type              = "e2-small"
+  zone                      = var.zone
+  tags                      = ["ilgijjan-vm", "ilgijjan-monitoring"]
+  allow_stopping_for_update = true
 
   boot_disk {
     initialize_params {
@@ -72,6 +73,11 @@ resource "google_compute_instance" "monitoring" {
     access_config {
       nat_ip = google_compute_address.monitoring.address
     }
+  }
+
+  service_account {
+    email  = google_service_account.app.email
+    scopes = ["cloud-platform"]
   }
 
   metadata = {

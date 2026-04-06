@@ -22,7 +22,7 @@
 |--------|------|------|
 | Grafana | 메트릭/로그 시각화 | 3000 |
 | Prometheus | 메트릭 수집 (prod VM actuator 스크랩) | 9090 |
-| Loki | 로그 수집 (Promtail에서 push) | 3100 |
+| Loki | 로그 수집 (Promtail에서 push) + GCS 저장 | 3100 |
 | nginx | 리버스 프록시 + HTTPS (Let's Encrypt) | 80, 443 |
 
 ## 파일 설명
@@ -32,8 +32,18 @@ monitoring/
 ├── CLAUDE.md            # 이 파일
 ├── docker-compose.yml   # Grafana + Prometheus + Loki 구성
 ├── prometheus.yml       # Prometheus 스크랩 설정 (prod VM 내부 IP: 10.10.0.2)
-├── loki-config.yml      # Loki 설정
-└── promtail-config.yml  # prod VM에 배치해야 하는 Promtail 설정
+├── loki-config.yml      # Loki 설정 (GCS 스토리지: ilgijjan-490801-logs 버킷)
+├── promtail-config.yml  # prod VM에 배치해야 하는 Promtail 설정
+└── grafana/
+    ├── provisioning/
+    │   ├── datasources/
+    │   │   └── datasources.yml   # Loki, Prometheus 데이터소스 자동 등록
+    │   ├── dashboards/
+    │   │   └── dashboards.yml    # 대시보드 경로 지정
+    │   └── alerting/
+    │       └── alerting.yml      # 서버 다운 Discord 알림 룰 + contact point
+    └── dashboards/
+        └── logs.json             # ilgijjan Logs 대시보드
 ```
 
 > ⚠️ `promtail-config.yml`은 **prod VM 홈 디렉토리**에 복사해야 합니다.
@@ -57,13 +67,23 @@ sudo usermod -aG docker $USER
 mkdir -p ~/monitoring
 ```
 
-아래 3개 파일을 monitoring VM의 `~/monitoring/` 에 내용 그대로 복사 붙여넣기 합니다.
+아래 파일들을 monitoring VM의 `~/monitoring/` 에 복사합니다.
 - `monitoring/docker-compose.yml` → `~/monitoring/docker-compose.yml`
 - `monitoring/prometheus.yml` → `~/monitoring/prometheus.yml` (`${PROD_VM_INTERNAL_IP}` → prod VM 내부 IP로 변경, GCP 콘솔에서 확인)
 - `monitoring/loki-config.yml` → `~/monitoring/loki-config.yml`
+- `monitoring/grafana/` → `~/monitoring/grafana/` (폴더 통째로 복사)
+
+```bash
+scp -i ~/.ssh/ilgijjan -r monitoring/grafana/ <user>@<monitoring-ip>:~/monitoring/
+scp -i ~/.ssh/ilgijjan monitoring/docker-compose.yml monitoring/prometheus.yml monitoring/loki-config.yml <user>@<monitoring-ip>:~/monitoring/
+```
 
 그리고 `monitoring/promtail-config.yml`은 **prod VM 홈 디렉토리**에 복사합니다.
 - `monitoring/promtail-config.yml` → prod VM `~/promtail-config.yml` (`${MONITORING_VM_INTERNAL_IP}` → monitoring VM 내부 IP로 변경, GCP 콘솔에서 확인)
+
+```bash
+scp -i ~/.ssh/ilgijjan monitoring/promtail-config.yml <user>@<prod-ip>:~/
+```
 
 ### 3. 모니터링 스택 실행
 ```bash
@@ -95,6 +115,21 @@ sudo certbot --nginx -d monitoring.ilgijjan.store --email {이메일} --agree-to
 
 - 접속: https://monitoring.ilgijjan.store
 - 초기 계정: admin / admin (최초 접속 시 비밀번호 변경 권장)
-- Data Source 추가:
-  - Loki: `http://loki:3100`
-  - Prometheus: `http://prometheus:9090`
+- 데이터소스(Loki, Prometheus), 대시보드(ilgijjan Logs), 알림 룰은 프로비저닝으로 자동 등록됨
+
+## 로그 저장 구조
+
+```
+Spring Boot (prod VM)
+    ↓ /logs/spring.log 파일 저장
+Promtail (prod VM)
+    ↓ Loki로 push
+Loki (monitoring VM)
+    ↓ GCS 버킷(ilgijjan-490801-logs)에 청크 저장
+Grafana
+    ← Loki 조회해서 대시보드 표시
+```
+
+- 로그 파일은 prod VM `~/logs/` 에 7일 롤링 보관
+- Loki는 GCS에 영구 저장 (monitoring VM 날아가도 유지)
+- Grafana 알림: 서버 다운 시 Discord로 실시간 알림
