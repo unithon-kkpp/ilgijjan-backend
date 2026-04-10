@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 페이지</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, sans-serif; background: #f5f5f5; min-height: 100vh; }
+        header { background: white; padding: 16px 32px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-size: 18px; font-weight: 700; color: #333; }
+        main { max-width: 520px; margin: 48px auto; padding: 0 16px; }
+        .card { background: white; padding: 32px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 16px; }
+        .card h2 { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 24px; }
+        label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+        .input-row { display: flex; gap: 8px; margin-bottom: 0; }
+        .input-row input { flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .input-row input:focus { outline: none; border-color: #4f46e5; }
+        .input-row button { padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+        .input-row button:hover { background: #4338ca; }
+        input[type=number] { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 16px; }
+        input[type=number]:focus { outline: none; border-color: #4f46e5; }
+        .btn-full { width: 100%; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-full:hover { background: #4338ca; }
+        .success { background: #f0fdf4; color: #16a34a; padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 24px; }
+        .error { background: #fef2f2; color: #dc2626; padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 24px; }
+        .user-info { background: #f5f3ff; border: 1px solid #e0d9ff; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+        .user-info .name { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 4px; }
+        .user-info .notes { font-size: 13px; color: #6b5ce7; }
+        .logout-btn { background: none; border: none; color: #888; font-size: 13px; cursor: pointer; padding: 0; }
+        .logout-btn:hover { color: #333; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>🎵 일기짠 관리자</h1>
+    <form th:action="@{/admin/logout}" method="post" onsubmit="return confirm('로그아웃 하시겠습니까?')" style="margin:0">
+        <button type="submit" class="logout-btn">로그아웃</button>
+    </form>
+</header>
+<main>
+    <div class="card">
+        <h2>유저 조회</h2>
+        <div th:if="${searchError}" class="error" th:text="${searchError}"></div>
+        <form th:action="@{/admin/search}" method="get">
+            <label>닉네임</label>
+            <div class="input-row">
+                <input type="text" name="nickname" placeholder="사용자 닉네임 입력" th:value="${searchedNickname}" required autofocus>
+                <button type="submit">조회</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${foundNickname}" class="card">
+        <h2>음표 충전</h2>
+        <div th:if="${success}" class="success" th:text="${success}"></div>
+        <div class="user-info">
+            <div class="name" th:text="${foundNickname}"></div>
+            <div class="notes">현재 보유 음표: <strong th:text="${currentNoteCount}"></strong>개</div>
+        </div>
+        <form th:action="@{/admin/charge}" method="post">
+            <input type="hidden" name="nickname" th:value="${foundNickname}">
+            <label>충전할 음표 개수</label>
+            <input type="number" name="amount" placeholder="충전할 음표 개수" min="1" required>
+            <button type="submit" class="btn-full">충전하기</button>
+        </form>
+    </div>
+
+</main>
+</body>
+</html>
