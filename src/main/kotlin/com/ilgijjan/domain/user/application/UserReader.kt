@@ -19,4 +19,8 @@ class UserReader(
     fun findByProviderId(provider: OauthProvider, providerId: String): User? {
         return userRepository.findByOauthInfoProviderAndOauthInfoProviderId(provider, providerId)
     }
+
+    fun findByName(name: String): User? {
+        return userRepository.findByName(name)
+    }
 }

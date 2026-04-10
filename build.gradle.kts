@@ -62,6 +62,12 @@ dependencies {
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
+    // Thymeleaf
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
+    // OAuth2 Client
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
     // Spring Actuator
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 

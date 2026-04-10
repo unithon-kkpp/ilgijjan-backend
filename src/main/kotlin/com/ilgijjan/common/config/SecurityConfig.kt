@@ -7,6 +7,7 @@ import com.ilgijjan.common.jwt.JwtTokenProvider
 import com.ilgijjan.domain.auth.application.TokenManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@Order(2)
 class SecurityConfig(
     private val jwtTokenProvider: JwtTokenProvider,
     private val authenticationEntryPoint: JwtAuthenticationEntryPoint,
@@ -25,6 +27,7 @@ class SecurityConfig(
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
+            .securityMatcher("/api/**", "/billing/**", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**")
             .csrf { it.disable() }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }

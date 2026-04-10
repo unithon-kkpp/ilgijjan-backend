@@ -46,6 +46,8 @@ out/
 ### Kotlin ###
 .kotlin
 
+docker-compose.local.yml
+
 ### Terraform ###
 **/.terraform/
 *.tfstate
