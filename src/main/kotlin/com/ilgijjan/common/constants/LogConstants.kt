@@ -8,6 +8,7 @@ object LogConstants {
         "/swagger-ui",
         "/v3/api-docs",
         "/error",
-        "/favicon.ico"
+        "/favicon.ico",
+        "/admin"
     )
 }

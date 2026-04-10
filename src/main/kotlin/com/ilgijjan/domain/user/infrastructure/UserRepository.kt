@@ -10,6 +10,8 @@ interface UserRepository : JpaRepository<User, Long> {
 
     fun existsByNameAndIdNot(name: String, id: Long): Boolean
 
+    fun findByName(name: String): User?
+
     fun findByOauthInfoProviderAndOauthInfoProviderId(
         provider: OauthProvider,
         providerId: String
