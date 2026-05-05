@@ -1,5 +1,6 @@
 package com.ilgijjan.domain.user.domain
 
+import com.ilgijjan.common.constants.AuthConstants
 import com.ilgijjan.common.domain.BaseEntity
 import com.ilgijjan.domain.auth.domain.OauthInfo
 import jakarta.persistence.Column
@@ -59,6 +60,16 @@ class User(
 
     fun withdraw() {
         this.deletedAt = LocalDateTime.now()
+    }
+
+    fun restore() {
+        this.deletedAt = null
+    }
+
+    fun clearProviderId() {
         this.oauthInfo = oauthInfo.copy(providerId = null)
     }
+
+    val isWithinRejoinWindow: Boolean
+        get() = deletedAt?.isAfter(LocalDateTime.now().minusDays(AuthConstants.REJOIN_WINDOW_DAYS)) == true
 }

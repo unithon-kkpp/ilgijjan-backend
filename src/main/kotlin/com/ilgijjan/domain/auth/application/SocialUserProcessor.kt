@@ -18,8 +18,18 @@ class SocialUserProcessor(
         val client = oauthClients.getClient(command.provider)
         val providerId = client.getProviderId(command)
 
-        return userReader.findByProviderId(command.provider, providerId)
-            ?: userCreator.createSocialUser(command.provider, providerId)
+        userReader.findByProviderId(command.provider, providerId)?.let { return it }
+
+        val deletedUser = userReader.findDeletedByProviderId(command.provider, providerId)
+        if (deletedUser != null) {
+            if (deletedUser.isWithinRejoinWindow) {
+                deletedUser.restore()
+                return deletedUser
+            }
+            deletedUser.clearProviderId()
+        }
+
+        return userCreator.createSocialUser(command.provider, providerId)
     }
 
     fun logout(command: OauthCommand) {

@@ -23,4 +23,8 @@ class UserReader(
     fun findByName(name: String): User? {
         return userRepository.findByName(name)
     }
+
+    fun findDeletedByProviderId(provider: OauthProvider, providerId: String): User? {
+        return userRepository.findDeletedByProviderAndProviderId(provider.name, providerId)
+    }
 }
