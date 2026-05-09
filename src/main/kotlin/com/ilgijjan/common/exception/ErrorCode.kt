@@ -20,6 +20,7 @@ enum class ErrorCode(
     DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, "일기 정보를 찾을 수 없습니다."),
     NOT_DIARY_OWNER(HttpStatus.FORBIDDEN, "해당 일기 작성자가 아닙니다."),
     PRIVATE_DIARY_ACCESS_DENIED(HttpStatus.FORBIDDEN, "비공개 일기에 접근할 권한이 없습니다."),
+    DIARY_NOT_COMPLETED(HttpStatus.UNPROCESSABLE_ENTITY, "생성이 완료되지 않은 일기는 상세 조회할 수 없습니다."),
 
     // Music
     MUSIC_GENERATE_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "음악 생성 타임아웃"),
