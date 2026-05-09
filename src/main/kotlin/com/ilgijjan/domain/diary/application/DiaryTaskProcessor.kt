@@ -1,9 +1,11 @@
 package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.LogExecutionTime
+import com.ilgijjan.common.constants.WalletConstants
 import com.ilgijjan.domain.diary.domain.DiaryInputType
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenDeleter
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenReader
+import com.ilgijjan.domain.wallet.application.UserWalletUpdater
 import com.ilgijjan.integration.image.application.ImageGenerator
 import com.ilgijjan.integration.music.application.MusicGenerator
 import com.ilgijjan.integration.notification.application.NotificationSender
@@ -24,7 +26,8 @@ class DiaryTaskProcessor(
     private val musicGenerator: MusicGenerator,
     private val fcmTokenReader: FcmTokenReader,
     private val fcmTokenDeleter: FcmTokenDeleter,
-    private val notificationSender: NotificationSender
+    private val notificationSender: NotificationSender,
+    private val userWalletUpdater: UserWalletUpdater
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -67,6 +70,14 @@ class DiaryTaskProcessor(
         } catch (e: Exception) {
             log.error("일기 생성 중 에러 발생 - ID: $diaryId, 사유: ${e.message}")
             diaryUpdater.fail(diaryId)
+            val userId = diary.user.id!!
+            userWalletUpdater.charge(userId, WalletConstants.DIARY_CREATION_COST)
+
+            if (diary.user.isNotificationEnabled) {
+                val tokens = fcmTokenReader.findAllByUserId(userId).map { it.token }
+                val deadTokens = notificationSender.sendDiaryFailure(tokens, diaryId)
+                fcmTokenDeleter.deleteByTokens(deadTokens)
+            }
         }
     }
 }
