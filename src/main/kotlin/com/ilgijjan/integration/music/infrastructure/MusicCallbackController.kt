@@ -30,19 +30,27 @@ class MusicCallbackController(
             val lyricsData = callback.data.data
             if (lyricsData.isNullOrEmpty()) {
                 log.error("[Lyrics-CALLBACK-ERR] 가사 데이터가 비어있음")
+                sunoMusicGenerator.failTask(callback.data.taskId, "가사 데이터가 비어있음")
                 return ResponseEntity.badRequest().body("No lyrics data")
             }
 
             val firstComplete = lyricsData.firstOrNull { it.status == "complete" }
             if (firstComplete == null) {
                 log.error("[Lyrics-CALLBACK-ERR] 완료된 가사 없음")
+                sunoMusicGenerator.failTask(callback.data.taskId, "완료된 가사 없음")
                 return ResponseEntity.badRequest().body("No complete lyrics found")
             }
 
             val lyrics = firstComplete.text
             log.info("[Lyrics-CALLBACK-OK] 가사 수신 완료, 길이=${lyrics.length}")
 
-            val musicTaskId = sunoMusicGenerator.requestMusicGeneration(lyrics)
+            val musicTaskId = try {
+                sunoMusicGenerator.requestMusicGeneration(lyrics)
+            } catch (e: Exception) {
+                log.error("[Lyrics-CALLBACK-ERR] 음악 생성 요청 실패: ${e.message}")
+                sunoMusicGenerator.failTask(callback.data.taskId, "음악 생성 요청 실패: ${e.message}")
+                return ResponseEntity.status(500).body("Music generation request failed")
+            }
             log.info("[Lyrics-CALLBACK-INFO] 음악 생성 요청 완료, taskId=$musicTaskId")
 
             sunoMusicGenerator.transferFutureKey(callback.data.taskId ?: "", musicTaskId)
@@ -50,6 +58,7 @@ class MusicCallbackController(
             return ResponseEntity.ok("Lyrics received and music generation started")
         } else {
             log.error("[Lyrics-CALLBACK-ERR] 가사 생성 실패: code={}, msg={}", callback.code, callback.msg)
+            sunoMusicGenerator.failTask(callback.data.taskId, "가사 생성 실패: ${callback.msg}")
             return ResponseEntity.status(500).body("Error in lyrics generation")
         }
     }
@@ -69,6 +78,7 @@ class MusicCallbackController(
                     val musicDataList = callback.data.data
                     if (musicDataList.isEmpty()) {
                         log.error("[Music-CALLBACK-ERR] 음악 데이터 없음")
+                        sunoMusicGenerator.failTask(callback.data.taskId, "음악 데이터 없음")
                         return ResponseEntity.badRequest().body("No music data")
                     }
 
@@ -82,6 +92,7 @@ class MusicCallbackController(
 
                     if (audioUrl == null) {
                         log.error("[Music-CALLBACK-ERR] 오디오 URL 없음")
+                        sunoMusicGenerator.failTask(callback.data.taskId, "오디오 URL 없음")
                         return ResponseEntity.badRequest().body("No audio URL")
                     }
 
@@ -100,6 +111,7 @@ class MusicCallbackController(
             }
         } else {
             log.error("[Music-CALLBACK-ERR] 음악 생성 실패: code={}, msg={}", callback.code, callback.msg)
+            sunoMusicGenerator.failTask(callback.data.taskId, "음악 생성 실패: ${callback.msg}")
             return ResponseEntity.status(500).body("Error in music generation")
         }
     }

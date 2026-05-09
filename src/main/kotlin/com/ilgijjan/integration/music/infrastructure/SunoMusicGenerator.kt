@@ -145,6 +145,20 @@ class SunoMusicGenerator(
             log.warn("대기 중인 Future 없음, taskId=$taskId")
         }
     }
+
+    fun failTask(taskId: String?, message: String) {
+        if (taskId.isNullOrBlank()) {
+            log.warn("[failTask] taskId 없음 - 실패 처리 불가: msg=$message")
+            return
+        }
+        val future = taskFutures.remove(taskId)
+        if (future != null) {
+            future.completeExceptionally(RuntimeException(message))
+            log.warn("[failTask] Future 즉시 실패 처리: taskId=$taskId, msg=$message")
+        } else {
+            log.warn("[failTask] 대기 중인 Future 없음: taskId=$taskId, msg=$message")
+        }
+    }
 }
 
 data class TaskIdResponse(
