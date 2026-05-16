@@ -5,6 +5,7 @@ import com.ilgijjan.common.config.RabbitMqConfig
 import com.ilgijjan.common.constants.WalletConstants
 import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
 import com.ilgijjan.domain.diary.presentation.CreateDiaryResponse
+import com.ilgijjan.domain.diary.presentation.DiaryStatusResponse
 import com.ilgijjan.domain.diary.presentation.ReadDiaryResponse
 import com.ilgijjan.domain.diary.presentation.ReadMyDiariesResponse
 import com.ilgijjan.domain.diary.presentation.ReadPublicDiariesResponse
@@ -61,6 +62,12 @@ class DiaryService(
         val isOwner = diary.user.id == userId
         val isLiked = likeReader.isLiked(diaryId, userId)
         return ReadDiaryResponse.from(diary, isOwner, isLiked)
+    }
+
+    @CheckDiaryOwner
+    fun getDiaryStatus(diaryId: Long): DiaryStatusResponse {
+        val diary = diaryReader.getDiaryById(diaryId)
+        return DiaryStatusResponse.from(diary)
     }
 
     fun getMyDiariesByYearAndMonth(userId: Long, year: Int, month: Int): ReadMyDiariesResponse {

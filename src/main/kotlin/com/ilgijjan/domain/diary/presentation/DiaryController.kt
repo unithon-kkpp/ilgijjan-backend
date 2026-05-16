@@ -45,6 +45,24 @@ class DiaryController(
         return ResponseEntity(response, HttpStatus.OK)
     }
 
+    @GetMapping("/{diaryId}/status")
+    @Operation(
+        summary = "일기 생성 상태 폴링 조회",
+        description = """
+            일기 생성 진행 상태를 조회합니다. 본인이 작성한 일기만 조회 가능합니다.
+
+            - PENDING: 생성 중
+            - COMPLETED: 생성 완료 (이후 단건 조회 API 호출)
+            - FAILED: 생성 실패
+        """
+    )
+    fun getDiaryStatus(
+        @PathVariable diaryId: Long
+    ): ResponseEntity<DiaryStatusResponse> {
+        val response = diaryService.getDiaryStatus(diaryId)
+        return ResponseEntity(response, HttpStatus.OK)
+    }
+
     @GetMapping
     @Operation(
         summary = "본인 일기 목록 조회",
