@@ -8,6 +8,15 @@ import jakarta.persistence.*
 import org.hibernate.annotations.SQLRestriction
 
 @Entity
+@Table(
+    name = "diary",
+    indexes = [
+        // 월별 본인 일기 조회 (user_id 필터 + created_at 정렬) - issue #56
+        Index(name = "idx_diary_user_created", columnList = "user_id, created_at"),
+        // 공개 피드 커서 조회 (is_public 필터 + id 정렬) - issue #56
+        Index(name = "idx_diary_public_id", columnList = "is_public, id")
+    ]
+)
 @SQLRestriction("status <> 'DELETED'")
 class Diary (
     @Id
