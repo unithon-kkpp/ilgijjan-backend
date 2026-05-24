@@ -14,8 +14,8 @@ class AsyncConfig {
     @Bean(name = ["asyncExecutor"])
     fun asyncExecutor(): Executor {
         return ThreadPoolTaskExecutor().apply {
-            corePoolSize = 4
-            maxPoolSize = 8
+            corePoolSize = 8      // 컨슈머 동시성 증가 대응 (일기 1건당 음악+이미지 2개 비동기 작업)
+            maxPoolSize = 16
             queueCapacity = 100
             keepAliveSeconds = 30
             setThreadNamePrefix("AsyncThread-")
