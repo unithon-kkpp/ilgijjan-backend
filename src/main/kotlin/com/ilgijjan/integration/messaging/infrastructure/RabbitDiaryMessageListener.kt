@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 class RabbitDiaryMessageListener(
     private val eventPublisher: ApplicationEventPublisher
 ) {
-    @RabbitListener(queues = [RabbitMqConfig.DIARY_QUEUE])
+    @RabbitListener(queues = [RabbitMqConfig.DIARY_QUEUE], concurrency = "3-6")
     fun onMessage(diaryId: Long, @Header(name = "requestId", required = false) requestId: String?) {
         MDC.put("requestId", requestId ?: IdGenerator.generateTraceId())
 
