@@ -55,3 +55,6 @@ docker-compose.local.yml
 *.tfstate.backup
 *.tfvars
 terraform/*.json
+
+### 성능 측정 자료 (issue #56) - 로컬 측정용, 커밋 제외 ###
+perf/

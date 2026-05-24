@@ -1,6 +1,7 @@
 package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.CheckDiaryOwner
+import com.ilgijjan.common.config.CacheConfig
 import com.ilgijjan.common.config.RabbitMqConfig
 import com.ilgijjan.common.constants.WalletConstants
 import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
@@ -13,6 +14,8 @@ import com.ilgijjan.domain.like.application.LikeReader
 import com.ilgijjan.domain.user.application.UserReader
 import com.ilgijjan.domain.wallet.application.UserWalletUpdater
 import com.ilgijjan.integration.messaging.application.MessageProducer
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -75,6 +78,10 @@ class DiaryService(
         return ReadMyDiariesResponse.from(diaries)
     }
 
+    @Cacheable(
+        cacheNames = [CacheConfig.PUBLIC_DIARIES_CACHE],
+        key = "(#lastId ?: 0) + ':' + #size"
+    )
     fun getPublicDiaries(lastId: Long?, size: Int): ReadPublicDiariesResponse {
         val diariesSlice = diaryReader.findAllPublicWithSlice(lastId, size)
         return ReadPublicDiariesResponse.from(diariesSlice)
@@ -82,18 +89,21 @@ class DiaryService(
 
     @Transactional
     @CheckDiaryOwner
+    @CacheEvict(cacheNames = [CacheConfig.PUBLIC_DIARIES_CACHE], allEntries = true)
     fun publishDiary(diaryId: Long) {
         diaryUpdater.publish(diaryId)
     }
 
     @Transactional
     @CheckDiaryOwner
+    @CacheEvict(cacheNames = [CacheConfig.PUBLIC_DIARIES_CACHE], allEntries = true)
     fun unpublishDiary(diaryId: Long) {
         diaryUpdater.unpublish(diaryId)
     }
 
     @Transactional
     @CheckDiaryOwner
+    @CacheEvict(cacheNames = [CacheConfig.PUBLIC_DIARIES_CACHE], allEntries = true)
     fun deleteDiary(diaryId: Long) {
         diaryDeleter.delete(diaryId)
     }
