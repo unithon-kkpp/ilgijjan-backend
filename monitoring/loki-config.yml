@@ -30,7 +30,7 @@ storage_config:
     active_index_directory: /loki/index
     cache_location: /loki/boltdb-cache
   gcs:
-    bucket_name: ilgijjan-490801-logs
+    bucket_name: ilgijjan-499704-logs
 
 compactor:
   working_directory: /loki/compactor

@@ -27,7 +27,7 @@ resource "google_storage_bucket_iam_member" "public_read" {
 # GCS 버킷 — Loki 로그 저장
 # ============================================================
 resource "google_storage_bucket" "logs" {
-  name          = "ilgijjan-490801-logs"
+  name          = "ilgijjan-499704-logs"
   location      = var.region
   force_destroy = false
 
