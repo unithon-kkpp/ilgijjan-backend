@@ -58,3 +58,16 @@ terraform/*.json
 
 ### 성능 측정 자료 (issue #56) - 로컬 측정용, 커밋 제외 ###
 perf/
+
+### 학습 및 개선 기록 ###
+docs/
+
+### 테스트 토큰 생성 스크립트 ###
+src/test/kotlin/com/ilgijjan/unit/common/jwt/GenerateTestToken.kt
+
+### 로컬 성능 테스트용 Mock 구현체 ###
+src/main/kotlin/com/ilgijjan/integration/mock/
+
+### 인프라 설정 ###
+monitoring/
+terraform/

@@ -11,12 +11,25 @@ import java.util.concurrent.Executor
 @Configuration
 class AsyncConfig {
 
+    @Bean(name = ["diaryTaskExecutor"])
+    fun diaryTaskExecutor(): Executor {
+        return ThreadPoolTaskExecutor().apply {
+            corePoolSize = 30    // 동시 처리할 일기 수 상한 (Gemini Rate Limit 기준)
+            maxPoolSize = 30
+            queueCapacity = 200
+            keepAliveSeconds = 30
+            setThreadNamePrefix("DiaryTask-")
+            setTaskDecorator(MdcTaskDecorator())
+            initialize()
+        }
+    }
+
     @Bean(name = ["asyncExecutor"])
     fun asyncExecutor(): Executor {
         return ThreadPoolTaskExecutor().apply {
-            corePoolSize = 12     // 컨슈머 동시성 최대 6 × (음악+이미지 2개) = 12개 즉시 병렬 처리
-            maxPoolSize = 16
-            queueCapacity = 100
+            corePoolSize = 60    // 동시 처리 일기(30) × 자식 작업 수(music 1 + image 1 = 2) = 60
+            maxPoolSize = 60
+            queueCapacity = 200
             keepAliveSeconds = 30
             setThreadNamePrefix("AsyncThread-")
             setTaskDecorator(MdcTaskDecorator())

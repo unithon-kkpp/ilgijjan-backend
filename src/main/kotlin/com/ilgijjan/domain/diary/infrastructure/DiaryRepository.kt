@@ -1,6 +1,7 @@
 package com.ilgijjan.domain.diary.infrastructure
 
 import com.ilgijjan.domain.diary.domain.Diary
+import com.ilgijjan.domain.diary.domain.DiaryStatus
 import jakarta.persistence.LockModeType
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -42,4 +43,7 @@ interface DiaryRepository : JpaRepository<Diary, Long> {
         ORDER BY d.id DESC
     """)
     fun findPublicDiariesNextPage(@Param("lastId") lastId: Long, pageable: Pageable): Slice<Diary>
+
+    @Query("SELECT d FROM Diary d JOIN FETCH d.user WHERE d.status = :status")
+    fun findAllByStatus(@Param("status") status: DiaryStatus): List<Diary>
 }

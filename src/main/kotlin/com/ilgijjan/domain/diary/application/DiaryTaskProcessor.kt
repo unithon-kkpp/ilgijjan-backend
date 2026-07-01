@@ -12,6 +12,7 @@ import com.ilgijjan.integration.notification.application.NotificationSender
 import com.ilgijjan.integration.ocr.application.OcrProcessor
 import com.ilgijjan.integration.text.application.TextRefiner
 import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -31,6 +32,7 @@ class DiaryTaskProcessor(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    @Async("diaryTaskExecutor")
     @LogExecutionTime
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     fun process(diaryId: Long) {
@@ -41,15 +43,16 @@ class DiaryTaskProcessor(
             val baseText = when (diary.type) {
                 DiaryInputType.PHOTO -> {
                     log.info("PHOTO 타입: OCR 추출 시작")
-                    ocrProcessor.extractText(diary.photoUrl!!)
+                    val photoUrl = requireNotNull(diary.photoUrl) { "PHOTO 타입 일기에 photoUrl이 누락되었습니다. ID: $diaryId" }
+                    ocrProcessor.extractText(photoUrl)
                 }
                 DiaryInputType.TEXT -> {
                     log.info("TEXT 타입: 입력된 텍스트 사용")
-                    diary.text
+                    requireNotNull(diary.text) { "TEXT 타입 일기에 text가 누락되었습니다. ID: $diaryId" }
                 }
             }
 
-            val refinedText = textRefiner.refineText(baseText!!)
+            val refinedText = textRefiner.refineText(baseText)
 
             val musicFuture = musicGenerator.generateMusicAsync(refinedText)
             val imageFuture = imageGenerator.generateImageAsync(refinedText, diary.weather)

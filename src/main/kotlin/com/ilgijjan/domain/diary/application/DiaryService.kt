@@ -2,7 +2,6 @@ package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.CheckDiaryOwner
 import com.ilgijjan.common.config.CacheConfig
-import com.ilgijjan.common.config.RabbitMqConfig
 import com.ilgijjan.common.constants.WalletConstants
 import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
 import com.ilgijjan.domain.diary.presentation.CreateDiaryResponse
@@ -13,7 +12,6 @@ import com.ilgijjan.domain.diary.presentation.ReadPublicDiariesResponse
 import com.ilgijjan.domain.like.application.LikeReader
 import com.ilgijjan.domain.user.application.UserReader
 import com.ilgijjan.domain.wallet.application.UserWalletUpdater
-import com.ilgijjan.integration.messaging.application.MessageProducer
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -28,7 +26,7 @@ class DiaryService(
     private val diaryUpdater: DiaryUpdater,
     private val diaryValidator: DiaryValidator,
     private val likeReader: LikeReader,
-    private val messageProducer: MessageProducer,
+    private val diaryTaskProcessor: DiaryTaskProcessor,
     private val userReader: UserReader,
     private val userWalletUpdater: UserWalletUpdater
 ) {
@@ -49,11 +47,7 @@ class DiaryService(
         val command = CreateDiaryCommand.of(request, user)
         val diary = diaryCreator.create(command)
 
-        messageProducer.sendMessage(
-            exchange = RabbitMqConfig.DIARY_EXCHANGE,
-            routingKey = RabbitMqConfig.DIARY_ROUTING_KEY,
-            payload = diary.id!!
-        )
+        diaryTaskProcessor.process(diary.id!!)
 
         return CreateDiaryResponse(diary.id)
     }

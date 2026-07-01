@@ -8,6 +8,7 @@ import io.netty.channel.ChannelOption
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
@@ -17,6 +18,7 @@ import java.time.Duration
 import java.util.Base64
 import java.util.concurrent.CompletableFuture
 
+@Profile("!mock")
 @Primary
 @Component
 class GeminiImageGenerator(
