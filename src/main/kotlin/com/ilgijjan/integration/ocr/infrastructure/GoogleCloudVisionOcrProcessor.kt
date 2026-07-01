@@ -12,10 +12,12 @@ import com.ilgijjan.integration.ocr.application.OcrProcessor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 import java.io.IOException
 
+@Profile("!mock")
 @Primary
 @Component
 class GoogleVisionOcrProcessor(

@@ -2,6 +2,7 @@ package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.LogExecutionTime
 import com.ilgijjan.common.constants.WalletConstants
+import org.springframework.scheduling.annotation.Async
 import com.ilgijjan.domain.diary.domain.DiaryInputType
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenDeleter
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenReader
@@ -31,6 +32,7 @@ class DiaryTaskProcessor(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    @Async("asyncExecutor")
     @LogExecutionTime
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     fun process(diaryId: Long) {
