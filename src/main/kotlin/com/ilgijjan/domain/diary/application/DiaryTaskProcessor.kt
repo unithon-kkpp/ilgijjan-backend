@@ -32,8 +32,8 @@ class DiaryTaskProcessor(
     private val userWalletUpdater: UserWalletUpdater
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
-    // asyncExecutor 기본 쓰레드 수(corePoolSize=24) / 일기 1건당 쓰레드 수(process 1 + music 1 + image 1 = 3) = 8
-    private val semaphore = Semaphore(8)
+    // asyncExecutor 기본 쓰레드 수(corePoolSize=90) / 일기 1건당 쓰레드 수(process 1 + music 1 + image 1 = 3) = 30
+    private val semaphore = Semaphore(30)
 
     @Async("asyncExecutor")
     @LogExecutionTime

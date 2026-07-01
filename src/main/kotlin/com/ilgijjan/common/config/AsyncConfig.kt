@@ -14,9 +14,9 @@ class AsyncConfig {
     @Bean(name = ["asyncExecutor"])
     fun asyncExecutor(): Executor {
         return ThreadPoolTaskExecutor().apply {
-            corePoolSize = 24     // 컨슈머 동시성 최대 12 × (음악+이미지 2개) = 24개 즉시 병렬 처리
-            maxPoolSize = 32
-            queueCapacity = 100
+            corePoolSize = 90    // Semaphore(30) × 일기 1건당 쓰레드(3) = 90
+            maxPoolSize = 90
+            queueCapacity = 200
             keepAliveSeconds = 30
             setThreadNamePrefix("AsyncThread-")
             setTaskDecorator(MdcTaskDecorator())
