@@ -55,10 +55,9 @@ class DiaryTaskProcessor(
             val refinedText = textRefiner.refineText(baseText)
 
             val musicFuture = musicGenerator.generateMusicAsync(refinedText)
-            val imageFuture = imageGenerator.generateImageAsync(refinedText, diary.weather)
+            val imageUrl = imageGenerator.generateImage(refinedText, diary.weather)
 
             val musicResult = musicFuture.get()
-            val imageUrl = imageFuture.get()
 
             val updateCommand = UpdateDiaryResultCommand.of(imageUrl, musicResult)
             diaryUpdater.updateResult(diaryId, updateCommand)

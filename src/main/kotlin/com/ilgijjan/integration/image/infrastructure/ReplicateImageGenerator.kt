@@ -47,7 +47,7 @@ class ReplicateImageGenerator(
         return CompletableFuture.completedFuture(imageUrl)
     }
 
-    fun generateImage(text: String, weather: Weather): String {
+    override fun generateImage(text: String, weather: Weather): String {
         val prompt = buildPrompt(text, weather)
 
         val requestBody = mapOf(
