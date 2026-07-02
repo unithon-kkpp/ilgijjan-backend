@@ -14,6 +14,7 @@ import com.ilgijjan.domain.user.application.UserReader
 import com.ilgijjan.domain.wallet.application.UserWalletUpdater
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -28,7 +29,8 @@ class DiaryService(
     private val likeReader: LikeReader,
     private val diaryTaskProcessor: DiaryTaskProcessor,
     private val userReader: UserReader,
-    private val userWalletUpdater: UserWalletUpdater
+    private val userWalletUpdater: UserWalletUpdater,
+    private val eventPublisher: ApplicationEventPublisher
 ) {
 
     @Transactional
@@ -47,7 +49,7 @@ class DiaryService(
         val command = CreateDiaryCommand.of(request, user)
         val diary = diaryCreator.create(command)
 
-        diaryTaskProcessor.process(diary.id!!)
+        eventPublisher.publishEvent(DiaryCreatedEvent(diary.id!!))
 
         return CreateDiaryResponse(diary.id)
     }
