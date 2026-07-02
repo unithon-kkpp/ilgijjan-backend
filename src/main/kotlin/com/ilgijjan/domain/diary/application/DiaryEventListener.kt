@@ -9,8 +9,7 @@ class DiaryEventListener(
     private val diaryTaskProcessor: DiaryTaskProcessor
 ) {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    fun
-            onDiaryCreated(event: DiaryCreatedEvent) {
+    fun onDiaryCreated(event: DiaryCreatedEvent) {
         diaryTaskProcessor.process(event.diaryId)
     }
 }

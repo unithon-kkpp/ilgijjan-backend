@@ -59,7 +59,7 @@ class GeminiImageGenerator(
         }
     }
 
-    fun generateImage(text: String, weather: Weather): String {
+    override fun generateImage(text: String, weather: Weather): String {
         val prompt = buildPrompt(text, weather)
 
         val safetySettings = listOf(
