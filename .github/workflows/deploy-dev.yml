@@ -72,5 +72,7 @@ jobs:
             IMAGE_TAG="${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:dev-${GITHUB_SHA::7}"
             sudo docker pull ${IMAGE_TAG}
 
+            grep -v "DOCKER_IMAGE_DEV" .env > .env.tmp 2>/dev/null || true
+            mv .env.tmp .env
             echo "DOCKER_IMAGE_DEV=${IMAGE_TAG}" >> .env
             sudo docker compose up -d --no-deps application-dev
