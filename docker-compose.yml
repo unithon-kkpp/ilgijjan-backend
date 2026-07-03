@@ -1,9 +1,9 @@
 version: "3"
 
 services:
-  application:
-    image: ${DOCKER_IMAGE}
-    container_name: ilgijjan-server
+  application-prod:
+    image: ${DOCKER_IMAGE_PROD}
+    container_name: ilgijjan-server-prod
     restart: always
     ports:
       - "8080:8080"
@@ -11,6 +11,21 @@ services:
       - redis
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - ./logs:/logs
+    networks:
+      - ilgijjan-net
+
+  application-dev:
+    image: ${DOCKER_IMAGE_DEV}
+    container_name: ilgijjan-server-dev
+    restart: always
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
     volumes:
       - ./logs:/logs
     networks:
