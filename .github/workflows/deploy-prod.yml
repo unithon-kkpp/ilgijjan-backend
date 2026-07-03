@@ -64,17 +64,17 @@ jobs:
           envs: GITHUB_SHA
           script: |
             cd /home/${{ secrets.SSH_USERNAME }}
-            
-            sudo docker compose stop application-prod || true
-            sudo docker compose rm -f application-prod || true
+
+            touch .env
+
+            sudo docker compose --profile prod stop application-prod || true
+            sudo docker compose --profile prod rm -f application-prod || true
             sudo docker image prune -af
 
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             IMAGE_TAG="${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:prod-${GITHUB_SHA::7}"
             sudo docker pull ${IMAGE_TAG}
 
-            touch .env
-            grep -q "DOCKER_IMAGE_DEV" .env || echo "DOCKER_IMAGE_DEV=" >> .env
             sed -i '/DOCKER_IMAGE_PROD/d' .env
             echo "DOCKER_IMAGE_PROD=${IMAGE_TAG}" >> .env
-            sudo docker compose up -d --no-deps application-prod
+            sudo docker compose --profile prod up -d --no-deps application-prod

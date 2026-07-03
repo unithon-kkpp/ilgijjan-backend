@@ -1,9 +1,8 @@
-version: "3"
-
 services:
   application-prod:
     image: ${DOCKER_IMAGE_PROD}
     container_name: ilgijjan-server-prod
+    profiles: ["prod"]
     restart: always
     ports:
       - "8080:8080"
@@ -19,6 +18,7 @@ services:
   application-dev:
     image: ${DOCKER_IMAGE_DEV}
     container_name: ilgijjan-server-dev
+    profiles: ["dev"]
     restart: always
     ports:
       - "8081:8081"
