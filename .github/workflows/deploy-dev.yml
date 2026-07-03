@@ -73,6 +73,7 @@ jobs:
             sudo docker pull ${IMAGE_TAG}
 
             touch .env
+            grep -q "DOCKER_IMAGE_PROD" .env || echo "DOCKER_IMAGE_PROD=" >> .env
             sed -i '/DOCKER_IMAGE_DEV/d' .env
             echo "DOCKER_IMAGE_DEV=${IMAGE_TAG}" >> .env
             sudo docker compose up -d --no-deps application-dev
