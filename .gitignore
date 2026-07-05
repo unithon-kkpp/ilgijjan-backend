@@ -7,6 +7,9 @@ build/
 **/resources/**
 !**/resources/templates/**
 !**/resources/logback-spring.xml
+!**/resources/db/
+!**/resources/db/migration/
+!**/resources/db/migration/**
 prometheus_data/
 grafana_data/
 logs/

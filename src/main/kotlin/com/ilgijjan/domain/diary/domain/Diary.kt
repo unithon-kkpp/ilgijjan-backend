@@ -8,15 +8,8 @@ import jakarta.persistence.*
 import org.hibernate.annotations.SQLRestriction
 
 @Entity
-@Table(
-    name = "diary",
-    indexes = [
-        // 월별 본인 일기 조회 (user_id 필터 + created_at 정렬) - issue #56
-        Index(name = "idx_diary_user_created", columnList = "user_id, created_at"),
-        // 공개 피드 커서 조회 (is_public 필터 + id 정렬) - issue #56
-        Index(name = "idx_diary_public_id", columnList = "is_public, id")
-    ]
-)
+// 인덱스는 Flyway 마이그레이션(db/migration)에서 관리한다. 엔티티에 선언하지 않음.
+@Table(name = "diary")
 @SQLRestriction("status <> 'DELETED'")
 class Diary (
     @Id
