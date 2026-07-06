@@ -8,7 +8,6 @@ import jakarta.persistence.*
 import org.hibernate.annotations.SQLRestriction
 
 @Entity
-// 인덱스는 Flyway 마이그레이션(db/migration)에서 관리한다. 엔티티에 선언하지 않음.
 @Table(name = "diary")
 @SQLRestriction("status <> 'DELETED'")
 class Diary (

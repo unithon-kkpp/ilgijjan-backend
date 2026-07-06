@@ -1,9 +1,5 @@
 -- V1: baseline 스키마 (순수)
 -- 테이블 + PK + UNIQUE + FK(및 FK 필수 인덱스)만 포함.
--- 성능 인덱스(공개 피드 / 월별 복합)는 제외 → 이후 V2, V3 마이그레이션으로 추가하며 측정.
---
--- 주의: dev/prod는 baseline-on-migrate로 "이미 적용됨" 처리되어 이 스크립트가 실행되지 않음.
---       실제로 실행되는 건 빈 DB(로컬/신규 환경)뿐이므로 기존 데이터에 영향 없음.
 -- FK 의존성 순서로 생성: users/product → diary/store_product → likes/payment_history → fcm_token/user_wallet
 
 CREATE TABLE `users` (

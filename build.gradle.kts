@@ -30,7 +30,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("mysql:mysql-connector-java:8.0.33")
 
-	// Flyway (DB 마이그레이션 / 스키마 버전 관리)
+	// Flyway
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-mysql")
 
