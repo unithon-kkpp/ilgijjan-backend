@@ -35,9 +35,8 @@ class GoogleCloudStorageUploader(
         return StorageResponse(generateFileUrl(uuid))
     }
 
-    override fun upload(fileData: ByteArray): String {
+    override fun upload(fileData: ByteArray, contentType: String): String {
         val uuid = UUID.randomUUID().toString()
-        val contentType = "image/png"
 
         val blobInfo = BlobInfo.newBuilder(bucketName, uuid)
             .setContentType(contentType)

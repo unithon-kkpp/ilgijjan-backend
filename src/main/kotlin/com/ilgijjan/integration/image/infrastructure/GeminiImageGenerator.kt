@@ -144,6 +144,6 @@ class GeminiImageGenerator(
             ?.get("inlineData")?.let { (it as Map<*, *>)["data"] as? String }
             ?: throw RuntimeException("이미지 Base64 데이터 없음")
 
-        return fileUploader.upload(Base64.getDecoder().decode(base64Data))
+        return fileUploader.upload(Base64.getDecoder().decode(base64Data), "image/png")
     }
 }
