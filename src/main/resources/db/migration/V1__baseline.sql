@@ -1,6 +1,4 @@
--- V1: baseline 스키마 (순수)
--- 테이블 + PK + UNIQUE + FK(및 FK 필수 인덱스)만 포함.
--- FK 의존성 순서로 생성: users/product → diary/store_product → likes/payment_history → fcm_token/user_wallet
+-- baseline 스키마 (성능 인덱스 제외, FK 의존성 순서로 생성)
 
 CREATE TABLE `users` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -27,7 +25,6 @@ CREATE TABLE `product` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- diary: 성능 인덱스 제외. user_id FK를 위한 plain 인덱스만 유지.
 CREATE TABLE `diary` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `created_at` datetime(6) DEFAULT NULL,
@@ -45,7 +42,6 @@ CREATE TABLE `diary` (
   `status` enum('PENDING','COMPLETED','FAILED','DELETED') NOT NULL,
   `type` enum('PHOTO','TEXT') DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `ix_diary_user_id` (`user_id`),
   CONSTRAINT `FK74rd0bn5raxejw2ukenelbdmt` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
