@@ -27,7 +27,8 @@ CREATE TABLE `product` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- diary: 성능 인덱스 제외. user_id FK를 위한 plain 인덱스만 유지.
+-- diary: 성능 인덱스 제외(공개 피드/월별 복합은 V2, V3에서 추가).
+-- user_id는 FK 제약만 선언 → MySQL이 FK용 인덱스를 자동 생성(이름=제약명). 명시적으로 KEY를 두지 않음.
 CREATE TABLE `diary` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `created_at` datetime(6) DEFAULT NULL,
@@ -45,7 +46,6 @@ CREATE TABLE `diary` (
   `status` enum('PENDING','COMPLETED','FAILED','DELETED') NOT NULL,
   `type` enum('PHOTO','TEXT') DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `ix_diary_user_id` (`user_id`),
   CONSTRAINT `FK74rd0bn5raxejw2ukenelbdmt` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
