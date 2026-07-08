@@ -25,9 +25,8 @@ Ilgijjan (일기짠) is a Korean diary AI service backend built with Spring Boot
 
 - **Language**: Kotlin 1.9.25, JDK 21
 - **Framework**: Spring Boot 3.5.4, Spring Security (JWT), Spring Data JPA
-- **Database**: MySQL 8.0.33, Redis
-- **Messaging**: RabbitMQ (Spring AMQP)
-- **External APIs**: Google Cloud (Storage, Vision, Gemini AI), Suno AI (music), Replicate (image), Kakao OAuth, Naver Clova OCR, Firebase (FCM)
+- **Database**: MySQL 8.0.33, Redis, Flyway (schema/index migrations)
+- **External APIs**: Google Cloud (Storage, Vision, Gemini AI, Gemini Lyria for music), Kakao OAuth, Naver Clova OCR, Firebase (FCM)
 
 ## Architecture
 
@@ -37,7 +36,7 @@ Ilgijjan (일기짠) is a Korean diary AI service backend built with Spring Boot
 src/main/kotlin/com/ilgijjan/
 ├── common/         # Cross-cutting concerns (annotations, AOP, config, logging, JWT, exceptions)
 ├── domain/         # Business domains (auth, billing, diary, fcmtoken, like, user, wallet)
-└── integration/    # External service integrations (cache, image, messaging, music, notification, oauth, ocr, storage, text)
+└── integration/    # External service integrations (billing, cache, image, music, notification, oauth, ocr, storage, text)
 ```
 
 ### Key Patterns
@@ -47,9 +46,9 @@ src/main/kotlin/com/ilgijjan/
 - Custom annotations: `@LoginUser` for user extraction via argument resolver, `@CheckDiaryOwner` for authorization via AOP
 
 **Event-Driven Processing**:
-- RabbitMQ queues for async diary processing pipeline: text refinement → image generation → music generation
-- Spring `@Async` with custom executor (4-8 threads) for parallel operations
-- External callbacks from Suno API via webhook endpoints
+- Diary creation publishes a Spring `ApplicationEvent`, picked up by `@TransactionalEventListener(AFTER_COMMIT)` and processed by `@Async` on a virtual-thread executor (`AsyncConfig`, JDK 21 `SimpleAsyncTaskExecutor` with `setVirtualThreads(true)`)
+- Pipeline: text refinement (OCR first for photo input) → image generation and music generation run in parallel → persist results → notify (FCM push for app, polling for web)
+- On restart, `ApplicationRunner`-based recovery reprocesses PENDING diaries (no queue redelivery involved)
 
 **Logging Infrastructure**:
 - `ApiAccessLogFilter`: Captures HTTP requests/responses with trace IDs
@@ -59,7 +58,7 @@ src/main/kotlin/com/ilgijjan/
 - Excluded paths defined in `LogConstants` to prevent OOM on file uploads
 
 **Integration Layer**:
-- Strategy pattern for generators (e.g., `GeminiImageGenerator` vs `ReplicateImageGenerator`)
+- Strategy pattern for generators (`ImageGenerator` → `GeminiImageGenerator`; `MusicGenerator` → `LyriaMusicGenerator`)
 - WebClient for async HTTP calls to external APIs
 
 ### Security
