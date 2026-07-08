@@ -1,4 +1,6 @@
-# 일기짠 (ilgijjan) — Server
+# 일기짠 Backend
+<img width="1920" height="1080" alt="표지" src="https://github.com/user-attachments/assets/812f90f3-7bb2-43c7-b2d7-06f3af385a42" />
+
 
 > 아동을 위한 **AI 일기장 앱**의 백엔드 API 서버
 
