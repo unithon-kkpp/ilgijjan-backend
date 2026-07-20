@@ -23,6 +23,7 @@ class CacheConfig {
         return RedisCacheManager.builder(connectionFactory)
             .withCacheConfiguration(CacheConstants.PUBLIC_DIARIES_CACHE, publicDiariesCacheConfig())
             .disableCreateOnMissingCache()
+            .enableStatistics()
             .build()
     }
 
