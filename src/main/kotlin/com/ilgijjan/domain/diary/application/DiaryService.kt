@@ -1,7 +1,7 @@
 package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.CheckDiaryOwner
-import com.ilgijjan.common.config.CacheConfig
+import com.ilgijjan.common.constants.CacheConstants
 import com.ilgijjan.common.constants.WalletConstants
 import com.ilgijjan.domain.diary.presentation.CreateDiaryRequest
 import com.ilgijjan.domain.diary.presentation.CreateDiaryResponse
@@ -75,8 +75,9 @@ class DiaryService(
     }
 
     @Cacheable(
-        cacheNames = [CacheConfig.PUBLIC_DIARIES_CACHE],
-        key = "(#lastId ?: 0) + ':' + #size"
+        cacheNames = [CacheConstants.PUBLIC_DIARIES_CACHE],
+        key = "(#lastId ?: 0) + ':' + #size",
+        sync = true
     )
     fun getPublicDiaries(lastId: Long?, size: Int): ReadPublicDiariesResponse {
         val diariesSlice = diaryReader.findAllPublicWithSlice(lastId, size)
@@ -85,21 +86,21 @@ class DiaryService(
 
     @Transactional
     @CheckDiaryOwner
-    @CacheEvict(cacheNames = [CacheConfig.PUBLIC_DIARIES_CACHE], allEntries = true)
+    @CacheEvict(cacheNames = [CacheConstants.PUBLIC_DIARIES_CACHE], allEntries = true)
     fun publishDiary(diaryId: Long) {
         diaryUpdater.publish(diaryId)
     }
 
     @Transactional
     @CheckDiaryOwner
-    @CacheEvict(cacheNames = [CacheConfig.PUBLIC_DIARIES_CACHE], allEntries = true)
+    @CacheEvict(cacheNames = [CacheConstants.PUBLIC_DIARIES_CACHE], allEntries = true)
     fun unpublishDiary(diaryId: Long) {
         diaryUpdater.unpublish(diaryId)
     }
 
     @Transactional
     @CheckDiaryOwner
-    @CacheEvict(cacheNames = [CacheConfig.PUBLIC_DIARIES_CACHE], allEntries = true)
+    @CacheEvict(cacheNames = [CacheConstants.PUBLIC_DIARIES_CACHE], allEntries = true)
     fun deleteDiary(diaryId: Long) {
         diaryDeleter.delete(diaryId)
     }
