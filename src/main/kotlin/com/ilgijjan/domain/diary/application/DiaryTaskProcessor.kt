@@ -65,21 +65,20 @@ class DiaryTaskProcessor(
         } catch (e: Exception) {
             log.error("일기 생성 중 에러 발생 - ID: $diaryId, 사유: ${e.message}")
             diaryFailureHandler.handle(diaryId, diary.user.id!!)
-            notifySafely(diary, diaryId) { tokens -> notificationSender.sendDiaryFailure(tokens, diaryId) }
+            sendNotification(diary, false)
             return
         }
 
-        notifySafely(diary, diaryId) { tokens -> notificationSender.sendDiaryCompletion(tokens, diaryId) }
+        sendNotification(diary, true)
     }
 
-    private fun notifySafely(diary: Diary, diaryId: Long, send: (List<String>) -> List<String>) {
-        if (!diary.user.isNotificationEnabled) return
-        try {
-            val tokens = fcmTokenReader.findAllByUserId(diary.user.id!!).map { it.token }
-            val deadTokens = send(tokens)
-            fcmTokenDeleter.deleteByTokens(deadTokens)
-        } catch (e: Exception) {
-            log.error("알림 발송 실패 - ID: $diaryId, 사유: ${e.message}")
+    private fun sendNotification(diary: Diary, isSuccess: Boolean) {
+        val tokens = fcmTokenReader.findAllByUserId(diary.user.id!!).map { it.token }
+        val deadTokens = if (isSuccess) {
+            notificationSender.sendDiaryCompletion(tokens, diary.id!!)
+        } else {
+            notificationSender.sendDiaryFailure(tokens, diary.id!!)
         }
+        fcmTokenDeleter.deleteByTokens(deadTokens)
     }
 }
