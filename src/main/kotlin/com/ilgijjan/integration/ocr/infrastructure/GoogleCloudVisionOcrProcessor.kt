@@ -8,6 +8,7 @@ import com.google.cloud.vision.v1.Image
 import com.google.cloud.vision.v1.ImageAnnotatorClient
 import com.google.cloud.vision.v1.ImageAnnotatorSettings
 import com.google.cloud.vision.v1.ImageSource
+import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.integration.ocr.application.OcrProcessor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -15,7 +16,6 @@ import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
-import java.io.IOException
 
 @Profile("!mock")
 @Primary
@@ -31,49 +31,59 @@ class GoogleVisionOcrProcessor(
     override fun extractText(photoUrl: String): String {
         log.info("Google Vision OCR 요청 시작 - photoUrl: {}", photoUrl)
 
-        try {
-            val resource = resourceLoader.getResource(keyPath)
-            val credentials = GoogleCredentials.fromStream(resource.inputStream)
+        val resource = resourceLoader.getResource(keyPath)
+        val credentials = GoogleCredentials.fromStream(resource.inputStream)
+        val settings = ImageAnnotatorSettings.newBuilder()
+            .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
+            .build()
 
-            val settings = ImageAnnotatorSettings.newBuilder()
-                .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
-                .build()
+        var lastException: Exception? = null
 
-            ImageAnnotatorClient.create(settings).use { client ->
-                val imgSource = ImageSource.newBuilder().setImageUri(photoUrl).build()
-                val img = Image.newBuilder().setSource(imgSource).build()
-                val feat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).build()
+        for (attempt in 1..5) {
+            try {
+                log.info("Google Vision OCR 요청 시도 ($attempt/5)")
 
-                val request = AnnotateImageRequest.newBuilder()
-                    .addFeatures(feat)
-                    .setImage(img)
-                    .build()
+                ImageAnnotatorClient.create(settings).use { client ->
+                    val imgSource = ImageSource.newBuilder().setImageUri(photoUrl).build()
+                    val img = Image.newBuilder().setSource(imgSource).build()
+                    val feat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).build()
 
-                val response = client.batchAnnotateImages(listOf(request))
-                val responses = response.responsesList
+                    val request = AnnotateImageRequest.newBuilder()
+                        .addFeatures(feat)
+                        .setImage(img)
+                        .build()
 
-                val resultBuilder = StringBuilder()
+                    val response = client.batchAnnotateImages(listOf(request))
+                    val responses = response.responsesList
 
-                for (res in responses) {
-                    if (res.hasError()) {
-                        log.error("Google Vision API Error: {}", res.error.message)
-                        throw RuntimeException("OCR 처리 실패: ${res.error.message}")
+                    val resultBuilder = StringBuilder()
+
+                    for (res in responses) {
+                        if (res.hasError()) {
+                            log.error("Google Vision API Error: {}", res.error.message)
+                            throw RuntimeException("OCR 처리 실패: ${res.error.message}")
+                        }
+                        resultBuilder.append(res.fullTextAnnotation.text)
+                        resultBuilder.append(" ")
                     }
-                    resultBuilder.append(res.fullTextAnnotation.text)
-                    resultBuilder.append(" ")
+
+                    val extractedText = resultBuilder.toString().trim()
+                    log.info("추출된 텍스트 길이: {}", extractedText.length)
+
+                    return extractedText
                 }
+            } catch (e: NonRetryableException) {
+                throw e
+            } catch (e: Exception) {
+                lastException = e
+                log.warn("Google Vision OCR 시도 실패 ($attempt/5). 재시도합니다. 원인: ${e.message}")
 
-                val extractedText = resultBuilder.toString().trim()
-                log.info("추출된 텍스트 길이: {}", extractedText.length)
-
-                return extractedText
+                if (attempt < 5) {
+                    val sleepMs = (1L shl attempt) * 1_000L
+                    Thread.sleep(sleepMs)
+                }
             }
-        } catch (e: IOException) {
-            log.error("Google Vision OCR 호출 중 I/O 에러 (키 파일 확인 필요)", e)
-            throw RuntimeException("Google OCR 호출 실패", e)
-        } catch (e: Exception) {
-            log.error("Google Vision OCR 처리 중 알 수 없는 에러", e)
-            throw e
         }
+        throw RuntimeException("Google Vision OCR 5회 시도 모두 실패", lastException)
     }
 }
