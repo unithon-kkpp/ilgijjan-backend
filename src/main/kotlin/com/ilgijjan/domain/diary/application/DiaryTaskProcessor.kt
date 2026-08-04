@@ -1,11 +1,10 @@
 package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.LogExecutionTime
-import com.ilgijjan.common.constants.WalletConstants
+import com.ilgijjan.domain.diary.domain.Diary
 import com.ilgijjan.domain.diary.domain.DiaryInputType
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenDeleter
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenReader
-import com.ilgijjan.domain.wallet.application.UserWalletUpdater
 import com.ilgijjan.integration.image.application.ImageGenerator
 import com.ilgijjan.integration.music.application.MusicGenerator
 import com.ilgijjan.integration.notification.application.NotificationSender
@@ -21,14 +20,14 @@ import org.springframework.transaction.annotation.Transactional
 class DiaryTaskProcessor(
     private val diaryReader: DiaryReader,
     private val diaryUpdater: DiaryUpdater,
+    private val diaryFailureHandler: DiaryFailureHandler,
     private val ocrProcessor: OcrProcessor,
     private val textRefiner: TextRefiner,
     private val imageGenerator: ImageGenerator,
     private val musicGenerator: MusicGenerator,
     private val fcmTokenReader: FcmTokenReader,
     private val fcmTokenDeleter: FcmTokenDeleter,
-    private val notificationSender: NotificationSender,
-    private val userWalletUpdater: UserWalletUpdater
+    private val notificationSender: NotificationSender
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -62,24 +61,24 @@ class DiaryTaskProcessor(
             val updateCommand = UpdateDiaryResultCommand.of(imageUrl, musicResult)
             diaryUpdater.updateResult(diaryId, updateCommand)
 
-            if (diary.user.isNotificationEnabled) {
-                val tokens = fcmTokenReader.findAllByUserId(diary.user.id!!).map { it.token }
-                val deadTokens = notificationSender.sendDiaryCompletion(tokens, diaryId)
-                fcmTokenDeleter.deleteByTokens(deadTokens)
-            }
-
             log.info("비동기 일기 생성 완료 - ID: $diaryId")
         } catch (e: Exception) {
             log.error("일기 생성 중 에러 발생 - ID: $diaryId, 사유: ${e.message}")
-            diaryUpdater.fail(diaryId)
-            val userId = diary.user.id!!
-            userWalletUpdater.charge(userId, WalletConstants.DIARY_CREATION_COST)
-
-            if (diary.user.isNotificationEnabled) {
-                val tokens = fcmTokenReader.findAllByUserId(userId).map { it.token }
-                val deadTokens = notificationSender.sendDiaryFailure(tokens, diaryId)
-                fcmTokenDeleter.deleteByTokens(deadTokens)
-            }
+            diaryFailureHandler.handle(diaryId, diary.user.id!!)
+            sendNotification(diary, false)
+            return
         }
+
+        sendNotification(diary, true)
+    }
+
+    private fun sendNotification(diary: Diary, isSuccess: Boolean) {
+        val tokens = fcmTokenReader.findAllByUserId(diary.user.id!!).map { it.token }
+        val deadTokens = if (isSuccess) {
+            notificationSender.sendDiaryCompletion(tokens, diary.id!!)
+        } else {
+            notificationSender.sendDiaryFailure(tokens, diary.id!!)
+        }
+        fcmTokenDeleter.deleteByTokens(deadTokens)
     }
 }

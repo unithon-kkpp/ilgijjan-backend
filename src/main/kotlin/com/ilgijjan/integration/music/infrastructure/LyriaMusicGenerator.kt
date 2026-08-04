@@ -39,7 +39,7 @@ class LyriaMusicGenerator(
         .defaultHeader("x-goog-api-key", apiKey)
         .defaultHeader("Content-Type", "application/json")
         .codecs { configurer ->
-            configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024)
+            configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024) // WebClient 응답 버퍼 기본 한도(256KB)가 base64 오디오 응답엔 부족해서 16MB로 늘린 것
         }
         .clientConnector(ReactorClientHttpConnector(
             HttpClient.create()
