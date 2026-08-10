@@ -13,6 +13,7 @@ class GeminiTextRefiner(
     private val apiUrl: String,
     @Value("\${gemini.api.key}")
     private val apiKey: String,
+    private val promptBuilder: TextRefinePromptBuilder,
     webClientBuilder: WebClient.Builder
 ): TextRefiner {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -25,7 +26,7 @@ class GeminiTextRefiner(
 
     override fun refineText(text: String): String {
         log.info(">>> [Gemini-REQ] originalText={}", text)
-        val prompt = "$text Please refine this diary entry into concise English within 80 characters, capturing the core meaning. Output only the refined text without any extra explanations."
+        val prompt = promptBuilder.build(text)
 
         val requestBody = mapOf(
             "contents" to listOf(
