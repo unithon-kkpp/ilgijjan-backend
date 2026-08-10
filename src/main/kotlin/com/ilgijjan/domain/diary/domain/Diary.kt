@@ -109,6 +109,14 @@ class Diary (
         this.status = DiaryStatus.FAILED_PERMANENTLY
     }
 
+    fun increaseRetryCount() {
+        this.retryCount++
+    }
+
+    fun markPending() {
+        this.status = DiaryStatus.PENDING
+    }
+
     fun delete() {
         this.status = DiaryStatus.DELETED
         this.isPublic = false

@@ -36,6 +36,18 @@ class DiaryUpdater(
     }
 
     @Transactional
+    fun increaseRetryCount(diaryId: Long) {
+        val diary = diaryReader.getDiaryById(diaryId)
+        diary.increaseRetryCount()
+    }
+
+    @Transactional
+    fun markPending(diaryId: Long) {
+        val diary = diaryReader.getDiaryById(diaryId)
+        diary.markPending()
+    }
+
+    @Transactional
     fun saveExtractedText(diaryId: Long, extractedText: String) {
         val diary = diaryReader.getDiaryById(diaryId)
         diary.saveExtractedText(extractedText)
