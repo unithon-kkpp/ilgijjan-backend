@@ -75,12 +75,12 @@ class DiaryTaskProcessor(
             log.info("비동기 일기 생성 완료 - ID: $diaryId")
         } catch (e: NonRetryableException) {
             log.error("일기 생성 중 재시도 불가능한 에러 발생 - ID: $diaryId, 사유: ${e.message}")
-            diaryFailureHandler.handlePermanently(diaryId, diary.user.id!!)
+            diaryFailureHandler.handlePermanently(diaryId)
             sendNotification(diary, false)
             return
         } catch (e: Exception) {
             log.error("일기 생성 중 에러 발생 - ID: $diaryId, 사유: ${e.message}")
-            diaryFailureHandler.handle(diaryId, diary.user.id!!)
+            diaryFailureHandler.handle(diaryId)
             sendNotification(diary, false)
             return
         }
