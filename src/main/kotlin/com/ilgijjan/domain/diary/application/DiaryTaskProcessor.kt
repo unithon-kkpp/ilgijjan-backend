@@ -1,6 +1,7 @@
 package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.LogExecutionTime
+import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.domain.diary.domain.Diary
 import com.ilgijjan.domain.diary.domain.DiaryInputType
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenDeleter
@@ -39,11 +40,13 @@ class DiaryTaskProcessor(
         val diary = diaryReader.getDiaryById(diaryId)
 
         try {
-            val baseText = when (diary.type) {
+            val baseText = diary.extractedText ?: when (diary.type) {
                 DiaryInputType.PHOTO -> {
                     log.info("PHOTO 타입: OCR 추출 시작")
                     val photoUrl = requireNotNull(diary.photoUrl) { "PHOTO 타입 일기에 photoUrl이 누락되었습니다. ID: $diaryId" }
-                    ocrProcessor.extractText(photoUrl)
+                    val extracted = ocrProcessor.extractText(photoUrl)
+                    diaryUpdater.saveExtractedText(diaryId, extracted)
+                    extracted
                 }
                 DiaryInputType.TEXT -> {
                     log.info("TEXT 타입: 입력된 텍스트 사용")
@@ -51,20 +54,33 @@ class DiaryTaskProcessor(
                 }
             }
 
-            val refinedText = textRefiner.refineText(baseText)
+            val refinedText = diary.refinedText ?: textRefiner.refineText(baseText).also {
+                diaryUpdater.saveRefinedText(diaryId, it)
+            }
 
-            val musicFuture = musicGenerator.generateMusicAsync(refinedText)
-            val imageUrl = imageGenerator.generateImage(refinedText, diary.weather)
+            val musicFuture = if (diary.musicUrl == null) musicGenerator.generateMusicAsync(refinedText) else null
 
-            val musicResult = musicFuture.get()
+            if (diary.imageUrl == null) {
+                val imageUrl = imageGenerator.generateImage(refinedText, diary.weather)
+                diaryUpdater.saveImage(diaryId, imageUrl)
+            }
 
-            val updateCommand = UpdateDiaryResultCommand.of(imageUrl, musicResult)
-            diaryUpdater.updateResult(diaryId, updateCommand)
+            if (musicFuture != null) {
+                val musicResult = musicFuture.get()
+                diaryUpdater.saveMusic(diaryId, musicResult.audioUrl, musicResult.lyrics)
+            }
+
+            diaryUpdater.complete(diaryId)
 
             log.info("비동기 일기 생성 완료 - ID: $diaryId")
+        } catch (e: NonRetryableException) {
+            log.error("일기 생성 중 재시도 불가능한 에러 발생 - ID: $diaryId, 사유: ${e.message}")
+            diaryFailureHandler.handlePermanently(diaryId)
+            sendNotification(diary, false)
+            return
         } catch (e: Exception) {
             log.error("일기 생성 중 에러 발생 - ID: $diaryId, 사유: ${e.message}")
-            diaryFailureHandler.handle(diaryId, diary.user.id!!)
+            diaryFailureHandler.handle(diaryId)
             sendNotification(diary, false)
             return
         }

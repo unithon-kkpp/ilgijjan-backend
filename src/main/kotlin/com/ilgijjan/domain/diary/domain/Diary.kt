@@ -25,6 +25,12 @@ class Diary (
     @Lob
     val text: String?,
 
+    @Lob
+    var extractedText: String? = null,
+
+    @Lob
+    var refinedText: String? = null,
+
     val photoUrl: String?,
 
     @Enumerated(EnumType.STRING)
@@ -44,7 +50,9 @@ class Diary (
     var isPublic: Boolean = false,
 
     @Enumerated(EnumType.STRING)
-    var status: DiaryStatus = DiaryStatus.PENDING
+    var status: DiaryStatus = DiaryStatus.PENDING,
+
+    var retryCount: Int = 0
 
 ) : BaseEntity() {
     fun increaseLikeCount() {
@@ -72,8 +80,19 @@ class Diary (
         }
     }
 
-    fun setGeneratedContent(imageUrl: String, musicUrl: String, lyrics: String) {
+    fun saveExtractedText(extractedText: String) {
+        this.extractedText = extractedText
+    }
+
+    fun saveRefinedText(refinedText: String) {
+        this.refinedText = refinedText
+    }
+
+    fun saveImage(imageUrl: String) {
         this.imageUrl = imageUrl
+    }
+
+    fun saveMusic(musicUrl: String, lyrics: String) {
         this.musicUrl = musicUrl
         this.lyrics = lyrics
     }
@@ -84,6 +103,18 @@ class Diary (
 
     fun fail() {
         this.status = DiaryStatus.FAILED
+    }
+
+    fun failPermanently() {
+        this.status = DiaryStatus.FAILED_PERMANENTLY
+    }
+
+    fun increaseRetryCount() {
+        this.retryCount++
+    }
+
+    fun markPending() {
+        this.status = DiaryStatus.PENDING
     }
 
     fun delete() {

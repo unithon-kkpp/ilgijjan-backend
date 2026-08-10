@@ -18,9 +18,8 @@ class DiaryUpdater(
     }
 
     @Transactional
-    fun updateResult(diaryId: Long, command: UpdateDiaryResultCommand) {
+    fun complete(diaryId: Long) {
         val diary = diaryReader.getDiaryById(diaryId)
-        diary.setGeneratedContent(command.imageUrl, command.musicUrl, command.lyrics)
         diary.complete()
     }
 
@@ -28,5 +27,47 @@ class DiaryUpdater(
     fun fail(diaryId: Long) {
         val diary = diaryReader.getDiaryById(diaryId)
         diary.fail()
+    }
+
+    @Transactional
+    fun failPermanently(diaryId: Long) {
+        val diary = diaryReader.getDiaryById(diaryId)
+        diary.failPermanently()
+    }
+
+    @Transactional
+    fun increaseRetryCount(diaryId: Long) {
+        val diary = diaryReader.getDiaryById(diaryId)
+        diary.increaseRetryCount()
+    }
+
+    @Transactional
+    fun markPending(diaryId: Long) {
+        val diary = diaryReader.getDiaryById(diaryId)
+        diary.markPending()
+    }
+
+    @Transactional
+    fun saveExtractedText(diaryId: Long, extractedText: String) {
+        val diary = diaryReader.getDiaryById(diaryId)
+        diary.saveExtractedText(extractedText)
+    }
+
+    @Transactional
+    fun saveRefinedText(diaryId: Long, refinedText: String) {
+        val diary = diaryReader.getDiaryById(diaryId)
+        diary.saveRefinedText(refinedText)
+    }
+
+    @Transactional
+    fun saveImage(diaryId: Long, imageUrl: String) {
+        val diary = diaryReader.getDiaryById(diaryId)
+        diary.saveImage(imageUrl)
+    }
+
+    @Transactional
+    fun saveMusic(diaryId: Long, musicUrl: String, lyrics: String) {
+        val diary = diaryReader.getDiaryById(diaryId)
+        diary.saveMusic(musicUrl, lyrics)
     }
 }

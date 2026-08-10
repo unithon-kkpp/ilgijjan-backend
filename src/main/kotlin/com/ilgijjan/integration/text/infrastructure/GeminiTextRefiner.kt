@@ -1,5 +1,6 @@
 package com.ilgijjan.integration.text.infrastructure
 
+import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.integration.text.application.TextRefiner
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -38,22 +39,36 @@ class GeminiTextRefiner(
             )
         )
 
-        return try {
-            val response = webClient.post()
-                .bodyValue(requestBody)
-                .retrieve()
-                .bodyToMono(GeminiEditResponse::class.java)
-                .block() ?: throw RuntimeException("Gemini API 응답 바디가 비어있습니다.")
+        var lastException: Exception? = null
 
-            val refinedText = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text?.trim() ?: ""
+        for (attempt in 1..5) {
+            try {
+                log.info("Gemini 텍스트 정제 시도 ($attempt/5)")
 
-            log.info("<<< [Gemini-RES] result={}", refinedText)
+                val response = webClient.post()
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(GeminiEditResponse::class.java)
+                    .block() ?: throw RuntimeException("Gemini API 응답 바디가 비어있습니다.")
 
-            refinedText
-        } catch (e: Exception) {
-            log.error("[Gemini-ERR] message={}", e.message)
-            throw e
+                val refinedText = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text?.trim() ?: ""
+
+                log.info("<<< [Gemini-RES] result={}", refinedText)
+
+                return refinedText
+            } catch (e: NonRetryableException) {
+                throw e
+            } catch (e: Exception) {
+                lastException = e
+                log.warn("Gemini 텍스트 정제 시도 실패 ($attempt/5). 재시도합니다. 원인: ${e.message}")
+
+                if (attempt < 5) {
+                    val sleepMs = (1L shl attempt) * 1_000L
+                    Thread.sleep(sleepMs)
+                }
+            }
         }
+        throw RuntimeException("Gemini 텍스트 정제 5회 시도 모두 실패", lastException)
     }
 }
 
