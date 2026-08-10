@@ -1,6 +1,7 @@
 package com.ilgijjan.domain.diary.application
 
 import com.ilgijjan.common.annotation.LogExecutionTime
+import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.domain.diary.domain.Diary
 import com.ilgijjan.domain.diary.domain.DiaryInputType
 import com.ilgijjan.domain.fcmtoken.application.FcmTokenDeleter
@@ -72,6 +73,11 @@ class DiaryTaskProcessor(
             diaryUpdater.complete(diaryId)
 
             log.info("비동기 일기 생성 완료 - ID: $diaryId")
+        } catch (e: NonRetryableException) {
+            log.error("일기 생성 중 재시도 불가능한 에러 발생 - ID: $diaryId, 사유: ${e.message}")
+            diaryFailureHandler.handlePermanently(diaryId, diary.user.id!!)
+            sendNotification(diary, false)
+            return
         } catch (e: Exception) {
             log.error("일기 생성 중 에러 발생 - ID: $diaryId, 사유: ${e.message}")
             diaryFailureHandler.handle(diaryId, diary.user.id!!)

@@ -30,6 +30,12 @@ class DiaryUpdater(
     }
 
     @Transactional
+    fun failPermanently(diaryId: Long) {
+        val diary = diaryReader.getDiaryById(diaryId)
+        diary.failPermanently()
+    }
+
+    @Transactional
     fun saveExtractedText(diaryId: Long, extractedText: String) {
         val diary = diaryReader.getDiaryById(diaryId)
         diary.saveExtractedText(extractedText)

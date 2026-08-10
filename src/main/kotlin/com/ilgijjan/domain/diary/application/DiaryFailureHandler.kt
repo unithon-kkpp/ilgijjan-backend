@@ -15,4 +15,10 @@ class DiaryFailureHandler(
         diaryUpdater.fail(diaryId)
         userWalletUpdater.charge(userId, WalletConstants.DIARY_CREATION_COST)
     }
+
+    @Transactional
+    fun handlePermanently(diaryId: Long, userId: Long) {
+        diaryUpdater.failPermanently(diaryId)
+        userWalletUpdater.charge(userId, WalletConstants.DIARY_CREATION_COST)
+    }
 }

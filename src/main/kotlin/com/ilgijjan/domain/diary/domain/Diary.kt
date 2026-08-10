@@ -105,6 +105,10 @@ class Diary (
         this.status = DiaryStatus.FAILED
     }
 
+    fun failPermanently() {
+        this.status = DiaryStatus.FAILED_PERMANENTLY
+    }
+
     fun delete() {
         this.status = DiaryStatus.DELETED
         this.isPublic = false
