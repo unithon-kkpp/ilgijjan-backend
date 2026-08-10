@@ -2,6 +2,7 @@ package com.ilgijjan.integration.music.infrastructure
 
 import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.integration.music.application.MusicGenerator
+import com.ilgijjan.integration.music.application.MusicPromptBuilder
 import com.ilgijjan.integration.music.application.MusicResult
 import com.ilgijjan.integration.storage.application.FileUploader
 import io.netty.channel.ChannelOption
@@ -30,6 +31,7 @@ class LyriaMusicGenerator(
     @Value("\${gemini.api.key}")
     private val apiKey: String,
     private val fileUploader: FileUploader,
+    private val promptBuilder: MusicPromptBuilder,
     webClientBuilder: WebClient.Builder
 ) : MusicGenerator {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -63,7 +65,7 @@ class LyriaMusicGenerator(
     }
 
     fun generateMusic(text: String): MusicResult {
-        val prompt = buildPrompt(text)
+        val prompt = promptBuilder.build(text)
         val requestBody = mapOf(
             "model" to model,
             "input" to prompt
@@ -105,15 +107,6 @@ class LyriaMusicGenerator(
             }
         }
         throw RuntimeException("Lyria API 5회 시도 모두 실패", lastException)
-    }
-
-    private fun buildPrompt(text: String): String {
-        return """
-            따뜻하고 포근한 한국 어린이 동요를 만들어줘.
-            밝고 순수한 아이 목소리로, 아래 일기 내용을 주제로 짧은 한국어 가사를 직접 만들어서 노래로 불러줘.
-
-            일기: $text
-        """.trimIndent()
     }
 
     private fun extractResult(response: Map<*, *>): MusicResult {
