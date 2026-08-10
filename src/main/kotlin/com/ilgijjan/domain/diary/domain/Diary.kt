@@ -25,6 +25,12 @@ class Diary (
     @Lob
     val text: String?,
 
+    @Lob
+    var extractedText: String? = null,
+
+    @Lob
+    var refinedText: String? = null,
+
     val photoUrl: String?,
 
     @Enumerated(EnumType.STRING)
@@ -44,7 +50,9 @@ class Diary (
     var isPublic: Boolean = false,
 
     @Enumerated(EnumType.STRING)
-    var status: DiaryStatus = DiaryStatus.PENDING
+    var status: DiaryStatus = DiaryStatus.PENDING,
+
+    var retryCount: Int = 0
 
 ) : BaseEntity() {
     fun increaseLikeCount() {
