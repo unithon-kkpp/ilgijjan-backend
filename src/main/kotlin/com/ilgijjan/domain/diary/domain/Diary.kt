@@ -86,6 +86,23 @@ class Diary (
         this.lyrics = lyrics
     }
 
+    fun saveExtractedText(extractedText: String) {
+        this.extractedText = extractedText
+    }
+
+    fun saveRefinedText(refinedText: String) {
+        this.refinedText = refinedText
+    }
+
+    fun saveImage(imageUrl: String) {
+        this.imageUrl = imageUrl
+    }
+
+    fun saveMusic(musicUrl: String, lyrics: String) {
+        this.musicUrl = musicUrl
+        this.lyrics = lyrics
+    }
+
     fun complete() {
         this.status = DiaryStatus.COMPLETED
     }
