@@ -18,9 +18,8 @@ class DiaryUpdater(
     }
 
     @Transactional
-    fun updateResult(diaryId: Long, command: UpdateDiaryResultCommand) {
+    fun complete(diaryId: Long) {
         val diary = diaryReader.getDiaryById(diaryId)
-        diary.setGeneratedContent(command.imageUrl, command.musicUrl, command.lyrics)
         diary.complete()
     }
 

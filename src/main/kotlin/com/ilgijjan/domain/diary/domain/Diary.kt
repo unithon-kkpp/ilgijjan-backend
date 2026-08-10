@@ -80,12 +80,6 @@ class Diary (
         }
     }
 
-    fun setGeneratedContent(imageUrl: String, musicUrl: String, lyrics: String) {
-        this.imageUrl = imageUrl
-        this.musicUrl = musicUrl
-        this.lyrics = lyrics
-    }
-
     fun saveExtractedText(extractedText: String) {
         this.extractedText = extractedText
     }
