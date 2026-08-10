@@ -3,6 +3,7 @@ package com.ilgijjan.integration.image.infrastructure
 import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.integration.image.application.ImageGenerator
+import com.ilgijjan.integration.image.application.ImagePromptBuilder
 import com.ilgijjan.integration.storage.application.FileUploader
 import io.netty.channel.ChannelOption
 import org.slf4j.LoggerFactory
@@ -27,6 +28,7 @@ class GeminiImageGenerator(
     @Value("\${gemini.api.key}")
     private val apiKey: String,
     private val fileUploader: FileUploader,
+    private val promptBuilder: ImagePromptBuilder,
     webClientBuilder: WebClient.Builder
 ) : ImageGenerator {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -60,7 +62,7 @@ class GeminiImageGenerator(
     }
 
     override fun generateImage(text: String, weather: Weather): String {
-        val prompt = buildPrompt(text, weather)
+        val prompt = promptBuilder.build(text, weather)
 
         val safetySettings = listOf(
             mapOf("category" to "HARM_CATEGORY_HARASSMENT", "threshold" to "BLOCK_ONLY_HIGH"),
@@ -108,24 +110,6 @@ class GeminiImageGenerator(
             }
         }
         throw RuntimeException("Gemini API 5회 시도 모두 실패", lastException)
-    }
-
-    private fun buildPrompt(text: String, weather: Weather): String {
-        val weatherStr = weather.name.lowercase()
-        return """
-            Generate an image directly based on the details below.
-            
-            [Content]
-            Story: "$text"
-            Weather: "$weatherStr"
-            Style: Cute children's storybook illustration.
-            Ratio: Square (1:1)
-
-            [CRITICAL INSTRUCTION]
-            1. Output ONLY the image.
-            2. DO NOT generate any text, conversation, or introduction (e.g., "Here is the image").
-            3. JUST GENERATE THE IMAGE DATA.
-        """.trimIndent()
     }
 
     private fun extractAndUploadImage(response: Map<*, *>): String {
