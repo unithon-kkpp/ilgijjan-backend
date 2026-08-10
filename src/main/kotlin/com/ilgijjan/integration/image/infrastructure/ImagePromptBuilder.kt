@@ -1,4 +1,4 @@
-package com.ilgijjan.integration.image.application
+package com.ilgijjan.integration.image.infrastructure
 
 import com.ilgijjan.domain.diary.domain.Weather
 import org.springframework.stereotype.Component

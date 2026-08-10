@@ -1,7 +1,6 @@
 package com.ilgijjan.integration.text.infrastructure
 
 import com.ilgijjan.common.exception.NonRetryableException
-import com.ilgijjan.integration.text.application.TextRefinePromptBuilder
 import com.ilgijjan.integration.text.application.TextRefiner
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value

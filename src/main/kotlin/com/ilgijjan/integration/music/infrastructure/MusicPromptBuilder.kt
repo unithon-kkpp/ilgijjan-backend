@@ -1,4 +1,4 @@
-package com.ilgijjan.integration.music.application
+package com.ilgijjan.integration.music.infrastructure
 
 import org.springframework.stereotype.Component
 

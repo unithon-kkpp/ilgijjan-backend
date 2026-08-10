@@ -3,7 +3,6 @@ package com.ilgijjan.integration.image.infrastructure
 import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.integration.image.application.ImageGenerator
-import com.ilgijjan.integration.image.application.ImagePromptBuilder
 import com.ilgijjan.integration.storage.application.FileUploader
 import io.netty.channel.ChannelOption
 import org.slf4j.LoggerFactory

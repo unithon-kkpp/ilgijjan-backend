@@ -1,4 +1,4 @@
-package com.ilgijjan.integration.text.application
+package com.ilgijjan.integration.text.infrastructure
 
 import org.springframework.stereotype.Component
 

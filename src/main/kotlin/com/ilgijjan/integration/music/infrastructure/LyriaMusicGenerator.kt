@@ -2,7 +2,6 @@ package com.ilgijjan.integration.music.infrastructure
 
 import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.integration.music.application.MusicGenerator
-import com.ilgijjan.integration.music.application.MusicPromptBuilder
 import com.ilgijjan.integration.music.application.MusicResult
 import com.ilgijjan.integration.storage.application.FileUploader
 import io.netty.channel.ChannelOption
