@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/diaries/{diaryId}/likes")
+@RequestMapping("/diaries/{diaryId}/likes")
 @Tag(name = "Like", description = "좋아요 관련 API입니다.")
 class LikeController(
     private val likeService: LikeService

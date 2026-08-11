@@ -73,7 +73,7 @@ class SunoMusicGenerator(
         val url = "$sunoBaseUrl/lyrics"
         val requestBody = mapOf(
             "prompt" to prompt,
-            "callBackUrl" to "$ourBaseUrl/api/music/lyrics-callback"
+            "callBackUrl" to "$ourBaseUrl/music/lyrics-callback"
         )
 
         log.info("[requestLyricsGeneration] API 요청 시작: $url")
@@ -109,7 +109,7 @@ class SunoMusicGenerator(
             "title" to "Generated Song",
             "instrumental" to false,
             "model" to "V4_5",
-            "callBackUrl" to "$ourBaseUrl/api/music/music-callback"
+            "callBackUrl" to "$ourBaseUrl/music/music-callback"
         )
 
         log.info("[requestMusicGeneration] API 요청 시작: $url")

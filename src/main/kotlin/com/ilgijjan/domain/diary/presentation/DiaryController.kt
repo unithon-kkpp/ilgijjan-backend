@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/diaries")
+@RequestMapping("/diaries")
 @Tag(name = "Diary", description = "Diary 관련 API입니다.")
 class DiaryController(
     private val diaryService: DiaryService

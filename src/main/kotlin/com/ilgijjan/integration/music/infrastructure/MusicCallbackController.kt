@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @Hidden
 @RestController
-@RequestMapping("/api/music")
+@RequestMapping("/music")
 class MusicCallbackController(
     private val sunoMusicGenerator: SunoMusicGenerator,
     private val objectMapper: ObjectMapper

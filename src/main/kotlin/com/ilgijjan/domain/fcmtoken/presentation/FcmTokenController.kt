@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/fcm/tokens")
+@RequestMapping("/fcm/tokens")
 @Tag(name = "FCM", description = "FCM 관련 API입니다.")
 class FcmTokenController(
     private val fcmTokenService: FcmTokenService

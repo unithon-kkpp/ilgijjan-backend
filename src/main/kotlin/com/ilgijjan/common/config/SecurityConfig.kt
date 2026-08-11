@@ -27,7 +27,11 @@ class SecurityConfig(
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .securityMatcher("/api/**", "/billing/**", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**")
+            .securityMatcher(
+                "/auth/**", "/diaries/**", "/users/**", "/fcm/**",
+                "/billing/**", "/storage/**", "/music/**",
+                "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**"
+            )
             .csrf { it.disable() }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
@@ -36,8 +40,8 @@ class SecurityConfig(
             }
             .authorizeHttpRequests {
                 it.requestMatchers(
-                    "/api/auth/login", "/api/auth/reissue",
-                    "/api/music/**",
+                    "/auth/login", "/auth/reissue",
+                    "/music/**",
                     "/billing/webhooks/**",
                     "/swagger-ui/**", "/v3/api-docs/**",
                     "/actuator/**"

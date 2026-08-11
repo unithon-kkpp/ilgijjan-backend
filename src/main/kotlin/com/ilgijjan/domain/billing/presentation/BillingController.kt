@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/billing")
+@RequestMapping("/billing")
 @Tag(name = "Billing", description = "결제 관련 API입니다.")
 class BillingController(
     private val billingService: BillingService
