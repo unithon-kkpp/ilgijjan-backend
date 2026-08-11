@@ -4,7 +4,7 @@ import com.ilgijjan.common.exception.CustomException
 import com.ilgijjan.common.exception.ErrorCode
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.client.RestClient
 import kotlin.jvm.java
 
 @Component
@@ -12,28 +12,26 @@ class OneStoreBillingClient(
     private val authClient: OneStoreAuthClient,
     @Value("\${onestore.base-url}") private val baseUrl: String,
     @Value("\${onestore.client-id}") private val clientId: String,
-    webClientBuilder: WebClient.Builder
+    restClientBuilder: RestClient.Builder
 ) {
-    private val webClient = webClientBuilder.baseUrl(baseUrl).build()
+    private val restClient = restClientBuilder.baseUrl(baseUrl).build()
 
     fun getPurchaseDetails(productId: String, purchaseToken: String): OneStoreGetPurchaseDetailsResponse {
-        return webClient.get()
+        return restClient.get()
             .uri("/v7/apps/$clientId/purchases/inapp/products/$productId/$purchaseToken")
             .header("Authorization", "Bearer ${authClient.getAccessToken()}")
             .header("x-market-code", "MKT_GLB")
             .retrieve()
-            .bodyToMono(OneStoreGetPurchaseDetailsResponse::class.java)
-            .block() ?: throw CustomException(ErrorCode.ONE_STORE_VERIFY_FAILED)
+            .body(OneStoreGetPurchaseDetailsResponse::class.java) ?: throw CustomException(ErrorCode.ONE_STORE_VERIFY_FAILED)
     }
 
     fun consumePurchase(productId: String, purchaseToken: String) {
-        webClient.post()
+        restClient.post()
             .uri("/v7/apps/$clientId/purchases/inapp/products/$productId/$purchaseToken/consume")
             .header("Authorization", "Bearer ${authClient.getAccessToken()}")
             .header("x-market-code", "MKT_GLB")
-            .bodyValue(mapOf("developerPayload" to ""))
+            .body(mapOf("developerPayload" to ""))
             .retrieve()
-            .bodyToMono(Map::class.java)
-            .block() ?: throw CustomException(ErrorCode.ONE_STORE_CONSUME_FAILED)
+            .body(Map::class.java) ?: throw CustomException(ErrorCode.ONE_STORE_CONSUME_FAILED)
     }
 }

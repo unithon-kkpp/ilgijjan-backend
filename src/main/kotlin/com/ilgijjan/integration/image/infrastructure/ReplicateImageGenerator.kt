@@ -3,16 +3,13 @@ package com.ilgijjan.integration.image.infrastructure
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.integration.image.application.ImageGenerator
 import com.ilgijjan.integration.storage.application.FileUploader
-import io.netty.channel.ChannelOption
-import io.netty.handler.timeout.ReadTimeoutHandler
-import io.netty.handler.timeout.WriteTimeoutHandler
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder
+import org.springframework.boot.http.client.ClientHttpRequestFactorySettings
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient
+import org.springframework.web.client.RestClient
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 
@@ -21,22 +18,20 @@ class ReplicateImageGenerator(
     @Value("\${replicate.api.base-url}") private val baseUrl: String,
     @Value("\${replicate.api.token}") private val apiToken: String,
     @Value("\${replicate.api.model-version}") private val modelVersion: String,
-    private val fileUploader: FileUploader
+    private val fileUploader: FileUploader,
+    restClientBuilder: RestClient.Builder
 ) : ImageGenerator {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private val webClient: WebClient = WebClient.builder()
+    private val restClient: RestClient = restClientBuilder.clone()
         .baseUrl(baseUrl)
-        .clientConnector(ReactorClientHttpConnector(
-            HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10_000) // 연결 타임아웃 10초
-                .responseTimeout(Duration.ofSeconds(300)) // 응답 타임아웃 60초
-                .doOnConnected { conn ->
-                    conn.addHandlerLast(ReadTimeoutHandler(300))
-                    conn.addHandlerLast(WriteTimeoutHandler(300))
-                }
-                .keepAlive(false) // 매 요청마다 새 TCP 연결
-        ))
+        .requestFactory(
+            ClientHttpRequestFactoryBuilder.detect().build(
+                ClientHttpRequestFactorySettings.defaults()
+                    .withConnectTimeout(Duration.ofSeconds(10))
+                    .withReadTimeout(Duration.ofSeconds(300)) // 응답 타임아웃 300초
+            )
+        )
         .build()
 
     @Async("asyncExecutor")
@@ -59,14 +54,13 @@ class ReplicateImageGenerator(
         log.info("Replicate API에 이미지 생성 요청 보냄 - 프롬프트: {}", prompt)
 
         val initialResponse = try {
-            webClient.post()
+            restClient.post()
                 .header("Authorization", "Bearer $apiToken")
                 .header("Content-Type", "application/json")
                 .header("Prefer", "wait")
-                .bodyValue(requestBody)
+                .body(requestBody)
                 .retrieve()
-                .bodyToMono(Map::class.java)
-                .block() ?: throw RuntimeException("Replicate API 응답 없음")
+                .body(Map::class.java) ?: throw RuntimeException("Replicate API 응답 없음")
         } catch (e: Exception) {
             log.error("Replicate API 호출 실패", e)
             throw e
@@ -128,12 +122,11 @@ class ReplicateImageGenerator(
         var lastError: Exception? = null
         while (attempt < maxRetries) {
             try {
-                return webClient.get()
+                return restClient.get()
                     .uri("/$id")
                     .header("Authorization", "Bearer $apiToken")
                     .retrieve()
-                    .bodyToMono(Map::class.java)
-                    .block() ?: throw RuntimeException("상태 조회 응답 없음")
+                    .body(Map::class.java) ?: throw RuntimeException("상태 조회 응답 없음")
             } catch (e: Exception) {
                 log.warn("폴링 상태 조회 실패 (재시도 ${attempt + 1}/$maxRetries)", e)
                 lastError = e

@@ -7,11 +7,9 @@ import com.ilgijjan.integration.music.application.MusicResult
 import com.ilgijjan.integration.music.application.MusicGenerator
 import com.ilgijjan.integration.storage.application.FileUploader
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.RestClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
@@ -22,7 +20,7 @@ import java.util.concurrent.TimeoutException
 
 @Component
 class SunoMusicGenerator(
-    private val restTemplate: RestTemplate,
+    restClientBuilder: RestClient.Builder,
     private val fileUploader: FileUploader,
     @Value("\${suno.api.token}")
     private val apiToken: String,
@@ -32,6 +30,7 @@ class SunoMusicGenerator(
     private val ourBaseUrl: String
 ) : MusicGenerator {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
+    private val restClient = restClientBuilder.build()
     private val taskFutures = ConcurrentHashMap<String, CompletableFuture<MusicResult>>()
 
     @Async("asyncExecutor")
@@ -72,18 +71,19 @@ class SunoMusicGenerator(
 
     fun requestLyricsGeneration(prompt: String): String {
         val url = "$sunoBaseUrl/lyrics"
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_JSON
-            set("Authorization", "Bearer $apiToken")
-        }
         val requestBody = mapOf(
             "prompt" to prompt,
             "callBackUrl" to "$ourBaseUrl/api/music/lyrics-callback"
         )
-        val requestEntity = HttpEntity(requestBody, headers)
 
         log.info("[requestLyricsGeneration] API 요청 시작: $url")
-        val response = restTemplate.postForEntity(url, requestEntity, String::class.java)
+        val response = restClient.post()
+            .uri(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer $apiToken")
+            .body(requestBody)
+            .retrieve()
+            .toEntity(String::class.java)
         log.info("[requestLyricsGeneration] 응답 상태: ${response.statusCode}")
         log.info("[requestLyricsGeneration] 응답 바디: ${response.body}")
 
@@ -102,10 +102,6 @@ class SunoMusicGenerator(
         val cleanedLyrics = lyrics.replace(Regex("\\[(.*?)]\\n*"), "")
 
         val url = "$sunoBaseUrl/generate"
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_JSON
-            set("Authorization", "Bearer $apiToken")
-        }
         val requestBody = mapOf(
             "prompt" to cleanedLyrics,
             "customMode" to true,
@@ -115,11 +111,15 @@ class SunoMusicGenerator(
             "model" to "V4_5",
             "callBackUrl" to "$ourBaseUrl/api/music/music-callback"
         )
-        val requestEntity = HttpEntity(requestBody, headers)
 
         log.info("[requestMusicGeneration] API 요청 시작: $url")
-        val response = restTemplate.postForEntity(url, requestEntity, TaskIdResponse::class.java)
-        val responseBody = response.body ?: throw RuntimeException("Empty response from Music Generate API")
+        val responseBody = restClient.post()
+            .uri(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer $apiToken")
+            .body(requestBody)
+            .retrieve()
+            .body(TaskIdResponse::class.java) ?: throw RuntimeException("Empty response from Music Generate API")
         if (responseBody.code != 200) throw RuntimeException("Music Generate API error: ${responseBody.msg}")
 
         return responseBody.data?.taskId ?: throw RuntimeException("Music generation taskId가 없습니다")

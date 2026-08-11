@@ -4,17 +4,13 @@ import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.domain.diary.domain.Weather
 import com.ilgijjan.integration.image.application.ImageGenerator
 import com.ilgijjan.integration.storage.application.FileUploader
-import io.netty.channel.ChannelOption
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient
-import java.time.Duration
+import org.springframework.web.client.RestClient
 import java.util.Base64
 import java.util.concurrent.CompletableFuture
 
@@ -28,22 +24,14 @@ class GeminiImageGenerator(
     private val apiKey: String,
     private val fileUploader: FileUploader,
     private val promptBuilder: ImagePromptBuilder,
-    webClientBuilder: WebClient.Builder
+    restClientBuilder: RestClient.Builder
 ) : ImageGenerator {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private val webClient: WebClient = webClientBuilder
+    private val restClient: RestClient = restClientBuilder
         .baseUrl(apiUrl)
         .defaultHeader("x-goog-api-key", apiKey)
         .defaultHeader("Content-Type", "application/json")
-        .codecs { configurer ->
-            configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024)
-        }
-        .clientConnector(ReactorClientHttpConnector(
-            HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10_000)
-                .responseTimeout(Duration.ofSeconds(60))
-        ))
         .build()
 
     @Async("asyncExecutor")
@@ -87,11 +75,10 @@ class GeminiImageGenerator(
             try {
                 log.info("Gemini 요청 시도 ($attempt/5)")
 
-                val response = webClient.post()
-                    .bodyValue(requestBody)
+                val response = restClient.post()
+                    .body(requestBody)
                     .retrieve()
-                    .bodyToMono(Map::class.java)
-                    .block() ?: throw RuntimeException("응답 없음")
+                    .body(Map::class.java) ?: throw RuntimeException("응답 없음")
 
                 return extractAndUploadImage(response)
 
