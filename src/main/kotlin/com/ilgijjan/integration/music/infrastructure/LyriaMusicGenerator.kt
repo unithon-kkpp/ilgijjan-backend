@@ -4,17 +4,16 @@ import com.ilgijjan.common.exception.NonRetryableException
 import com.ilgijjan.integration.music.application.MusicGenerator
 import com.ilgijjan.integration.music.application.MusicResult
 import com.ilgijjan.integration.storage.application.FileUploader
-import io.netty.channel.ChannelOption
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder
+import org.springframework.boot.http.client.ClientHttpRequestFactorySettings
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientResponseException
-import reactor.netty.http.client.HttpClient
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.RestClient
 import java.time.Duration
 import java.util.Base64
 import java.util.concurrent.CompletableFuture
@@ -31,22 +30,21 @@ class LyriaMusicGenerator(
     private val apiKey: String,
     private val fileUploader: FileUploader,
     private val promptBuilder: MusicPromptBuilder,
-    webClientBuilder: WebClient.Builder
+    restClientBuilder: RestClient.Builder
 ) : MusicGenerator {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private val webClient: WebClient = webClientBuilder.clone()
+    private val restClient: RestClient = restClientBuilder.clone()
         .baseUrl(apiUrl)
         .defaultHeader("x-goog-api-key", apiKey)
         .defaultHeader("Content-Type", "application/json")
-        .codecs { configurer ->
-            configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024) // WebClient 응답 버퍼 기본 한도(256KB)가 base64 오디오 응답엔 부족해서 16MB로 늘린 것
-        }
-        .clientConnector(ReactorClientHttpConnector(
-            HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10_000)
-                .responseTimeout(Duration.ofSeconds(120))
-        ))
+        .requestFactory(
+            ClientHttpRequestFactoryBuilder.detect().build(
+                ClientHttpRequestFactorySettings.defaults()
+                    .withConnectTimeout(Duration.ofSeconds(10))
+                    .withReadTimeout(Duration.ofSeconds(120))
+            )
+        )
         .build()
 
     @Async("asyncExecutor")
@@ -81,19 +79,14 @@ class LyriaMusicGenerator(
             try {
                 log.info("Lyria 요청 시도 ($attempt/5) - model: $model")
 
-                return webClient.post()
-                    .bodyValue(requestBody)
+                return restClient.post()
+                    .body(requestBody)
                     .retrieve()
-                    .bodyToMono(Map::class.java)
-                    .block() ?: throw RuntimeException("Lyria 응답 없음")
+                    .body(Map::class.java) ?: throw RuntimeException("Lyria 응답 없음")
 
-            } catch (e: WebClientResponseException) {
+            } catch (e: HttpClientErrorException) {
                 // 4xx는 재시도해도 동일하게 실패하므로 즉시 중단
-                if (e.statusCode.is4xxClientError) {
-                    throw NonRetryableException("Lyria API 호출 실패 (클라이언트 오류: ${e.statusCode})")
-                }
-                lastException = e
-                log.warn("Lyria 시도 실패 ($attempt/5). 재시도합니다. 원인: ${e.message}")
+                throw NonRetryableException("Lyria API 호출 실패 (클라이언트 오류: ${e.statusCode})")
             } catch (e: Exception) {
                 lastException = e
                 log.warn("Lyria 시도 실패 ($attempt/5). 재시도합니다. 원인: ${e.message}")

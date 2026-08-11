@@ -5,7 +5,7 @@ import com.ilgijjan.integration.text.application.TextRefiner
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.client.RestClient
 
 @Component
 class GeminiTextRefiner(
@@ -14,11 +14,11 @@ class GeminiTextRefiner(
     @Value("\${gemini.api.key}")
     private val apiKey: String,
     private val promptBuilder: TextRefinePromptBuilder,
-    webClientBuilder: WebClient.Builder
+    restClientBuilder: RestClient.Builder
 ): TextRefiner {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private val webClient = webClientBuilder
+    private val restClient = restClientBuilder
         .baseUrl(apiUrl)
         .defaultHeader("x-goog-api-key", apiKey)
         .defaultHeader("Content-Type", "application/json")
@@ -46,11 +46,10 @@ class GeminiTextRefiner(
             try {
                 log.info("Gemini 텍스트 정제 시도 ($attempt/5)")
 
-                val response = webClient.post()
-                    .bodyValue(requestBody)
+                val response = restClient.post()
+                    .body(requestBody)
                     .retrieve()
-                    .bodyToMono(GeminiEditResponse::class.java)
-                    .block() ?: throw RuntimeException("Gemini API 응답 바디가 비어있습니다.")
+                    .body(GeminiEditResponse::class.java) ?: throw RuntimeException("Gemini API 응답 바디가 비어있습니다.")
 
                 val refinedText = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text?.trim() ?: ""
 
